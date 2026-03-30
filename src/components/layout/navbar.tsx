@@ -87,21 +87,42 @@ export function Navbar() {
   const [servicesOpen, setServicesOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [expertiseOpen, setExpertiseOpen] = useState(false)
-  const expertiseRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 })
+
+  // Position dropdown below trigger
+  useEffect(() => {
+    if (expertiseOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect()
+      setDropdownPos({ top: rect.bottom + 8, left: rect.left })
+    }
+  }, [expertiseOpen])
 
   // Close on click outside
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (expertiseRef.current && !expertiseRef.current.contains(e.target as Node)) {
-        setExpertiseOpen(false)
-      }
+      if (
+        triggerRef.current?.contains(e.target as Node) ||
+        dropdownRef.current?.contains(e.target as Node)
+      ) return
+      setExpertiseOpen(false)
     }
     if (expertiseOpen) document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [expertiseOpen])
 
+  // Close on scroll/resize
+  useEffect(() => {
+    if (!expertiseOpen) return
+    const close = () => setExpertiseOpen(false)
+    window.addEventListener('scroll', close, { passive: true })
+    window.addEventListener('resize', close)
+    return () => { window.removeEventListener('scroll', close); window.removeEventListener('resize', close) }
+  }, [expertiseOpen])
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-md border-b border-subtle-border shadow-sm dark:shadow-[0_8px_32px_rgba(28,17,16,0.5)] overflow-x-hidden">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-md border-b border-subtle-border shadow-sm dark:shadow-[0_8px_32px_rgba(28,17,16,0.5)]">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -113,56 +134,15 @@ export function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-8">
-            {/* Expertise dropdown — custom, no Radix viewport issues */}
-            <div ref={expertiseRef} className="relative">
-              <button
-                onClick={() => setExpertiseOpen(!expertiseOpen)}
-                className="inline-flex items-center gap-1 font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover transition-colors py-2"
-              >
-                Expertise
-                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${expertiseOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {expertiseOpen && (
-                <div className="absolute top-full left-0 mt-2 w-[min(calc(100vw-4rem),640px)] glass-card p-4 xl:p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="font-label text-[10px] uppercase tracking-[0.3em] text-nav-text/50">
-                      Our Expertise
-                    </p>
-                    <Link
-                      to="/about"
-                      onClick={() => setExpertiseOpen(false)}
-                      className="font-label text-[10px] uppercase tracking-[0.2em] text-brand-tertiary hover:text-brand-tertiary/80 transition-colors"
-                    >
-                      View All →
-                    </Link>
-                  </div>
-                  <ul className="grid grid-cols-2 lg:grid-cols-3 gap-1">
-                    {services.map((service) => (
-                      <li key={service.href}>
-                        <Link
-                          to={service.href}
-                          onClick={() => setExpertiseOpen(false)}
-                          className="flex items-center gap-3 rounded-sm p-3 hover:bg-secondary/50 transition-all duration-200 group"
-                        >
-                          <div className="w-9 h-9 rounded-sm bg-surface-high/50 flex items-center justify-center group-hover:bg-brand-tertiary/10 transition-colors shrink-0">
-                            <service.icon className="w-4 h-4 text-brand-tertiary" strokeWidth={1.5} />
-                          </div>
-                          <div>
-                            <div className="text-xs lg:text-sm font-heading font-semibold text-foreground">
-                              {service.label}
-                            </div>
-                            <p className="text-[10px] lg:text-xs text-nav-text/60 leading-snug">
-                              {service.description}
-                            </p>
-                          </div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+            {/* Expertise trigger */}
+            <button
+              ref={triggerRef}
+              onClick={() => setExpertiseOpen(!expertiseOpen)}
+              className="inline-flex items-center gap-1 font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover transition-colors py-2"
+            >
+              Expertise
+              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${expertiseOpen ? 'rotate-180' : ''}`} />
+            </button>
 
             <Link
               to="/about"
@@ -292,6 +272,56 @@ export function Navbar() {
         </div>
       </div>
       <GetStartedDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+
+      {/* Expertise dropdown — fixed position, outside nav overflow context */}
+      {expertiseOpen && (
+        <div
+          ref={dropdownRef}
+          className="fixed z-[100] glass-card p-4 xl:p-6 animate-in fade-in slide-in-from-top-2 duration-200"
+          style={{
+            top: dropdownPos.top,
+            left: dropdownPos.left,
+            width: `min(calc(100vw - 2rem), 640px)`,
+            maxWidth: `calc(100vw - ${dropdownPos.left}px - 1rem)`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <p className="font-label text-[10px] uppercase tracking-[0.3em] text-nav-text/50">
+              Our Expertise
+            </p>
+            <Link
+              to="/about"
+              onClick={() => setExpertiseOpen(false)}
+              className="font-label text-[10px] uppercase tracking-[0.2em] text-brand-tertiary hover:text-brand-tertiary/80 transition-colors"
+            >
+              View All →
+            </Link>
+          </div>
+          <ul className="grid grid-cols-2 xl:grid-cols-3 gap-1">
+            {services.map((service) => (
+              <li key={service.href}>
+                <Link
+                  to={service.href}
+                  onClick={() => setExpertiseOpen(false)}
+                  className="flex items-center gap-3 rounded-sm p-3 hover:bg-secondary/50 transition-all duration-200 group"
+                >
+                  <div className="w-9 h-9 rounded-sm bg-surface-high/50 flex items-center justify-center group-hover:bg-brand-tertiary/10 transition-colors shrink-0">
+                    <service.icon className="w-4 h-4 text-brand-tertiary" strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <div className="text-xs xl:text-sm font-heading font-semibold text-foreground">
+                      {service.label}
+                    </div>
+                    <p className="text-[10px] xl:text-xs text-nav-text/60 leading-snug">
+                      {service.description}
+                    </p>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </nav>
   )
 }
