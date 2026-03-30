@@ -26,15 +26,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-  NavigationMenuLink,
-  navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
+import { useRef, useEffect } from 'react'
 
 const services = [
   {
@@ -94,6 +86,19 @@ export function Navbar() {
   const [open, setOpen] = useState(false)
   const [servicesOpen, setServicesOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [expertiseOpen, setExpertiseOpen] = useState(false)
+  const expertiseRef = useRef<HTMLDivElement>(null)
+
+  // Close on click outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (expertiseRef.current && !expertiseRef.current.contains(e.target as Node)) {
+        setExpertiseOpen(false)
+      }
+    }
+    if (expertiseOpen) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [expertiseOpen])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-md border-b border-subtle-border shadow-sm dark:shadow-[0_8px_32px_rgba(28,17,16,0.5)]">
@@ -107,74 +112,71 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <NavigationMenu>
-              <NavigationMenuList className="gap-2">
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover data-[state=open]:text-nav-text-hover">
-                    Expertise
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="w-[calc(100vw-3rem)] max-w-180 glass-card p-4 lg:p-6">
-                      <div className="flex items-center justify-between mb-4 lg:mb-5">
-                        <p className="font-label text-[10px] uppercase tracking-[0.3em] text-nav-text/50">
-                          Our Expertise
-                        </p>
-                        <Link to="/about" className="font-label text-[10px] uppercase tracking-[0.2em] text-brand-tertiary hover:text-brand-tertiary/80 transition-colors">
-                          View All →
-                        </Link>
-                      </div>
-                      <ul className="grid grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-2">
-                        {services.map((service) => (
-                          <li key={service.href}>
-                            <NavigationMenuLink asChild>
-                              <Link
-                                to={service.href}
-                                className="flex items-center lg:flex-col gap-3 rounded-sm p-3 lg:p-4 hover:bg-secondary/50 transition-all duration-300 group h-full"
-                              >
-                                <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-sm bg-surface-high/50 flex items-center justify-center group-hover:bg-brand-tertiary/10 transition-colors shrink-0">
-                                  <service.icon className="w-4 h-4 lg:w-5 lg:h-5 text-brand-tertiary" strokeWidth={1.5} />
-                                </div>
-                                <div>
-                                  <div className="text-xs lg:text-sm font-heading font-semibold text-foreground mb-0.5 lg:mb-1">
-                                    {service.label}
-                                  </div>
-                                  <p className="text-[10px] lg:text-xs text-nav-text/60 leading-snug lg:leading-relaxed">
-                                    {service.description}
-                                  </p>
-                                </div>
-                              </Link>
-                            </NavigationMenuLink>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+            {/* Expertise dropdown — custom, no Radix viewport issues */}
+            <div ref={expertiseRef} className="relative">
+              <button
+                onClick={() => setExpertiseOpen(!expertiseOpen)}
+                className="inline-flex items-center gap-1 font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover transition-colors py-2"
+              >
+                Expertise
+                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${expertiseOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
+              {expertiseOpen && (
+                <div className="absolute top-full right-0 mt-2 w-[min(calc(100vw-2rem),680px)] glass-card p-4 lg:p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="font-label text-[10px] uppercase tracking-[0.3em] text-nav-text/50">
+                      Our Expertise
+                    </p>
                     <Link
                       to="/about"
-                      className={navigationMenuTriggerStyle() + ' bg-transparent font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover'}
+                      onClick={() => setExpertiseOpen(false)}
+                      className="font-label text-[10px] uppercase tracking-[0.2em] text-brand-tertiary hover:text-brand-tertiary/80 transition-colors"
                     >
-                      Process
+                      View All →
                     </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                  </div>
+                  <ul className="grid grid-cols-2 lg:grid-cols-3 gap-1">
+                    {services.map((service) => (
+                      <li key={service.href}>
+                        <Link
+                          to={service.href}
+                          onClick={() => setExpertiseOpen(false)}
+                          className="flex items-center gap-3 rounded-sm p-3 hover:bg-secondary/50 transition-all duration-200 group"
+                        >
+                          <div className="w-9 h-9 rounded-sm bg-surface-high/50 flex items-center justify-center group-hover:bg-brand-tertiary/10 transition-colors shrink-0">
+                            <service.icon className="w-4 h-4 text-brand-tertiary" strokeWidth={1.5} />
+                          </div>
+                          <div>
+                            <div className="text-xs lg:text-sm font-heading font-semibold text-foreground">
+                              {service.label}
+                            </div>
+                            <p className="text-[10px] lg:text-xs text-nav-text/60 leading-snug">
+                              {service.description}
+                            </p>
+                          </div>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
 
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      to="/contact"
-                      className={navigationMenuTriggerStyle() + ' bg-transparent font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover'}
-                    >
-                      Contact
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+            <Link
+              to="/about"
+              className="font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover transition-colors py-2"
+            >
+              Process
+            </Link>
+
+            <Link
+              to="/contact"
+              className="font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover transition-colors py-2"
+            >
+              Contact
+            </Link>
           </div>
 
           {/* Desktop CTA + Auth */}
