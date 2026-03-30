@@ -12,7 +12,7 @@ const logos = [
 
 export function LogoBar() {
   return (
-    <section className="py-24 px-6 md:px-12 max-w-screen-2xl mx-auto border-t border-decoration/30 overflow-hidden">
+    <section className="py-12 md:py-24 px-4 sm:px-6 md:px-12 max-w-screen-2xl mx-auto border-t border-decoration/30 overflow-hidden">
       <FadeInView>
         <p className="font-label text-center text-muted-foreground text-[10px] tracking-[0.4em] uppercase mb-12">
           Trusted by Next-Gen Entities

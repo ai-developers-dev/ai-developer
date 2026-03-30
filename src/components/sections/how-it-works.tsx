@@ -31,10 +31,10 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="py-32 px-6 md:px-12 max-w-screen-2xl mx-auto">
+    <section className="py-16 md:py-32 px-4 sm:px-6 md:px-12 max-w-screen-2xl mx-auto">
       <FadeInView>
         <div className="text-center mb-14">
-          <h2 className="font-heading text-4xl md:text-6xl font-bold architectural-outline uppercase mb-6">
+          <h2 className="font-heading text-2xl sm:text-4xl md:text-6xl font-bold architectural-outline uppercase mb-6">
             Our Process
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

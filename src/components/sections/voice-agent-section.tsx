@@ -46,7 +46,7 @@ export function VoiceAgentSection() {
         }}
       />
 
-      <div className="relative max-w-screen-2xl mx-auto px-6 md:px-12">
+      <div className="relative max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-12">
         <FadeInView>
           <div className="text-center mb-12">
             <h2 className="font-heading text-3xl sm:text-4xl font-bold text-foreground mb-4">

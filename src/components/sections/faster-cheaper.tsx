@@ -1,9 +1,61 @@
+import { useEffect, useRef, useState } from 'react'
 import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { TrendingUp, Zap, Clock } from 'lucide-react'
 
+function RollUpNumber({ value, suffix = '', duration = 2000 }: { value: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0)
+  const [hasStarted, setHasStarted] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true)
+        }
+      },
+      { threshold: 0.5 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasStarted])
+
+  useEffect(() => {
+    if (!hasStarted) return
+
+    const steps = 40
+    const stepTime = duration / steps
+    let current = 0
+
+    const timer = setInterval(() => {
+      current++
+      // Ease-out curve: fast start, slow finish
+      const progress = current / steps
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.round(eased * value))
+
+      if (current >= steps) {
+        setCount(value)
+        clearInterval(timer)
+      }
+    }, stepTime)
+
+    return () => clearInterval(timer)
+  }, [hasStarted, value, duration])
+
+  return (
+    <div ref={ref} className="text-5xl font-heading font-bold text-brand-tertiary mb-2">
+      <span className="inline-block tabular-nums">{count}</span>{suffix}
+    </div>
+  )
+}
+
 export function FasterCheaperSection() {
   return (
-    <section className="py-32 px-6 md:px-12 bg-surface-low">
+    <section className="py-16 md:py-32 px-4 sm:px-6 md:px-12 bg-surface-low">
       <div className="max-w-screen-2xl mx-auto">
         <FadeInView>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:auto-rows-[300px]">
@@ -23,7 +75,7 @@ export function FasterCheaperSection() {
             <div className="md:col-span-4 glass-card p-12 flex flex-col justify-between" style={{ background: 'rgba(255,198,64,0.05)' }}>
               <TrendingUp className="w-12 h-12 text-brand-tertiary" strokeWidth={1.5} />
               <div>
-                <div className="text-5xl font-heading font-bold text-brand-tertiary mb-2">3×</div>
+                <RollUpNumber value={20} suffix="×" duration={2000} />
                 <p className="font-label uppercase tracking-widest text-xs text-muted-foreground">
                   Faster Delivery
                 </p>
@@ -34,7 +86,7 @@ export function FasterCheaperSection() {
             <div className="md:col-span-4 glass-card p-12 flex flex-col justify-between overflow-hidden relative">
               <div className="relative z-10">
                 <h4 className="font-heading text-2xl font-bold text-brand-primary mb-4 uppercase">
-                  50% Lower Cost
+                  Up to 90% Lower Cost
                 </h4>
                 <p className="text-muted-foreground text-sm">
                   By automating repetitive coding, testing, and QA, we pass the savings

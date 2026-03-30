@@ -115,28 +115,40 @@ export function Navbar() {
                     Expertise
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-125 grid-cols-2 gap-1 p-2 bg-card border border-subtle-border">
-                      {services.map((service) => (
-                        <li key={service.href}>
-                          <NavigationMenuLink asChild>
-                            <Link
-                              to={service.href}
-                              className="flex items-start gap-3 rounded-sm p-3 hover:bg-secondary transition-colors"
-                            >
-                              <service.icon className="w-5 h-5 text-brand-tertiary mt-0.5 shrink-0" />
-                              <div>
-                                <div className="text-sm font-medium leading-none text-brand-primary">
-                                  {service.label}
+                    <div className="w-180 glass-card p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <p className="font-label text-[10px] uppercase tracking-[0.3em] text-nav-text/50">
+                          Our Expertise
+                        </p>
+                        <Link to="/about" className="font-label text-[10px] uppercase tracking-[0.2em] text-brand-tertiary hover:text-brand-tertiary/80 transition-colors">
+                          View All →
+                        </Link>
+                      </div>
+                      <ul className="grid grid-cols-3 gap-2">
+                        {services.map((service) => (
+                          <li key={service.href}>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to={service.href}
+                                className="flex flex-col gap-3 rounded-sm p-4 hover:bg-secondary/50 transition-all duration-300 group h-full"
+                              >
+                                <div className="w-10 h-10 rounded-sm bg-surface-high/50 flex items-center justify-center group-hover:bg-brand-tertiary/10 transition-colors">
+                                  <service.icon className="w-5 h-5 text-brand-tertiary" strokeWidth={1.5} />
                                 </div>
-                                <p className="text-xs text-nav-text/60 mt-1 leading-snug">
-                                  {service.description}
-                                </p>
-                              </div>
-                            </Link>
-                          </NavigationMenuLink>
-                        </li>
-                      ))}
-                    </ul>
+                                <div>
+                                  <div className="text-sm font-heading font-semibold text-foreground mb-1">
+                                    {service.label}
+                                  </div>
+                                  <p className="text-xs text-nav-text/60 leading-relaxed">
+                                    {service.description}
+                                  </p>
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 

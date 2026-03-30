@@ -7,7 +7,7 @@ export function HeroSection() {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
-    <section className="relative min-h-[795px] flex flex-col justify-center px-6 md:px-12 max-w-screen-2xl mx-auto overflow-hidden pt-24">
+    <section className="relative min-h-[600px] md:min-h-[795px] flex flex-col justify-center px-4 sm:px-6 md:px-12 max-w-screen-2xl mx-auto overflow-hidden pt-24">
       {/* Animated neural network background */}
       <NeuralNetworkBg />
 
@@ -19,7 +19,7 @@ export function HeroSection() {
         </FadeInView>
 
         <FadeInView delay={0.1}>
-          <h1 className="font-heading text-6xl md:text-9xl font-bold leading-tight mb-8">
+          <h1 className="font-heading text-4xl sm:text-6xl md:text-9xl font-bold leading-tight mb-8">
             <span className="architectural-outline block">WE BUILD</span>
             <span className="text-brand-primary block">THE FUTURE</span>
           </h1>
@@ -34,16 +34,16 @@ export function HeroSection() {
         </FadeInView>
 
         <FadeInView delay={0.3}>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex flex-wrap gap-4 sm:gap-6">
             <button
-              className="gradient-btn text-primary-foreground font-label px-10 py-4 font-bold tracking-widest uppercase transition-all hover:shadow-[0_0_40px_rgba(212,206,187,0.3)]"
+              className="gradient-btn text-primary-foreground font-label px-6 sm:px-10 py-3 sm:py-4 text-xs sm:text-sm font-bold tracking-widest uppercase transition-all hover:shadow-[0_0_40px_rgba(212,206,187,0.3)]"
               onClick={() => setDialogOpen(true)}
             >
               Explore Systems
             </button>
             <GetStartedDialog open={dialogOpen} onOpenChange={setDialogOpen} />
             <a href="#services">
-              <button className="glass-card text-brand-primary font-label px-10 py-4 font-bold tracking-widest uppercase transition-all">
+              <button className="glass-card text-brand-primary font-label px-6 sm:px-10 py-3 sm:py-4 text-xs sm:text-sm font-bold tracking-widest uppercase transition-all">
                 View Blueprint
               </button>
             </a>

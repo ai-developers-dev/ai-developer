@@ -50,11 +50,11 @@ const services = [
 
 export function ServicesSection() {
   return (
-    <section id="services" className="py-32 px-6 md:px-12 max-w-screen-2xl mx-auto">
+    <section id="services" className="py-16 md:py-32 px-4 sm:px-6 md:px-12 max-w-screen-2xl mx-auto">
       <FadeInView>
-        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-24 gap-8">
           <div className="max-w-xl">
-            <h2 className="font-heading text-4xl md:text-6xl font-bold architectural-outline uppercase mb-6">
+            <h2 className="font-heading text-2xl sm:text-4xl md:text-6xl font-bold architectural-outline uppercase mb-6">
               Our Specializations
             </h2>
             <p className="text-muted-foreground">

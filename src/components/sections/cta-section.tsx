@@ -3,6 +3,13 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { CheckCircle } from 'lucide-react'
 import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import type { FormEvent } from 'react'
 
 export function CTASection() {
@@ -30,16 +37,16 @@ export function CTASection() {
   }
 
   return (
-    <section className="py-32 px-6 md:px-12 max-w-screen-2xl mx-auto">
+    <section className="py-16 md:py-32 px-4 sm:px-6 md:px-12 max-w-screen-2xl mx-auto">
       <FadeInView>
-        <div className="glass-card p-12 md:p-20 relative overflow-hidden">
+        <div className="glass-card p-6 sm:p-12 md:p-20 relative overflow-hidden">
           {/* Ambient glow */}
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-brand-tertiary/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-24 -left-24 w-48 md:w-96 h-48 md:h-96 bg-brand-tertiary/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-40 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-40 relative z-10">
             {/* Left: heading */}
             <div>
-              <h2 className="font-heading text-5xl md:text-7xl font-bold architectural-outline uppercase mb-8">
+              <h2 className="font-heading text-3xl sm:text-5xl md:text-7xl font-bold architectural-outline uppercase mb-8">
                 Ready for<br />Optimization?
               </h2>
               <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
@@ -97,17 +104,18 @@ export function CTASection() {
                   <label className="font-label text-[10px] uppercase tracking-widest text-muted-foreground">
                     Primary Objective
                   </label>
-                  <select
-                    value={service}
-                    onChange={(e) => setService(e.target.value)}
-                    className="w-full bg-transparent border-0 border-b-2 border-decoration focus:border-brand-primary focus:ring-0 text-foreground py-3 transition-all outline-none"
-                  >
-                    <option className="bg-surface">Automation Strategy</option>
-                    <option className="bg-surface">Custom AI Application</option>
-                    <option className="bg-surface">Intelligent Web Interface</option>
-                    <option className="bg-surface">Voice AI Agent</option>
-                    <option className="bg-surface">Chat AI Agent</option>
-                  </select>
+                  <Select value={service} onValueChange={setService}>
+                    <SelectTrigger className="w-full bg-transparent border-0 border-b-2 border-decoration focus:border-brand-primary focus:ring-0 text-foreground py-3 rounded-none h-auto font-body">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glass-card border-subtle-border">
+                      <SelectItem value="Automation Strategy" className="font-body text-foreground focus:bg-secondary focus:text-foreground">Automation Strategy</SelectItem>
+                      <SelectItem value="Custom AI Application" className="font-body text-foreground focus:bg-secondary focus:text-foreground">Custom AI Application</SelectItem>
+                      <SelectItem value="Intelligent Web Interface" className="font-body text-foreground focus:bg-secondary focus:text-foreground">Intelligent Web Interface</SelectItem>
+                      <SelectItem value="Voice AI Agent" className="font-body text-foreground focus:bg-secondary focus:text-foreground">Voice AI Agent</SelectItem>
+                      <SelectItem value="Chat AI Agent" className="font-body text-foreground focus:bg-secondary focus:text-foreground">Chat AI Agent</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <button
                   type="submit"
