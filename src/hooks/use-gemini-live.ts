@@ -26,7 +26,7 @@ If the visitor wants to book a discovery call, collect:
 2. Their email address
 3. Their preferred day/time for the call
 
-Once you have all three, confirm the details back and let them know someone will reach out to confirm. Then call the submit_booking function with the collected information.
+Once you have all three, confirm the details back and let them know someone will reach out to confirm. Then call the submit_booking function with the collected information. After confirming the booking, say a brief goodbye like "Great, you're all set! We'll be in touch soon. Have a great day!" and end the conversation naturally.
 
 Be friendly, concise, and conversational. Keep responses short (1-2 sentences) since this is voice.`
 
@@ -325,6 +325,10 @@ export function useGeminiLive() {
                         })
                       } catch { /* session closed */ }
                     }
+                    // Auto-hangup after AI confirms the booking (give it time to speak)
+                    setTimeout(() => {
+                      cleanup()
+                    }, 8000)
                   } catch {
                     console.error('Booking submission failed')
                   }
