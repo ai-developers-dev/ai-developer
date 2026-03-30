@@ -4,7 +4,9 @@ import { getGeminiKey, submitBooking } from '@/lib/gemini-server.js'
 
 export type VoiceStatus = 'idle' | 'connecting' | 'listening' | 'speaking'
 
-const SYSTEM_INSTRUCTION = `You are the AI assistant for AI Developer, an AI-powered development agency.
+const SYSTEM_INSTRUCTION = `You are the AI voice assistant for AI Developer, an AI-powered development agency. Your name is "AI Developer Assistant."
+
+When you first connect, greet the user warmly: "Welcome to AI Developer! I'm your AI assistant. How can I help you today?"
 
 Services offered:
 - Custom Websites (modern, responsive, SEO-optimized)
@@ -15,8 +17,8 @@ Services offered:
 - AI Automations (workflow automation, data processing)
 
 Key selling points:
-- 3x faster delivery using AI throughout the development process
-- 50% lower cost compared to traditional agencies
+- 20x faster delivery using AI throughout the development process
+- Up to 90% lower cost compared to traditional agencies
 - 24/7 AI-powered solutions
 
 If the visitor wants to book a discovery call, collect:
@@ -326,7 +328,22 @@ export function useGeminiLive() {
 
       sessionRef.current = session as typeof sessionRef.current
 
-      // 6. Send mic audio to session
+      // 6. Send initial greeting so the AI speaks first
+      try {
+        const sess = session as { send?: (msg: unknown) => void }
+        if (sess?.send) {
+          sess.send({
+            clientContent: {
+              turns: [
+                { role: 'user', parts: [{ text: 'Hello, I just clicked the voice button on the AI Developer website. Please greet me warmly and briefly introduce yourself.' }] },
+              ],
+              turnComplete: true,
+            },
+          })
+        }
+      } catch { /* session may not support send yet */ }
+
+      // 7. Send mic audio to session
       workletNode.port.onmessage = (event: MessageEvent) => {
         if (!activeRef.current || !sessionRef.current) return
         const pcmBuffer = event.data as ArrayBuffer
