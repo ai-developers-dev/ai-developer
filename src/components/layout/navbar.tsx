@@ -101,7 +101,7 @@ export function Navbar() {
   }, [expertiseOpen])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-md border-b border-subtle-border shadow-sm dark:shadow-[0_8px_32px_rgba(28,17,16,0.5)]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-md border-b border-subtle-border shadow-sm dark:shadow-[0_8px_32px_rgba(28,17,16,0.5)] overflow-x-hidden">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -112,7 +112,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {/* Expertise dropdown — custom, no Radix viewport issues */}
             <div ref={expertiseRef} className="relative">
               <button
@@ -124,7 +124,7 @@ export function Navbar() {
               </button>
 
               {expertiseOpen && (
-                <div className="absolute top-full right-0 mt-2 w-[min(calc(100vw-2rem),680px)] glass-card p-4 lg:p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full left-0 mt-2 w-[min(calc(100vw-4rem),640px)] glass-card p-4 xl:p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="flex items-center justify-between mb-4">
                     <p className="font-label text-[10px] uppercase tracking-[0.3em] text-nav-text/50">
                       Our Expertise
@@ -180,7 +180,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop CTA + Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
             <SignedIn>
               <AuthDashboardLink />
@@ -202,7 +202,7 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu */}
-          <div className="md:hidden flex items-center gap-1">
+          <div className="lg:hidden flex items-center gap-1">
             <ThemeToggle />
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
