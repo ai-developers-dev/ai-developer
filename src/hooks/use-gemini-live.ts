@@ -93,6 +93,12 @@ export function useGeminiLive() {
     cleaningUpRef.current = true
     activeRef.current = false
 
+    // 0. Stop greeting audio
+    if (greetingAudioRef.current) {
+      greetingAudioRef.current.pause()
+      greetingAudioRef.current = null
+    }
+
     // 1. Stop audio playback
     stopPlayback()
 
@@ -201,13 +207,23 @@ export function useGeminiLive() {
     [scheduleBuffers],
   )
 
+  const greetingAudioRef = useRef<HTMLAudioElement | null>(null)
+
   const start = useCallback(async () => {
     if (activeRef.current) return
     activeRef.current = true
-    setStatus('connecting')
+    greetingDoneRef.current = false
+
+    // Play recorded Gemini greeting INSTANTLY — same voice, zero wait
+    setStatus('speaking')
+    try {
+      const audio = new Audio('/greeting.mp3')
+      greetingAudioRef.current = audio
+      await audio.play()
+    } catch { /* autoplay blocked — continue silently */ }
 
     try {
-      // 1. Fetch API key + get mic access + set up audio IN PARALLEL
+      // Connect to Gemini in background while greeting plays
       const [{ key }, stream] = await Promise.all([
         getGeminiKey(),
         navigator.mediaDevices.getUserMedia({
@@ -270,11 +286,6 @@ export function useGeminiLive() {
 
             // Back to listening when model turn is done
             if (serverContent?.turnComplete) {
-              if (!greetingDoneRef.current) {
-                // Greeting just finished — now start mic capture
-                greetingDoneRef.current = true
-                if (startMicCaptureRef.current) startMicCaptureRef.current()
-              }
               setStatus('listening')
             }
 
@@ -365,23 +376,28 @@ export function useGeminiLive() {
       // Store it on a ref the callback can access
       startMicCaptureRef.current = startMicCapture
 
-      // 7. Send initial greeting so the AI speaks first (mic stays off until greeting done)
-      greetingDoneRef.current = false
+      // 7. Gemini connected — tell it the user was already greeted, start mic when greeting audio ends
+      greetingDoneRef.current = true
+      if (startMicCaptureRef.current) startMicCaptureRef.current()
+
+      // Tell Gemini the greeting already happened so it has context
       try {
         const sess = session as { sendClientContent?: (params: unknown) => void }
         if (sess?.sendClientContent) {
           sess.sendClientContent({
             turns: [
-              { role: 'user', parts: [{ text: 'Hello, I just clicked the voice button on the AI Developer website. Please greet me warmly and briefly introduce yourself.' }] },
+              { role: 'model', parts: [{ text: 'Welcome to AI Developer! How can I help you today?' }] },
             ],
-            turnComplete: true,
+            turnComplete: false,
           })
         }
-      } catch (err) {
-        console.error('Failed to send initial greeting:', err)
-        // Fallback: start mic anyway
-        startMicCapture()
-        greetingDoneRef.current = true
+      } catch { /* ignore */ }
+
+      // Switch to listening when greeting audio finishes
+      const audio = greetingAudioRef.current
+      if (audio && !audio.ended) {
+        audio.onended = () => { if (activeRef.current) setStatus('listening') }
+      } else {
         setStatus('listening')
       }
     } catch (err) {
