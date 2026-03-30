@@ -90,6 +90,7 @@ export function Navbar() {
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 })
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Position dropdown below trigger
   useEffect(() => {
@@ -99,18 +100,13 @@ export function Navbar() {
     }
   }, [expertiseOpen])
 
-  // Close on click outside
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (
-        triggerRef.current?.contains(e.target as Node) ||
-        dropdownRef.current?.contains(e.target as Node)
-      ) return
-      setExpertiseOpen(false)
-    }
-    if (expertiseOpen) document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [expertiseOpen])
+  const openDropdown = () => {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current)
+    setExpertiseOpen(true)
+  }
+  const closeDropdown = () => {
+    hoverTimeout.current = setTimeout(() => setExpertiseOpen(false), 150)
+  }
 
   // Close on scroll/resize
   useEffect(() => {
@@ -134,10 +130,11 @@ export function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-8">
-            {/* Expertise trigger */}
+            {/* Expertise trigger — hover to open */}
             <button
               ref={triggerRef}
-              onClick={() => setExpertiseOpen(!expertiseOpen)}
+              onMouseEnter={openDropdown}
+              onMouseLeave={closeDropdown}
               className="inline-flex items-center gap-1 font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover transition-colors py-2"
             >
               Expertise
@@ -273,10 +270,12 @@ export function Navbar() {
       </div>
       <GetStartedDialog open={dialogOpen} onOpenChange={setDialogOpen} />
 
-      {/* Expertise dropdown — fixed position, outside nav overflow context */}
+      {/* Expertise dropdown — fixed position, hover to keep open */}
       {expertiseOpen && (
         <div
           ref={dropdownRef}
+          onMouseEnter={openDropdown}
+          onMouseLeave={closeDropdown}
           className="fixed z-[100] glass-card p-4 xl:p-6 animate-in fade-in slide-in-from-top-2 duration-200"
           style={{
             top: dropdownPos.top,

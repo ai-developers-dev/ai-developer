@@ -63,6 +63,8 @@ export function useGeminiLive() {
   const workletNodeRef = useRef<AudioWorkletNode | null>(null)
   const activeRef = useRef(false)
   const cleaningUpRef = useRef(false)
+  const greetingDoneRef = useRef(false)
+  const startMicCaptureRef = useRef<(() => void) | null>(null)
 
   // Audio scheduling refs for gapless playback
   const scheduledTimeRef = useRef(0)
@@ -191,7 +193,7 @@ export function useGeminiLive() {
       // If this is the first chunk (nothing scheduled yet or scheduled time is in the past),
       // add a small initial buffer delay so we have a few chunks ready before playing
       if (scheduledTimeRef.current <= ctx.currentTime) {
-        scheduledTimeRef.current = ctx.currentTime + 0.08 // 80ms initial buffer
+        scheduledTimeRef.current = ctx.currentTime + 0.03 // 30ms initial buffer — faster first response
       }
 
       scheduleBuffers()
@@ -205,25 +207,23 @@ export function useGeminiLive() {
     setStatus('connecting')
 
     try {
-      // 1. Get API key from server
-      const { key } = await getGeminiKey()
-
-      // 2. Get microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          sampleRate: 16000,
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
-      })
+      // 1. Fetch API key + get mic access + set up audio IN PARALLEL
+      const [{ key }, stream] = await Promise.all([
+        getGeminiKey(),
+        navigator.mediaDevices.getUserMedia({
+          audio: {
+            sampleRate: 16000,
+            channelCount: 1,
+            echoCancellation: true,
+            noiseSuppression: true,
+          },
+        }),
+      ])
       micStreamRef.current = stream
 
-      // 3. Create audio contexts
+      // 2. Create audio contexts + worklet
       captureCtxRef.current = new AudioContext({ sampleRate: 16000 })
       playbackCtxRef.current = new AudioContext({ sampleRate: 24000 })
-
-      // 4. Set up AudioWorklet for mic capture
       await captureCtxRef.current.audioWorklet.addModule('/audio-processor.js')
       const source = captureCtxRef.current.createMediaStreamSource(stream)
       const workletNode = new AudioWorkletNode(
@@ -233,7 +233,7 @@ export function useGeminiLive() {
       workletNodeRef.current = workletNode
       source.connect(workletNode)
 
-      // 5. Connect to Gemini Live
+      // 3. Connect to Gemini Live
       const ai = new GoogleGenAI({ apiKey: key })
       const session = await ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-12-2025',
@@ -244,7 +244,7 @@ export function useGeminiLive() {
         },
         callbacks: {
           onopen: () => {
-            if (activeRef.current) setStatus('listening')
+            // Stay in 'connecting' — greeting will trigger 'speaking'
           },
           onmessage: async (msg: LiveServerMessage) => {
             if (!activeRef.current) return
@@ -270,6 +270,11 @@ export function useGeminiLive() {
 
             // Back to listening when model turn is done
             if (serverContent?.turnComplete) {
+              if (!greetingDoneRef.current) {
+                // Greeting just finished — now start mic capture
+                greetingDoneRef.current = true
+                if (startMicCaptureRef.current) startMicCaptureRef.current()
+              }
               setStatus('listening')
             }
 
@@ -328,45 +333,56 @@ export function useGeminiLive() {
 
       sessionRef.current = session as typeof sessionRef.current
 
-      // 6. Send initial greeting so the AI speaks first
+      // 6. Function to start mic capture — called AFTER greeting finishes
+      function startMicCapture() {
+        if (!workletNodeRef.current) return
+        workletNodeRef.current.port.onmessage = (event: MessageEvent) => {
+          if (!activeRef.current || !sessionRef.current) return
+          const pcmBuffer = event.data as ArrayBuffer
+          const int16 = new Int16Array(pcmBuffer)
+          const uint8 = new Uint8Array(int16.buffer)
+
+          let binary = ''
+          for (let i = 0; i < uint8.length; i++) {
+            binary += String.fromCharCode(uint8[i])
+          }
+          const base64 = btoa(binary)
+
+          try {
+            const sess = sessionRef.current as {
+              sendRealtimeInput?: (i: unknown) => void
+            }
+            if (sess?.sendRealtimeInput) {
+              sess.sendRealtimeInput({
+                media: { mimeType: 'audio/pcm;rate=16000', data: base64 },
+              })
+            }
+          } catch { /* session closed */ }
+        }
+      }
+
+      // Expose startMicCapture so onmessage callback can call it
+      // Store it on a ref the callback can access
+      startMicCaptureRef.current = startMicCapture
+
+      // 7. Send initial greeting so the AI speaks first (mic stays off until greeting done)
+      greetingDoneRef.current = false
       try {
-        const sess = session as { send?: (msg: unknown) => void }
-        if (sess?.send) {
-          sess.send({
-            clientContent: {
-              turns: [
-                { role: 'user', parts: [{ text: 'Hello, I just clicked the voice button on the AI Developer website. Please greet me warmly and briefly introduce yourself.' }] },
-              ],
-              turnComplete: true,
-            },
+        const sess = session as { sendClientContent?: (params: unknown) => void }
+        if (sess?.sendClientContent) {
+          sess.sendClientContent({
+            turns: [
+              { role: 'user', parts: [{ text: 'Hello, I just clicked the voice button on the AI Developer website. Please greet me warmly and briefly introduce yourself.' }] },
+            ],
+            turnComplete: true,
           })
         }
-      } catch { /* session may not support send yet */ }
-
-      // 7. Send mic audio to session
-      workletNode.port.onmessage = (event: MessageEvent) => {
-        if (!activeRef.current || !sessionRef.current) return
-        const pcmBuffer = event.data as ArrayBuffer
-        const int16 = new Int16Array(pcmBuffer)
-        const uint8 = new Uint8Array(int16.buffer)
-
-        // Convert to base64
-        let binary = ''
-        for (let i = 0; i < uint8.length; i++) {
-          binary += String.fromCharCode(uint8[i])
-        }
-        const base64 = btoa(binary)
-
-        try {
-          const sess = sessionRef.current as {
-            sendRealtimeInput?: (i: unknown) => void
-          }
-          if (sess?.sendRealtimeInput) {
-            sess.sendRealtimeInput({
-              media: { mimeType: 'audio/pcm;rate=16000', data: base64 },
-            })
-          }
-        } catch { /* session closed */ }
+      } catch (err) {
+        console.error('Failed to send initial greeting:', err)
+        // Fallback: start mic anyway
+        startMicCapture()
+        greetingDoneRef.current = true
+        setStatus('listening')
       }
     } catch (err) {
       console.error('Failed to start Gemini Live session:', err)
