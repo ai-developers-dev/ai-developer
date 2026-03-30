@@ -1,0 +1,270 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Neural Architect brand colors — variable-driven for light/dark */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-tertiary: var(--brand-tertiary);
+  --color-brand-dark: var(--brand-dark);
+
+  /* Surface tiers — variable-driven for light/dark */
+  --color-surface-lowest: var(--surface-lowest);
+  --color-surface-low: var(--surface-low);
+  --color-surface: var(--surface);
+  --color-surface-high: var(--surface-high);
+  --color-surface-highest: var(--surface-highest);
+
+  /* Navigation & utility colors — variable-driven */
+  --color-nav-text: var(--nav-text);
+  --color-nav-text-hover: var(--nav-text-hover);
+  --color-subtle-border: var(--subtle-border);
+  --color-decoration: var(--decoration);
+
+  /* Font families */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-label: 'Manrope', sans-serif;
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT THEME — Obsidian Amber rosy-sand palette
+   Warm pinkish foundation from Material "Obsidian Amber"
+   Primary #F0EAD6, Secondary #8B7355, Tertiary #FFBF00
+   ═══════════════════════════════════════════ */
+:root {
+  --radius: 0.125rem;
+  /* Obsidian Amber — soft blush pink foundation (#FCE4EC) */
+  --background: #FCE4EC;
+  --foreground: #1A0F0E;
+  --card: #FDF0F4;
+  --card-foreground: #1A0F0E;
+  --popover: #FDF0F4;
+  --popover-foreground: #1A0F0E;
+  --primary: #6B5240;
+  --primary-foreground: #FCE4EC;
+  --secondary: #F3D2DA;
+  --secondary-foreground: #1A0F0E;
+  --muted: #F3D2DA;
+  --muted-foreground: #6B5D50;
+  --accent: #F3D2DA;
+  --accent-foreground: #1A0F0E;
+  --destructive: #B91C1C;
+  --border: rgba(26, 15, 14, 0.08);
+  --input: rgba(26, 15, 14, 0.08);
+  --ring: #8B7355;
+  --chart-1: #8B7355;
+  --chart-2: #6B5240;
+  --chart-3: #DAA520;
+  --chart-4: #6B5D50;
+  --chart-5: #1A0F0E;
+  --sidebar: #F6D9E1;
+  --sidebar-foreground: #1A0F0E;
+  --sidebar-primary: #6B5240;
+  --sidebar-primary-foreground: #FCE4EC;
+  --sidebar-accent: #F3D2DA;
+  --sidebar-accent-foreground: #1A0F0E;
+  --sidebar-border: rgba(26, 15, 14, 0.06);
+  --sidebar-ring: #8B7355;
+
+  /* Brand — Obsidian Amber palette */
+  --brand-primary: #6B5240;
+  --brand-secondary: #8B7355;
+  --brand-tertiary: #DAA520;
+  --brand-dark: #1A0F0E;
+
+  /* Surface tiers — blush pink graduation from #FCE4EC */
+  --surface-lowest: #FCE4EC;
+  --surface-low: #F6D9E1;
+  --surface: #F3D2DA;
+  --surface-high: #EAC4CD;
+  --surface-highest: #DFB3BD;
+
+  /* Navigation */
+  --nav-text: #6B5D50;
+  --nav-text-hover: #1A0F0E;
+  --subtle-border: rgba(26, 15, 14, 0.08);
+  --decoration: rgba(26, 15, 14, 0.12);
+}
+
+/* ═══════════════════════════════════════════
+   DARK THEME (.dark class on <html>)
+   ═══════════════════════════════════════════ */
+.dark {
+  --background: #1c1110;
+  --foreground: #f4dddb;
+  --card: #251917;
+  --card-foreground: #f4dddb;
+  --popover: #291d1b;
+  --popover-foreground: #f4dddb;
+  --primary: #d4cebb;
+  --primary-foreground: #333123;
+  --secondary: #342726;
+  --secondary-foreground: #f4dddb;
+  --muted: #291d1b;
+  --muted-foreground: #d0c5af;
+  --accent: #342726;
+  --accent-foreground: #f4dddb;
+  --destructive: #ffb4ab;
+  --border: rgba(208, 197, 175, 0.15);
+  --input: rgba(208, 197, 175, 0.15);
+  --ring: #d4cebb;
+  --chart-1: #d4cebb;
+  --chart-2: #dfc29f;
+  --chart-3: #ffc640;
+  --chart-4: #b8b3a0;
+  --chart-5: #f4dddb;
+  --sidebar: #251917;
+  --sidebar-foreground: #f4dddb;
+  --sidebar-primary: #d4cebb;
+  --sidebar-primary-foreground: #333123;
+  --sidebar-accent: #342726;
+  --sidebar-accent-foreground: #f4dddb;
+  --sidebar-border: rgba(208, 197, 175, 0.1);
+  --sidebar-ring: #d4cebb;
+
+  /* Brand */
+  --brand-primary: #d4cebb;
+  --brand-secondary: #dfc29f;
+  --brand-tertiary: #ffc640;
+  --brand-dark: #1c1110;
+
+  /* Surface tiers */
+  --surface-lowest: #160b0a;
+  --surface-low: #251917;
+  --surface: #291d1b;
+  --surface-high: #342726;
+  --surface-highest: #3f3130;
+
+  /* Navigation */
+  --nav-text: #d0c5af;
+  --nav-text-hover: #f4dddb;
+  --subtle-border: rgba(208, 197, 175, 0.15);
+  --decoration: rgba(77, 70, 53, 0.3);
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   UTILITY CLASSES — mode-aware
+   ═══════════════════════════════════════════ */
+
+/* Architectural outline text */
+.architectural-outline {
+  -webkit-text-stroke: 1.5px rgba(26, 15, 14, 0.25);
+  color: transparent;
+}
+.dark .architectural-outline {
+  -webkit-text-stroke: 1px rgba(208, 197, 175, 0.3);
+}
+
+/* Glass card — blush pink glassmorphism (light) */
+.glass-card {
+  background: rgba(253, 240, 244, 0.55);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(26, 15, 14, 0.05);
+  transition: all 0.5s ease;
+}
+.glass-card:hover {
+  background: rgba(253, 240, 244, 0.75);
+  border: 1px solid rgba(26, 15, 14, 0.12);
+}
+/* Glass card — dark obsidian glassmorphism */
+.dark .glass-card {
+  background: rgba(63, 49, 48, 0.4);
+  border: 1px solid rgba(208, 197, 175, 0.15);
+}
+.dark .glass-card:hover {
+  background: rgba(63, 49, 48, 0.6);
+  border: 1px solid rgba(208, 197, 175, 0.4);
+}
+
+/* Gradient button — dark bronze metallic (light) */
+.gradient-btn {
+  background: linear-gradient(135deg, #6B5240 0%, #523D30 100%);
+  color: #FCE4EC;
+}
+.gradient-btn:hover {
+  box-shadow: 0 0 40px rgba(107, 82, 64, 0.25);
+}
+/* Gradient button — champagne metallic (dark) */
+.dark .gradient-btn {
+  background: linear-gradient(135deg, #d4cebb 0%, #b8b3a0 100%);
+  color: #333123;
+}
+.dark .gradient-btn:hover {
+  box-shadow: 0 0 40px rgba(212, 206, 187, 0.3);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body ::selection {
+    background: #DAA520;
+    color: #FCE4EC;
+  }
+  .dark body ::selection {
+    background: #ffc640;
+    color: #1c1110;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
