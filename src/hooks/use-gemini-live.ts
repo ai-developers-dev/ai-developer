@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { GoogleGenAI, type LiveServerMessage, Modality } from '@google/genai'
-import { getGeminiKey, submitBooking } from '@/lib/gemini-server.js'
+import { getGeminiKey } from '@/lib/gemini-server.js'
+import { getAvailableSlots, bookCalSlot } from '@/lib/cal-server.js'
 
 export type VoiceStatus = 'idle' | 'connecting' | 'listening' | 'speaking'
 
 const SYSTEM_INSTRUCTION = `You are the AI voice assistant for AI Developer, an AI-powered development agency. Your name is "AI Developer Assistant."
-
-When you first connect, greet the user warmly: "Welcome to AI Developer! I'm your AI assistant. How can I help you today?"
 
 Services offered:
 - Custom Websites (modern, responsive, SEO-optimized)
@@ -21,31 +20,49 @@ Key selling points:
 - Up to 90% lower cost compared to traditional agencies
 - 24/7 AI-powered solutions
 
-If the visitor wants to book a discovery call, collect:
-1. Their name
-2. Their email address
-3. Their preferred day/time for the call
+BOOKING A DISCOVERY CALL:
+When a visitor wants to book a discovery call, follow these steps IN ORDER:
+1. Ask "What day works best for you?" — accept natural language like "tomorrow", "next Tuesday", "April 5th"
+2. Call the check_availability function with their answer to get real available time slots
+3. Read back 3-4 available times from the results. Example: "On Tuesday I have 9 AM, 11 AM, 2 PM, and 4 PM available. Which works best?"
+4. Once they pick a time, ask for their name and email
+5. Call the book_appointment function with the selected slot time, their name, and email
+6. Confirm the booking: "You're all set! You're booked for [day] at [time]. You'll get a confirmation email shortly. Have a great day!"
 
-Once you have all three, confirm the details back and let them know someone will reach out to confirm. Then call the submit_booking function with the collected information. After confirming the booking, say a brief goodbye like "Great, you're all set! We'll be in touch soon. Have a great day!" and end the conversation naturally.
+IMPORTANT: Always use check_availability BEFORE offering times — never make up availability. If no slots are available, suggest the next day.
 
 Be friendly, concise, and conversational. Keep responses short (1-2 sentences) since this is voice.`
 
-const BOOKING_TOOL = {
+const CAL_TOOLS = {
   functionDeclarations: [
     {
-      name: 'submit_booking',
-      description: 'Submit a discovery call booking request',
+      name: 'check_availability',
+      description: 'Check available appointment slots for a discovery call on a given day. Call this when the user says what day they want to book.',
       parameters: {
         type: 'object' as const,
         properties: {
-          name: { type: 'string' as const, description: 'Visitor name' },
-          email: { type: 'string' as const, description: 'Visitor email' },
-          preferred_time: {
+          date_expression: {
             type: 'string' as const,
-            description: 'Preferred day/time',
+            description: 'The day to check availability for, e.g. "tomorrow", "next Tuesday", "April 5th", "this Friday"',
           },
         },
-        required: ['name', 'email', 'preferred_time'],
+        required: ['date_expression'],
+      },
+    },
+    {
+      name: 'book_appointment',
+      description: 'Book a confirmed discovery call appointment. Call this after the user has selected a time slot and provided their name and email.',
+      parameters: {
+        type: 'object' as const,
+        properties: {
+          slot_time: {
+            type: 'string' as const,
+            description: 'The ISO datetime string of the selected time slot (from check_availability results)',
+          },
+          name: { type: 'string' as const, description: 'The attendee full name' },
+          email: { type: 'string' as const, description: 'The attendee email address' },
+        },
+        required: ['slot_time', 'name', 'email'],
       },
     },
   ],
@@ -256,7 +273,7 @@ export function useGeminiLive() {
         config: {
           responseModalities: [Modality.AUDIO],
           systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-          tools: [BOOKING_TOOL],
+          tools: [CAL_TOOLS],
         },
         callbacks: {
           onopen: () => {
@@ -289,48 +306,60 @@ export function useGeminiLive() {
               setStatus('listening')
             }
 
-            // Handle function calls (booking)
+            // Handle function calls (Cal.com tools)
             const toolCall = msg.toolCall
             if (toolCall?.functionCalls) {
               for (const fc of toolCall.functionCalls) {
-                if (fc.name === 'submit_booking' && fc.args) {
-                  const args = fc.args as {
-                    name?: string
-                    email?: string
-                    preferred_time?: string
+                const sendToolResponse = (response: unknown) => {
+                  if (!activeRef.current || !sessionRef.current) return
+                  const sess = sessionRef.current as { sendToolResponse?: (r: unknown) => void }
+                  if (sess?.sendToolResponse) {
+                    try {
+                      sess.sendToolResponse({
+                        functionResponses: [{ id: fc.id, name: fc.name, response }],
+                      })
+                    } catch { /* session closed */ }
                   }
+                }
+
+                if (fc.name === 'check_availability' && fc.args) {
+                  const args = fc.args as { date_expression?: string }
                   try {
-                    await submitBooking({
+                    const result = await getAvailableSlots({
+                      data: { dateExpression: args.date_expression ?? 'tomorrow' },
+                    })
+                    if (result.success && result.slots.length > 0) {
+                      const slotList = result.slots.map((s: { display: string; time: string }) => `${s.display} (${s.time})`).join(', ')
+                      sendToolResponse({ available: true, date: result.date, slots: slotList, slot_count: result.slots.length })
+                    } else {
+                      sendToolResponse({ available: false, error: result.error || 'No slots available on that day. Try another day.' })
+                    }
+                  } catch (err) {
+                    console.error('check_availability failed:', err)
+                    sendToolResponse({ available: false, error: 'Failed to check availability. Please try again.' })
+                  }
+                }
+
+                if (fc.name === 'book_appointment' && fc.args) {
+                  const args = fc.args as { slot_time?: string; name?: string; email?: string }
+                  try {
+                    const result = await bookCalSlot({
                       data: {
+                        start: args.slot_time ?? '',
                         name: args.name ?? '',
                         email: args.email ?? '',
-                        preferredTime: args.preferred_time ?? '',
                       },
                     })
-                    // Send function response back to session
-                    if (!activeRef.current || !sessionRef.current) return
-                    const sess = sessionRef.current as {
-                      sendToolResponse?: (r: unknown) => void
+                    if (result.success) {
+                      sendToolResponse({ success: true, date: result.date, time: result.time, bookingId: result.bookingId })
+                      // Auto-hangup after AI confirms (give it time to speak the confirmation)
+                      setTimeout(() => cleanup(), 10000)
+                    } else {
+                      sendToolResponse({ success: false, error: result.error })
                     }
-                    if (sess?.sendToolResponse) {
-                      try {
-                        sess.sendToolResponse({
-                          functionResponses: [
-                            {
-                              id: fc.id,
-                              name: fc.name,
-                              response: { success: true },
-                            },
-                          ],
-                        })
-                      } catch { /* session closed */ }
-                    }
-                    // Auto-hangup after AI confirms the booking (give it time to speak)
-                    setTimeout(() => {
-                      cleanup()
-                    }, 8000)
-                  } catch {
-                    console.error('Booking submission failed')
+                  } catch (err) {
+                    console.error('book_appointment failed:', err)
+                    sendToolResponse({ success: false, error: 'Booking failed. Please try again.' })
                   }
                 }
               }
