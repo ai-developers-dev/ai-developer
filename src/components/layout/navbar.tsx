@@ -115,8 +115,8 @@ export function Navbar() {
                     Expertise
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="w-180 glass-card p-6">
-                      <div className="flex items-center justify-between mb-5">
+                    <div className="w-[calc(100vw-3rem)] max-w-180 glass-card p-4 lg:p-6">
+                      <div className="flex items-center justify-between mb-4 lg:mb-5">
                         <p className="font-label text-[10px] uppercase tracking-[0.3em] text-nav-text/50">
                           Our Expertise
                         </p>
@@ -124,22 +124,22 @@ export function Navbar() {
                           View All →
                         </Link>
                       </div>
-                      <ul className="grid grid-cols-3 gap-2">
+                      <ul className="grid grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-2">
                         {services.map((service) => (
                           <li key={service.href}>
                             <NavigationMenuLink asChild>
                               <Link
                                 to={service.href}
-                                className="flex flex-col gap-3 rounded-sm p-4 hover:bg-secondary/50 transition-all duration-300 group h-full"
+                                className="flex items-center lg:flex-col gap-3 rounded-sm p-3 lg:p-4 hover:bg-secondary/50 transition-all duration-300 group h-full"
                               >
-                                <div className="w-10 h-10 rounded-sm bg-surface-high/50 flex items-center justify-center group-hover:bg-brand-tertiary/10 transition-colors">
-                                  <service.icon className="w-5 h-5 text-brand-tertiary" strokeWidth={1.5} />
+                                <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-sm bg-surface-high/50 flex items-center justify-center group-hover:bg-brand-tertiary/10 transition-colors shrink-0">
+                                  <service.icon className="w-4 h-4 lg:w-5 lg:h-5 text-brand-tertiary" strokeWidth={1.5} />
                                 </div>
                                 <div>
-                                  <div className="text-sm font-heading font-semibold text-foreground mb-1">
+                                  <div className="text-xs lg:text-sm font-heading font-semibold text-foreground mb-0.5 lg:mb-1">
                                     {service.label}
                                   </div>
-                                  <p className="text-xs text-nav-text/60 leading-relaxed">
+                                  <p className="text-[10px] lg:text-xs text-nav-text/60 leading-snug lg:leading-relaxed">
                                     {service.description}
                                   </p>
                                 </div>
