@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PostLoginRouteImport } from './routes/post-login'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -44,6 +45,11 @@ import { Route as DashboardProjectsIdRouteImport } from './routes/dashboard/proj
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostLoginRoute = PostLoginRouteImport.update({
+  id: '/post-login',
+  path: '/post-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRoute = PortalRouteImport.update({
@@ -205,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
+  '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
@@ -305,6 +314,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/portal'
+    | '/post-login'
     | '/privacy'
     | '/dashboard/clients'
     | '/dashboard/projects'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/case-studies'
     | '/contact'
+    | '/post-login'
     | '/privacy'
     | '/dashboard/clients'
     | '/dashboard/projects'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/portal'
+    | '/post-login'
     | '/privacy'
     | '/dashboard/clients'
     | '/dashboard/projects'
@@ -403,6 +415,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
+  PostLoginRoute: typeof PostLoginRoute
   PrivacyRoute: typeof PrivacyRoute
   PayIdRoute: typeof PayIdRoute
   ServicesAiAssistantsRoute: typeof ServicesAiAssistantsRoute
@@ -422,6 +435,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/post-login': {
+      id: '/post-login'
+      path: '/post-login'
+      fullPath: '/post-login'
+      preLoaderRoute: typeof PostLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal': {
@@ -720,6 +740,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
+  PostLoginRoute: PostLoginRoute,
   PrivacyRoute: PrivacyRoute,
   PayIdRoute: PayIdRoute,
   ServicesAiAssistantsRoute: ServicesAiAssistantsRoute,

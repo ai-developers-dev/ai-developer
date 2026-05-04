@@ -45,7 +45,7 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
-const hiddenLayoutPrefixes = ['/dashboard', '/portal', '/sign-in', '/sign-up', '/pay']
+const hiddenLayoutPrefixes = ['/dashboard', '/portal', '/sign-in', '/sign-up', '/pay', '/post-login']
 
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
