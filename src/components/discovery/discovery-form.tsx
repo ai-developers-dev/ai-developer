@@ -16,7 +16,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react'
 import { StepProgress } from './step-progress'
-import { MultiSelectDropdown } from './multi-select-dropdown'
+import { MultiSelectChips } from './multi-select-chips'
 import {
   ACCOUNTING_OPTIONS,
   AFTER_HOURS_OPTIONS,
@@ -436,7 +436,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
               </div>
 
               {form.primaryTrade && (
-                <MultiSelectDropdown
+                <MultiSelectChips
                   label="Services you offer (pick all that apply)"
                   options={servicesList}
                   value={form.servicesOffered}
@@ -444,7 +444,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 />
               )}
 
-              <MultiSelectDropdown
+              <MultiSelectChips
                 label="Where do your leads come from today? (pick all that apply)"
                 options={LEAD_SOURCES_OPTIONS}
                 value={form.leadSources}
@@ -514,7 +514,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
               </h2>
 
               {hasWebsite && (
-                <MultiSelectDropdown
+                <MultiSelectChips
                   label="What features does your website have today? (pick all that apply)"
                   options={WEBSITE_FEATURES_OPTIONS}
                   value={form.websiteFeatures}
@@ -673,14 +673,14 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 )}
               </div>
 
-              <MultiSelectDropdown
+              <MultiSelectChips
                 label="Other tools you rely on (optional)"
                 options={OTHER_TOOLS_OPTIONS}
                 value={form.otherTools}
                 onChange={(v) => set('otherTools', v)}
               />
 
-              <MultiSelectDropdown
+              <MultiSelectChips
                 label="Are you currently using any automations or AI? (pick all that apply)"
                 options={CURRENT_AUTOMATIONS_OPTIONS}
                 value={form.currentAutomations}
@@ -708,7 +708,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 </Select>
               </div>
 
-              <MultiSelectDropdown
+              <MultiSelectChips
                 label="Required integrations for the new CRM (pick all that apply)"
                 options={INTEGRATIONS_OPTIONS}
                 value={form.requiredIntegrations}
