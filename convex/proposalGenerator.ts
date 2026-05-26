@@ -5,6 +5,7 @@
 // settings" admin page) can tweak the model without touching logic.
 
 import type { Doc } from "./_generated/dataModel";
+import { DEFAULT_PRICING, type PricingConfig } from "./pricingSettings";
 
 type Discovery = Doc<"discoverySubmissions">;
 
@@ -23,69 +24,9 @@ export interface GeneratedProposal {
   totalAmount: number;
 }
 
-// ============================================================
-// Pricing constants (USD)
-// ============================================================
-
-export const BASE_PRICE = 15_000;
-
-const EMPLOYEE_SCALE: Record<string, number> = {
-  "1": 0,
-  "2-5": 0,
-  "6-10": 3_000,
-  "11-20": 6_000,
-  "21-50": 10_000,
-  "50+": 15_000,
-};
-
-const LOCATION_SCALE: Record<string, number> = {
-  single: 0,
-  "2-3": 2_000,
-  "4+": 4_000,
-  "multi-state": 6_000,
-};
-
-const RADIUS_SCALE: Record<string, number> = {
-  under_25: 0,
-  "25-50": 0,
-  "50-100": 500,
-  "100+": 1_500,
-};
-
-const TRADE_SCALE: Record<string, number> = {
-  electrician: 0,
-  plumber: 0,
-  hvac: 0,
-  "multi-trade": 3_000,
-  other: 2_000,
-};
-
-const INTEGRATION_PRICES: Record<string, { label: string; price: number }> = {
-  QuickBooks: {
-    label: "QuickBooks Online integration",
-    price: 2_500,
-  },
-  "Stripe / Square (card payments)": {
-    label: "Stripe / Square card processing",
-    price: 1_000,
-  },
-  "ACH payments": { label: "ACH payments", price: 1_500 },
-  "Supplier catalog": { label: "Supplier catalog integration", price: 3_000 },
-  "Google Maps routing": { label: "Google Maps routing & ETAs", price: 1_500 },
-  "SMS reminders": { label: "SMS reminders & notifications", price: 1_500 },
-  "Email marketing": { label: "Email marketing integration", price: 1_500 },
-  "Calendar sync (Google/Outlook)": {
-    label: "Calendar sync (Google / Outlook)",
-    price: 1_000,
-  },
-};
-
-const ON_SITE_QUOTING_PRICE = 2_000;
-const RECURRING_CONTRACTS_PRICE = 3_000;
-const PHOTO_DOCS_PRICE = 1_000;
-const VOICE_AI_CROSS_SELL_PRICE = 8_000;
-const AUTOMATIONS_CROSS_SELL_PRICE = 3_000;
-const RUSH_FEE_PCT = 0.2;
+// Pricing values now live in the Convex `pricingSettings` table (admin-
+// editable). DEFAULT_PRICING from pricingSettings.ts is the fallback
+// when no row exists yet or callers don't pass a config.
 
 // ============================================================
 // Pretty labels (used in description prose)
@@ -137,7 +78,10 @@ const BOTTLENECK_LABELS: Record<string, string> = {
 // Generator
 // ============================================================
 
-export function generateProposalFromDiscovery(d: Discovery): GeneratedProposal {
+export function generateProposalFromDiscovery(
+  d: Discovery,
+  cfg: PricingConfig = DEFAULT_PRICING,
+): GeneratedProposal {
   const items: GeneratedLineItem[] = [];
   const push = (description: string, unitPrice: number) => {
     if (unitPrice <= 0) return;
@@ -145,36 +89,42 @@ export function generateProposalFromDiscovery(d: Discovery): GeneratedProposal {
   };
 
   // Base
-  push("Custom CRM platform — core build", BASE_PRICE);
+  push("Custom CRM platform — core build", cfg.basePrice);
+
+  const scaleLookup = (
+    list: { key: string; price: number }[],
+    k: string,
+  ) => list.find((r) => r.key === k)?.price ?? 0;
 
   // Scale by employees
-  const empScale = EMPLOYEE_SCALE[d.employeeCount] ?? 0;
-  push(`Scale: ${EMPLOYEE_LABELS[d.employeeCount] ?? d.employeeCount} shop`, empScale);
+  push(
+    `Scale: ${EMPLOYEE_LABELS[d.employeeCount] ?? d.employeeCount} shop`,
+    scaleLookup(cfg.employeeScale, d.employeeCount),
+  );
 
   // Scale by locations
-  const locScale = LOCATION_SCALE[d.locationCount] ?? 0;
   push(
     `Multi-location workflows (${LOCATION_LABELS[d.locationCount] ?? d.locationCount})`,
-    locScale,
+    scaleLookup(cfg.locationScale, d.locationCount),
   );
 
   // Scale by service radius
   push(
     "Extended service-area routing & territory management",
-    RADIUS_SCALE[d.serviceRadiusMiles] ?? 0,
+    scaleLookup(cfg.radiusScale, d.serviceRadiusMiles),
   );
 
   // Trade complexity
   push(
     "Multi-trade workflow templates",
-    TRADE_SCALE[d.primaryTrade] ?? 0,
+    scaleLookup(cfg.tradeScale, d.primaryTrade),
   );
 
   // On-site quoting
   if (d.techsQuoteOnSite && d.techsQuoteOnSite !== "never") {
     push(
       "On-site mobile quoting with deposit collection",
-      ON_SITE_QUOTING_PRICE,
+      cfg.onSiteQuotingPrice,
     );
   }
 
@@ -182,16 +132,19 @@ export function generateProposalFromDiscovery(d: Discovery): GeneratedProposal {
   if (d.recurringContracts && d.recurringContracts !== "none") {
     push(
       "Recurring maintenance contract engine (auto-schedule + auto-invoice)",
-      RECURRING_CONTRACTS_PRICE,
+      cfg.recurringContractsPrice,
     );
   }
 
   // Photo documentation — baseline for every build
-  push("Photo documentation & job timeline", PHOTO_DOCS_PRICE);
+  push("Photo documentation & job timeline", cfg.photoDocsPrice);
 
   // Per-integration line items
+  const integrationMap = new Map(
+    cfg.integrations.map((i) => [i.key, { label: i.label, price: i.price }]),
+  );
   for (const integration of d.requiredIntegrations || []) {
-    const entry = INTEGRATION_PRICES[integration];
+    const entry = integrationMap.get(integration);
     if (entry) push(entry.label, entry.price);
   }
 
@@ -202,7 +155,7 @@ export function generateProposalFromDiscovery(d: Discovery): GeneratedProposal {
   if (usesVoiceAI) {
     push(
       "Voice AI receptionist (24/7 call handling, booking, triage)",
-      VOICE_AI_CROSS_SELL_PRICE,
+      cfg.voiceAiCrossSellPrice,
     );
   }
 
@@ -214,15 +167,19 @@ export function generateProposalFromDiscovery(d: Discovery): GeneratedProposal {
   if (nothingAutomated) {
     push(
       "Automations bundle (review requests, lead routing, follow-ups)",
-      AUTOMATIONS_CROSS_SELL_PRICE,
+      cfg.automationsCrossSellPrice,
     );
   }
 
   // Subtotal + rush
   const subtotal = items.reduce((s, i) => s + i.total, 0);
   if (d.desiredLaunch === "asap") {
-    const rushFee = Math.round(subtotal * RUSH_FEE_PCT);
-    push("Rush delivery (ASAP timeline — 20% expedite fee)", rushFee);
+    const rushFee = Math.round(subtotal * cfg.rushFeePct);
+    const pctLabel = Math.round(cfg.rushFeePct * 100);
+    push(
+      `Rush delivery (ASAP timeline — ${pctLabel}% expedite fee)`,
+      rushFee,
+    );
   }
 
   const totalAmount = items.reduce((s, i) => s + i.total, 0);

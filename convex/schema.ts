@@ -303,6 +303,47 @@ export default defineSchema({
     .index("by_stripeSessionId", ["stripeSessionId"])
     .index("by_secondStripeSessionId", ["secondStripeSessionId"]),
 
+  // Singleton row holding tunable pricing for the discovery → proposal
+  // generator. Read at proposal-conversion time; falls back to baked-in
+  // defaults if the row doesn't exist yet.
+  pricingSettings: defineTable({
+    basePrice: v.number(),
+
+    // Each scale is an array of {key,price}. Keys are the discovery enum
+    // values ("1", "2-5", "6-10", etc.) — strings, since Convex object
+    // validators require identifier-friendly keys.
+    employeeScale: v.array(
+      v.object({ key: v.string(), price: v.number() })
+    ),
+    locationScale: v.array(
+      v.object({ key: v.string(), price: v.number() })
+    ),
+    radiusScale: v.array(
+      v.object({ key: v.string(), price: v.number() })
+    ),
+    tradeScale: v.array(
+      v.object({ key: v.string(), price: v.number() })
+    ),
+
+    onSiteQuotingPrice: v.number(),
+    recurringContractsPrice: v.number(),
+    photoDocsPrice: v.number(),
+
+    voiceAiCrossSellPrice: v.number(),
+    automationsCrossSellPrice: v.number(),
+
+    rushFeePct: v.number(), // stored as 0.20 for 20%
+
+    // Fully dynamic — admin can add/remove rows
+    integrations: v.array(
+      v.object({
+        key: v.string(),
+        label: v.string(),
+        price: v.number(),
+      })
+    ),
+  }),
+
   services: defineTable({
     name: v.string(),
     description: v.optional(v.string()),

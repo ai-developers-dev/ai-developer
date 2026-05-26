@@ -38,6 +38,7 @@ import { Route as DashboardSubmissionsRouteImport } from './routes/dashboard/sub
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardProposalsRouteImport } from './routes/dashboard/proposals'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
+import { Route as DashboardPricingRouteImport } from './routes/dashboard/pricing'
 import { Route as DashboardDiscoveriesRouteImport } from './routes/dashboard/discoveries'
 import { Route as DashboardClientsRouteImport } from './routes/dashboard/clients'
 import { Route as BlogStopPayingMonthlyFieldServiceSoftwareRouteImport } from './routes/blog.stop-paying-monthly-field-service-software'
@@ -198,6 +199,11 @@ const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPricingRoute = DashboardPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardDiscoveriesRoute = DashboardDiscoveriesRouteImport.update({
   id: '/discoveries',
   path: '/discoveries',
@@ -294,6 +300,7 @@ export interface FileRoutesByFullPath {
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
+  '/dashboard/pricing': typeof DashboardPricingRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
+  '/dashboard/pricing': typeof DashboardPricingRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
+  '/dashboard/pricing': typeof DashboardPricingRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -430,6 +439,7 @@ export interface FileRouteTypes {
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/discoveries'
+    | '/dashboard/pricing'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/settings'
@@ -473,6 +483,7 @@ export interface FileRouteTypes {
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/discoveries'
+    | '/dashboard/pricing'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/settings'
@@ -518,6 +529,7 @@ export interface FileRouteTypes {
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/discoveries'
+    | '/dashboard/pricing'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/settings'
@@ -774,6 +786,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/pricing': {
+      id: '/dashboard/pricing'
+      path: '/pricing'
+      fullPath: '/dashboard/pricing'
+      preLoaderRoute: typeof DashboardPricingRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/discoveries': {
       id: '/dashboard/discoveries'
       path: '/discoveries'
@@ -925,6 +944,7 @@ const DashboardProposalsRouteWithChildren =
 interface DashboardRouteChildren {
   DashboardClientsRoute: typeof DashboardClientsRoute
   DashboardDiscoveriesRoute: typeof DashboardDiscoveriesRoute
+  DashboardPricingRoute: typeof DashboardPricingRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
   DashboardProposalsRoute: typeof DashboardProposalsRouteWithChildren
   DashboardSettingsRoute: typeof DashboardSettingsRoute
@@ -936,6 +956,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardClientsRoute: DashboardClientsRoute,
   DashboardDiscoveriesRoute: DashboardDiscoveriesRoute,
+  DashboardPricingRoute: DashboardPricingRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
   DashboardProposalsRoute: DashboardProposalsRouteWithChildren,
   DashboardSettingsRoute: DashboardSettingsRoute,

@@ -7,6 +7,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { generateProposalFromDiscovery } from "./proposalGenerator";
+import { DEFAULT_PRICING } from "./pricingSettings";
 
 // ===========================================================
 // Validators (must match schema.ts)
@@ -269,8 +270,18 @@ export const convertToProposal = mutation({
       });
     }
 
+    // Load the live pricing config (singleton row); fall back to defaults
+    // if the admin hasn't customized anything yet.
+    const settingsRow = await ctx.db.query("pricingSettings").first();
+    const cfg = settingsRow
+      ? (() => {
+          const { _id, _creationTime, ...rest } = settingsRow;
+          return rest as typeof DEFAULT_PRICING;
+        })()
+      : DEFAULT_PRICING;
+
     // Auto-generate the priced quote from discovery answers.
-    const generated = generateProposalFromDiscovery(discovery);
+    const generated = generateProposalFromDiscovery(discovery, cfg);
 
     // Project (stage = lead) so it shows in the pipeline.
     const projectId = await ctx.db.insert("projects", {
