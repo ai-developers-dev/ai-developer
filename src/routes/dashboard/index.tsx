@@ -10,7 +10,14 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Inbox, FolderKanban, FileText, Clock, ArrowRight } from 'lucide-react'
+import {
+  Inbox,
+  FolderKanban,
+  FileText,
+  Clock,
+  ArrowRight,
+  ClipboardList,
+} from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardOverview,
@@ -18,11 +25,14 @@ export const Route = createFileRoute('/dashboard/')({
 
 function DashboardOverview() {
   const submissions = useQuery(api.contactSubmissions.list, {})
+  const discoveries = useQuery(api.discoverySubmissions.list, {})
   const projects = useQuery(api.projects.list, {})
   const proposals = useQuery(api.proposals.list, {})
 
   const newSubmissions =
     submissions?.filter((s) => s.status === 'new').length ?? 0
+  const newDiscoveries =
+    discoveries?.filter((d) => d.status === 'new').length ?? 0
   const activeProjects =
     projects?.filter((p) => !['completed', 'lead'].includes(p.stage)).length ??
     0
@@ -31,6 +41,12 @@ function DashboardOverview() {
   const totalProjects = projects?.length ?? 0
 
   const stats = [
+    {
+      label: 'New Discoveries',
+      value: newDiscoveries,
+      icon: ClipboardList,
+      description: 'Qualified CRM leads',
+    },
     {
       label: 'New Submissions',
       value: newSubmissions,
@@ -63,8 +79,12 @@ function DashboardOverview() {
         return <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">New</Badge>
       case 'contacted':
         return <Badge className="bg-amber-50 text-amber-700 hover:bg-amber-50 border-amber-200">Contacted</Badge>
+      case 'quoted':
+        return <Badge className="bg-purple-50 text-purple-700 hover:bg-purple-50 border-purple-200">Quoted</Badge>
       case 'converted':
         return <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Converted</Badge>
+      case 'archived':
+        return <Badge variant="secondary">Archived</Badge>
       default:
         return <Badge variant="secondary">{status}</Badge>
     }
@@ -81,7 +101,7 @@ function DashboardOverview() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -100,8 +120,58 @@ function DashboardOverview() {
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Discoveries</CardTitle>
+              <CardDescription>
+                {newDiscoveries} new discovery
+                {newDiscoveries !== 1 ? ' submissions' : ' submission'} to
+                review.
+              </CardDescription>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard/discoveries">
+                View all
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {!discoveries || discoveries.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No discoveries yet.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {discoveries.slice(0, 5).map((d) => (
+                  <div
+                    key={d._id}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="space-y-1 min-w-0 mr-3">
+                      <p className="text-sm font-medium leading-none truncate">
+                        {d.businessName}
+                      </p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {d.businessEmail}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge variant="outline" className="text-[10px] capitalize">
+                        {d.primaryTrade.replace('-', ' ')}
+                      </Badge>
+                      {statusBadge(d.status)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Recent Submissions</CardTitle>
@@ -150,7 +220,7 @@ function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Active Projects</CardTitle>
