@@ -3,13 +3,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
@@ -21,6 +14,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -31,7 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Trash2, X } from 'lucide-react'
+import { Trash2, ChevronRight } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/discoveries')({
   component: DiscoveriesPage,
@@ -71,12 +72,6 @@ const statusBadge = (status: string) => {
       return <Badge variant="secondary">{status}</Badge>
   }
 }
-
-const tradeBadge = (trade: string) => (
-  <Badge variant="outline" className="text-[10px] px-1.5 py-0 capitalize">
-    {trade.replace('-', ' ')}
-  </Badge>
-)
 
 const PRETTY: Record<string, Record<string, string>> = {
   employeeCount: {
@@ -161,15 +156,27 @@ const PRETTY: Record<string, Record<string, string>> = {
   },
 }
 
-function pretty(field: string, value: string): string {
+function pretty(field: string, value: string | undefined): string {
+  if (!value) return '—'
   return PRETTY[field]?.[value] ?? value
+}
+
+function timeAgo(creationMs: number): string {
+  const diffMs = Date.now() - creationMs
+  const day = 24 * 60 * 60 * 1000
+  if (diffMs < day) {
+    const hours = Math.floor(diffMs / (60 * 60 * 1000))
+    if (hours < 1) return 'just now'
+    return `${hours}h ago`
+  }
+  const days = Math.floor(diffMs / day)
+  if (days < 7) return `${days}d ago`
+  return new Date(creationMs).toLocaleDateString()
 }
 
 function DiscoveriesPage() {
   const [filterStatus, setFilterStatus] = useState<Status | 'all'>('all')
-  const [selectedId, setSelectedId] = useState<
-    Id<'discoverySubmissions'> | null
-  >(null)
+  const [openId, setOpenId] = useState<Id<'discoverySubmissions'> | null>(null)
   const [notes, setNotes] = useState('')
 
   const submissions = useQuery(
@@ -179,46 +186,49 @@ function DiscoveriesPage() {
   const updateStatus = useMutation(api.discoverySubmissions.updateStatus)
   const removeSubmission = useMutation(api.discoverySubmissions.remove)
 
-  const selected = submissions?.find((s) => s._id === selectedId)
+  const selected = submissions?.find((s) => s._id === openId) ?? null
 
-  async function handleStatusChange(
-    id: Id<'discoverySubmissions'>,
-    status: Status,
-  ) {
-    await updateStatus({ id, status })
+  function openDetail(sub: NonNullable<typeof submissions>[number]) {
+    setOpenId(sub._id)
+    setNotes(sub.notes ?? '')
+  }
+
+  async function handleStatusChange(status: Status) {
+    if (!selected) return
+    await updateStatus({ id: selected._id, status })
   }
 
   async function handleSaveNotes() {
-    if (selectedId && selected) {
-      await updateStatus({
-        id: selectedId,
-        status: selected.status,
-        notes,
-      })
-    }
+    if (!selected) return
+    await updateStatus({
+      id: selected._id,
+      status: selected.status,
+      notes,
+    })
   }
 
-  async function handleDelete(id: Id<'discoverySubmissions'>) {
-    await removeSubmission({ id })
-    setSelectedId(null)
+  async function handleDelete() {
+    if (!selected) return
+    await removeSubmission({ id: selected._id })
+    setOpenId(null)
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             Discovery Submissions
           </h1>
           <p className="text-muted-foreground">
-            Qualified leads from the custom CRM funnel — full discovery payload.
+            Qualified leads from the custom CRM funnel.
           </p>
         </div>
         <Select
           value={filterStatus}
           onValueChange={(v) => setFilterStatus(v as Status | 'all')}
         >
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -232,123 +242,90 @@ function DiscoveriesPage() {
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inbox</CardTitle>
-              <CardDescription>
-                {submissions?.length ?? 0} discovery
-                {(submissions?.length ?? 0) !== 1 ? ' submissions' : ' submission'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!submissions || submissions.length === 0 ? (
-                <p className="text-muted-foreground text-sm text-center py-8">
-                  No discoveries yet.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {submissions.map((sub) => (
-                    <button
-                      key={sub._id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedId(sub._id)
-                        setNotes(sub.notes ?? '')
-                      }}
-                      className={`w-full text-left rounded-lg border p-3 hover:bg-muted/50 transition-colors ${
-                        selectedId === sub._id
-                          ? 'bg-muted border-primary/20'
-                          : ''
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-medium leading-none">
-                          {sub.businessName}
-                        </p>
-                        {statusBadge(sub.status)}
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-1.5">
-                        {sub.businessEmail}
-                      </p>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {tradeBadge(sub.primaryTrade)}
-                        <Badge
-                          variant="outline"
-                          className="text-[10px] px-1.5 py-0"
-                        >
-                          {pretty('employeeCount', sub.employeeCount)} emp
-                        </Badge>
-                        <Badge
-                          variant="outline"
-                          className="text-[10px] px-1.5 py-0"
-                        >
-                          {pretty('desiredLaunch', sub.desiredLaunch)}
-                        </Badge>
-                      </div>
-                    </button>
-                  ))}
+      <div className="space-y-2">
+        {!submissions ? (
+          <p className="text-sm text-muted-foreground py-12 text-center">
+            Loading…
+          </p>
+        ) : submissions.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-12 text-center">
+            No discoveries yet.
+          </p>
+        ) : (
+          submissions.map((sub) => (
+            <button
+              key={sub._id}
+              type="button"
+              onClick={() => openDetail(sub)}
+              className="w-full flex items-center gap-3 rounded-lg border bg-card px-4 py-3 hover:bg-muted/50 hover:border-brand-primary/40 transition-colors text-left"
+            >
+              {statusBadge(sub.status)}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm font-semibold truncate">
+                    {sub.businessName}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {sub.businessEmail}
+                  </span>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-2">
-          {selected ? (
-            <Card className="sticky top-24">
-              <CardHeader className="flex flex-row items-start justify-between gap-4">
-                <div>
-                  <CardTitle>{selected.businessName}</CardTitle>
-                  <CardDescription>
-                    {selected.businessEmail} · {selected.businessPhone}
-                  </CardDescription>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedId(null)}
-                  className="p-1 rounded-md hover:bg-muted"
+              </div>
+              <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-1.5 py-0 capitalize"
                 >
-                  <X className="w-4 h-4" />
-                </button>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Status + notes */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </p>
-                    <Select
-                      value={selected.status}
-                      onValueChange={(v) =>
-                        handleStatusChange(selected._id, v as Status)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="contacted">Contacted</SelectItem>
-                        <SelectItem value="quoted">Quoted</SelectItem>
-                        <SelectItem value="converted">Converted</SelectItem>
-                        <SelectItem value="archived">Archived</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Source
-                    </p>
-                    <p className="text-sm pt-2">
-                      {selected.source ?? 'direct'}
-                    </p>
-                  </div>
-                </div>
+                  {pretty('primaryTrade', sub.primaryTrade)}
+                </Badge>
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                  {pretty('employeeCount', sub.employeeCount)} emp
+                </Badge>
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                  {pretty('desiredLaunch', sub.desiredLaunch)}
+                </Badge>
+              </div>
+              <span className="text-xs text-muted-foreground shrink-0 w-16 text-right">
+                {timeAgo(sub._creationTime)}
+              </span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            </button>
+          ))
+        )}
+        {submissions && submissions.length > 0 && (
+          <p className="text-xs text-muted-foreground text-right pt-2">
+            {submissions.length} discovery
+            {submissions.length === 1 ? ' submission' : ' submissions'}
+          </p>
+        )}
+      </div>
 
-                {/* Section: Business */}
+      {/* Detail dialog */}
+      <Dialog
+        open={selected !== null}
+        onOpenChange={(o) => {
+          if (!o) setOpenId(null)
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          {selected && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <DialogTitle className="text-xl">
+                    {selected.businessName}
+                  </DialogTitle>
+                  {statusBadge(selected.status)}
+                </div>
+                <DialogDescription className="flex items-center gap-2 flex-wrap text-sm">
+                  <span>{selected.businessEmail}</span>
+                  <span>·</span>
+                  <span>{selected.businessPhone}</span>
+                  <span>·</span>
+                  <span>Source: {selected.source ?? 'direct'}</span>
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-5 py-2">
                 <Section title="Business basics">
                   <Pair
                     label="Has website?"
@@ -378,14 +355,16 @@ function DiscoveriesPage() {
                       />
                     </>
                   )}
-                  <Pair label="Address" value={selected.businessAddress || '—'} />
+                  <Pair
+                    label="Address"
+                    value={selected.businessAddress || '—'}
+                  />
                   <Pair
                     label="Employees"
                     value={pretty('employeeCount', selected.employeeCount)}
                   />
                 </Section>
 
-                {/* Section: What they do */}
                 <Section title="What they do">
                   <Pair
                     label="Primary trade"
@@ -420,22 +399,24 @@ function DiscoveriesPage() {
                     }
                   />
                   <Pair
-                    label="Top bottleneck"
+                    label="Top bottlenecks"
                     value={(() => {
                       const list =
-                        selected.topBottlenecks && selected.topBottlenecks.length
+                        selected.topBottlenecks &&
+                        selected.topBottlenecks.length
                           ? selected.topBottlenecks
                           : selected.topBottleneck
                             ? [selected.topBottleneck]
                             : []
                       return list.length
-                        ? list.map((b) => pretty('topBottlenecks', b)).join(', ')
+                        ? list
+                            .map((b) => pretty('topBottlenecks', b))
+                            .join(', ')
                         : '—'
                     })()}
                   />
                 </Section>
 
-                {/* Section: Operations */}
                 <Section title="Operations">
                   <Pair
                     label="Locations"
@@ -492,7 +473,6 @@ function DiscoveriesPage() {
                   />
                 </Section>
 
-                {/* Section: Tech & project */}
                 <Section title="Tech & project">
                   <Pair
                     label="Accounting"
@@ -528,8 +508,39 @@ function DiscoveriesPage() {
                   </Section>
                 )}
 
-                {/* Notes */}
-                <div className="space-y-2 pt-2">
+                {/* Admin controls */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Status
+                    </p>
+                    <Select
+                      value={selected.status}
+                      onValueChange={(v) => handleStatusChange(v as Status)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="contacted">Contacted</SelectItem>
+                        <SelectItem value="quoted">Quoted</SelectItem>
+                        <SelectItem value="converted">Converted</SelectItem>
+                        <SelectItem value="archived">Archived</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Submitted
+                    </p>
+                    <p className="text-sm pt-2">
+                      {new Date(selected._creationTime).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Admin notes
                   </p>
@@ -543,13 +554,14 @@ function DiscoveriesPage() {
                     Save Notes
                   </Button>
                 </div>
+              </div>
 
-                {/* Delete */}
+              <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="w-full">
+                    <Button variant="destructive">
                       <Trash2 className="w-4 h-4 mr-1" />
-                      Delete discovery
+                      Delete
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -566,7 +578,7 @@ function DiscoveriesPage() {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleDelete(selected._id)}
+                        onClick={handleDelete}
                         className="bg-destructive text-white hover:bg-destructive/90"
                       >
                         Delete
@@ -574,19 +586,14 @@ function DiscoveriesPage() {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground text-sm">
-                  Select a discovery submission to view details.
-                </p>
-              </CardContent>
-            </Card>
+                <Button variant="outline" onClick={() => setOpenId(null)}>
+                  Close
+                </Button>
+              </DialogFooter>
+            </>
           )}
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -612,7 +619,7 @@ function Pair({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid grid-cols-3 gap-2 text-sm">
       <span className="text-muted-foreground col-span-1">{label}</span>
-      <span className="col-span-2">{value}</span>
+      <span className="col-span-2 break-words">{value}</span>
     </div>
   )
 }
