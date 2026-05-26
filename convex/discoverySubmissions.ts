@@ -6,6 +6,7 @@ import {
   internalQuery,
 } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { generateProposalFromDiscovery } from "./proposalGenerator";
 
 // ===========================================================
 // Validators (must match schema.ts)
@@ -225,6 +226,99 @@ export const updateStatus = mutation({
     const update: Record<string, unknown> = { status };
     if (notes !== undefined) update.notes = notes;
     await ctx.db.patch(id, update);
+  },
+});
+
+// ===========================================================
+// Convert a discovery into a draft proposal (+ client + project)
+// ===========================================================
+
+export const convertToProposal = mutation({
+  args: { id: v.id("discoverySubmissions") },
+  handler: async (ctx, { id }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkUserId", (q) =>
+        q.eq("clerkUserId", identity.subject)
+      )
+      .unique();
+    if (!user || user.role !== "admin") throw new Error("Not authorized");
+
+    const discovery = await ctx.db.get(id);
+    if (!discovery) throw new Error("Discovery not found");
+
+    // Find or create the client. Match by email so we don't duplicate.
+    let client = await ctx.db
+      .query("clients")
+      .withIndex("by_email", (q) =>
+        q.eq("contactEmail", discovery.businessEmail)
+      )
+      .unique();
+    let clientId;
+    if (client) {
+      clientId = client._id;
+    } else {
+      clientId = await ctx.db.insert("clients", {
+        name: discovery.businessName,
+        contactEmail: discovery.businessEmail,
+        phone: discovery.businessPhone,
+        company: discovery.businessName,
+        isActive: true,
+      });
+    }
+
+    // Auto-generate the priced quote from discovery answers.
+    const generated = generateProposalFromDiscovery(discovery);
+
+    // Project (stage = lead) so it shows in the pipeline.
+    const projectId = await ctx.db.insert("projects", {
+      clientId,
+      title: generated.title,
+      service: generated.service,
+      description: generated.description.slice(0, 500),
+      stage: "lead",
+      budget: generated.totalAmount,
+    });
+
+    // Default installments: 50/50 deposit + on-completion. Admin can edit
+    // the schedule before sending.
+    const installments = [
+      {
+        id: crypto.randomUUID(),
+        label: "Deposit",
+        percent: 50,
+        order: 0,
+        trigger: { type: "on_acceptance" as const },
+        status: "pending" as const,
+      },
+      {
+        id: crypto.randomUUID(),
+        label: "Final",
+        percent: 50,
+        order: 1,
+        trigger: { type: "on_completion" as const },
+        status: "pending" as const,
+      },
+    ];
+
+    const proposalId = await ctx.db.insert("proposals", {
+      projectId,
+      clientId,
+      title: generated.title,
+      description: generated.description,
+      service: generated.service,
+      lineItems: generated.lineItems,
+      totalAmount: generated.totalAmount,
+      status: "draft",
+      installments,
+    });
+
+    // Mark the discovery as quoted so it moves out of the inbox flow.
+    await ctx.db.patch(id, { status: "quoted" });
+
+    return { proposalId };
   },
 });
 

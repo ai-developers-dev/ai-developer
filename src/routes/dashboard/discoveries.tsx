@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
@@ -32,7 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Trash2, ChevronRight } from 'lucide-react'
+import { Trash2, ChevronRight, FileText, Loader2 } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/discoveries')({
   component: DiscoveriesPage,
@@ -175,9 +175,11 @@ function timeAgo(creationMs: number): string {
 }
 
 function DiscoveriesPage() {
+  const navigate = useNavigate()
   const [filterStatus, setFilterStatus] = useState<Status | 'all'>('all')
   const [openId, setOpenId] = useState<Id<'discoverySubmissions'> | null>(null)
   const [notes, setNotes] = useState('')
+  const [converting, setConverting] = useState(false)
 
   const submissions = useQuery(
     api.discoverySubmissions.list,
@@ -185,6 +187,9 @@ function DiscoveriesPage() {
   )
   const updateStatus = useMutation(api.discoverySubmissions.updateStatus)
   const removeSubmission = useMutation(api.discoverySubmissions.remove)
+  const convertToProposal = useMutation(
+    api.discoverySubmissions.convertToProposal,
+  )
 
   const selected = submissions?.find((s) => s._id === openId) ?? null
 
@@ -211,6 +216,22 @@ function DiscoveriesPage() {
     if (!selected) return
     await removeSubmission({ id: selected._id })
     setOpenId(null)
+  }
+
+  async function handleConvertToProposal() {
+    if (!selected) return
+    setConverting(true)
+    try {
+      const result = await convertToProposal({ id: selected._id })
+      setOpenId(null)
+      navigate({
+        to: '/dashboard/proposals/$id',
+        params: { id: result.proposalId },
+      })
+    } catch (err) {
+      console.error('Failed to convert to proposal:', err)
+      setConverting(false)
+    }
   }
 
   return (
@@ -554,6 +575,25 @@ function DiscoveriesPage() {
                     Save Notes
                   </Button>
                 </div>
+
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleConvertToProposal}
+                  disabled={converting}
+                >
+                  {converting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating proposal…
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="w-4 h-4 mr-2" />
+                      Convert to Proposal
+                    </>
+                  )}
+                </Button>
               </div>
 
               <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
