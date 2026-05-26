@@ -355,7 +355,28 @@ function DiscoveriesPage() {
                     value={selected.hasWebsite === 'yes' ? 'Yes' : 'No'}
                   />
                   {selected.hasWebsite === 'yes' && (
-                    <Pair label="Website URL" value={selected.websiteUrl || '—'} />
+                    <>
+                      <Pair
+                        label="Website has chat?"
+                        value={
+                          selected.websiteHasChat
+                            ? selected.websiteHasChat === 'yes'
+                              ? 'Yes'
+                              : 'No'
+                            : '—'
+                        }
+                      />
+                      <Pair
+                        label="Online appointment booking?"
+                        value={
+                          selected.websiteHasOnlineBooking
+                            ? selected.websiteHasOnlineBooking === 'yes'
+                              ? 'Yes'
+                              : 'No'
+                            : '—'
+                        }
+                      />
+                    </>
                   )}
                   <Pair label="Address" value={selected.businessAddress || '—'} />
                   <Pair
@@ -445,30 +466,6 @@ function DiscoveriesPage() {
                       selected.collectsGoogleReviews,
                     )}
                   />
-                  {selected.hasWebsite === 'yes' && (
-                    <>
-                      <Pair
-                        label="Website has chat?"
-                        value={
-                          selected.websiteHasChat
-                            ? selected.websiteHasChat === 'yes'
-                              ? 'Yes'
-                              : 'No'
-                            : '—'
-                        }
-                      />
-                      <Pair
-                        label="Online appointment booking?"
-                        value={
-                          selected.websiteHasOnlineBooking
-                            ? selected.websiteHasOnlineBooking === 'yes'
-                              ? 'Yes'
-                              : 'No'
-                            : '—'
-                        }
-                      />
-                    </>
-                  )}
                   <Pair
                     label="Missed-call handling"
                     value={pretty(

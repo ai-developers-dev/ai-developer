@@ -120,7 +120,6 @@ export const submit = mutation({
     businessName: v.string(),
     businessAddress: v.optional(v.string()),
     hasWebsite: v.union(v.literal("yes"), v.literal("no")),
-    websiteUrl: v.optional(v.string()),
     businessPhone: v.string(),
     businessEmail: v.string(),
     employeeCount: employeeCountV,
@@ -386,7 +385,8 @@ export const notify = internalAction({
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
           ${row("Business name", sub.businessName)}
           ${row("Has website?", sub.hasWebsite === "yes" ? "Yes" : "No")}
-          ${row("Website URL", sub.websiteUrl || "—")}
+          ${sub.hasWebsite === "yes" ? row("Website has chat?", sub.websiteHasChat === "yes" ? "Yes" : sub.websiteHasChat === "no" ? "No" : "—") : ""}
+          ${sub.hasWebsite === "yes" ? row("Online appointment booking?", sub.websiteHasOnlineBooking === "yes" ? "Yes" : sub.websiteHasOnlineBooking === "no" ? "No" : "—") : ""}
           ${row("Address", sub.businessAddress || "—")}
           ${row("Phone", sub.businessPhone)}
           ${row("Email", sub.businessEmail)}
@@ -411,8 +411,6 @@ export const notify = internalAction({
           ${row("Change-order freq", label("changeOrderFrequency", sub.changeOrderFrequency))}
           ${row("Recurring contracts", label("recurringContracts", sub.recurringContracts))}
           ${row("Collects Google reviews", label("collectsGoogleReviews", sub.collectsGoogleReviews))}
-          ${row("Website has chat?", sub.hasWebsite === "yes" ? (sub.websiteHasChat === "yes" ? "Yes" : sub.websiteHasChat === "no" ? "No" : "—") : "(no website)")}
-          ${row("Online appointment booking?", sub.hasWebsite === "yes" ? (sub.websiteHasOnlineBooking === "yes" ? "Yes" : sub.websiteHasOnlineBooking === "no" ? "No" : "—") : "(no website)")}
           ${row("Missed-call handling", label("missedCallHandling", sub.missedCallHandling))}
           ${row("After-hours handling", label("afterHoursHandling", sub.afterHoursHandling))}
         </table>
