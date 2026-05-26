@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { Button } from '@/components/ui/button'
@@ -16,7 +16,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react'
 import { StepProgress } from './step-progress'
-import { MultiSelectChips } from './multi-select-chips'
+import { MultiSelectDropdown } from './multi-select-dropdown'
 import {
   ACCOUNTING_OPTIONS,
   AFTER_HOURS_OPTIONS,
@@ -128,6 +128,8 @@ export interface DiscoveryFormProps {
 
 export function DiscoveryForm({ source }: DiscoveryFormProps) {
   const submit = useMutation(api.discoverySubmissions.submit)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const isFirstRender = useRef(true)
   const [step, setStep] = useState(1)
   const [form, setForm] = useState<FormState>(INITIAL)
   const [submitting, setSubmitting] = useState(false)
@@ -159,6 +161,22 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
       // ignore
     }
   }, [form, step])
+
+  // Scroll to the top of the form whenever the user advances/goes back a
+  // step, so they see the new step's heading and progress bar immediately.
+  // Skip on initial mount — they're naturally already at the top.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    if (typeof window === 'undefined') return
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [step])
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -294,7 +312,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
   const hasWebsite = form.websiteUrl.trim().length > 0
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div ref={containerRef} className="max-w-3xl mx-auto space-y-6 scroll-mt-8">
       <StepProgress steps={STEPS} currentStep={step} />
 
       <Card className="border-subtle-border bg-surface">
@@ -418,7 +436,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
               </div>
 
               {form.primaryTrade && (
-                <MultiSelectChips
+                <MultiSelectDropdown
                   label="Services you offer (pick all that apply)"
                   options={servicesList}
                   value={form.servicesOffered}
@@ -426,7 +444,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 />
               )}
 
-              <MultiSelectChips
+              <MultiSelectDropdown
                 label="Where do your leads come from today? (pick all that apply)"
                 options={LEAD_SOURCES_OPTIONS}
                 value={form.leadSources}
@@ -496,7 +514,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
               </h2>
 
               {hasWebsite && (
-                <MultiSelectChips
+                <MultiSelectDropdown
                   label="What features does your website have today? (pick all that apply)"
                   options={WEBSITE_FEATURES_OPTIONS}
                   value={form.websiteFeatures}
@@ -655,14 +673,14 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 )}
               </div>
 
-              <MultiSelectChips
+              <MultiSelectDropdown
                 label="Other tools you rely on (optional)"
                 options={OTHER_TOOLS_OPTIONS}
                 value={form.otherTools}
                 onChange={(v) => set('otherTools', v)}
               />
 
-              <MultiSelectChips
+              <MultiSelectDropdown
                 label="Are you currently using any automations or AI? (pick all that apply)"
                 options={CURRENT_AUTOMATIONS_OPTIONS}
                 value={form.currentAutomations}
@@ -690,7 +708,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 </Select>
               </div>
 
-              <MultiSelectChips
+              <MultiSelectDropdown
                 label="Required integrations for the new CRM (pick all that apply)"
                 options={INTEGRATIONS_OPTIONS}
                 value={form.requiredIntegrations}
