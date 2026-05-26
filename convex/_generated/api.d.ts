@@ -10,6 +10,7 @@
 
 import type * as clients from "../clients.js";
 import type * as contactSubmissions from "../contactSubmissions.js";
+import type * as crmStarterMapper from "../crmStarterMapper.js";
 import type * as discoverySubmissions from "../discoverySubmissions.js";
 import type * as http from "../http.js";
 import type * as pricingSettings from "../pricingSettings.js";
@@ -29,6 +30,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   clients: typeof clients;
   contactSubmissions: typeof contactSubmissions;
+  crmStarterMapper: typeof crmStarterMapper;
   discoverySubmissions: typeof discoverySubmissions;
   http: typeof http;
   pricingSettings: typeof pricingSettings;

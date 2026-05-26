@@ -139,13 +139,68 @@ export function generateProposalFromDiscovery(
   // Photo documentation — baseline for every build
   push("Photo documentation & job timeline", cfg.photoDocsPrice);
 
+  // Marketing landing page + online booking widget — if they don't have a
+  // website OR their site doesn't have online booking.
+  if (
+    d.hasWebsite === "no" ||
+    (d.hasWebsite === "yes" && d.websiteHasOnlineBooking !== "yes")
+  ) {
+    push(
+      "Marketing landing page + online booking widget",
+      cfg.landingPagePrice ?? 0,
+    );
+  }
+
+  // Automated review request engine — unless they already do this religiously.
+  if (d.collectsGoogleReviews !== "yes_routinely") {
+    push(
+      "Automated post-job review request engine",
+      cfg.reviewsPrice ?? 0,
+    );
+  }
+
+  // Reporting dashboard — only worth it once they have a few techs.
+  const REPORTING_THRESHOLDS = new Set([
+    "6-10",
+    "11-20",
+    "21-50",
+    "50+",
+  ])
+  if (REPORTING_THRESHOLDS.has(d.employeeCount)) {
+    push(
+      "Reporting dashboard (KPIs, technician performance)",
+      cfg.reportingPrice ?? 0,
+    );
+  }
+
+  // Calendar + dispatch board — needed for crews > 5 or multi-location.
+  if (
+    REPORTING_THRESHOLDS.has(d.employeeCount) ||
+    d.locationCount !== "single"
+  ) {
+    push(
+      "Calendar + dispatch board (drag-and-drop tech assignment)",
+      cfg.calendarDispatchPrice ?? 0,
+    );
+  }
+
   // Per-integration line items
   const integrationMap = new Map(
-    cfg.integrations.map((i) => [i.key, { label: i.label, price: i.price }]),
+    cfg.integrations.map((i) => [
+      i.key,
+      { label: i.label, price: i.price, customBuild: i.customBuild ?? false },
+    ]),
   );
+  let hasCustomBuildLine = false;
   for (const integration of d.requiredIntegrations || []) {
     const entry = integrationMap.get(integration);
-    if (entry) push(entry.label, entry.price);
+    if (entry) {
+      const label = entry.customBuild
+        ? `${entry.label} — custom build`
+        : entry.label;
+      if (entry.customBuild) hasCustomBuildLine = true;
+      push(label, entry.price);
+    }
   }
 
   // Cross-sell: Voice AI receptionist
@@ -188,7 +243,7 @@ export function generateProposalFromDiscovery(
   const title = `Custom CRM for ${d.businessName}`;
 
   // Description
-  const description = buildDescription(d);
+  const description = buildDescription(d, { hasCustomBuildLine });
 
   return {
     title,
@@ -203,7 +258,10 @@ export function generateProposalFromDiscovery(
 // Description template
 // ============================================================
 
-function buildDescription(d: Discovery): string {
+function buildDescription(
+  d: Discovery,
+  opts: { hasCustomBuildLine?: boolean } = {},
+): string {
   const tradeLabel = TRADE_LABELS[d.primaryTrade] ?? "home service business";
   const empLabel =
     EMPLOYEE_LABELS[d.employeeCount] ?? `${d.employeeCount} employee`;
@@ -253,6 +311,12 @@ function buildDescription(d: Discovery): string {
   sections.push(
     `**You own it forever.** No per-seat licensing, no monthly platform fees beyond hosting (typically $50-100/month). The code, the data, the integrations — all yours, for the life of your business.`,
   );
+
+  if (opts.hasCustomBuildLine) {
+    sections.push(
+      `_Note: items marked **custom build** require additional development time beyond our standard CRM template. Timeline and scope are scoped during kickoff._`,
+    );
+  }
 
   return sections.join("\n\n");
 }

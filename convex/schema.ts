@@ -329,17 +329,26 @@ export default defineSchema({
     recurringContractsPrice: v.number(),
     photoDocsPrice: v.number(),
 
+    // Modules CRM Starter ships out of the box
+    landingPagePrice: v.optional(v.number()),
+    reviewsPrice: v.optional(v.number()),
+    reportingPrice: v.optional(v.number()),
+    calendarDispatchPrice: v.optional(v.number()),
+
     voiceAiCrossSellPrice: v.number(),
     automationsCrossSellPrice: v.number(),
 
     rushFeePct: v.number(), // stored as 0.20 for 20%
 
-    // Fully dynamic — admin can add/remove rows
+    // Fully dynamic — admin can add/remove rows.
+    // customBuild=true marks the integration as "needs custom build beyond
+    // CRM Starter template" so the proposal description can flag it.
     integrations: v.array(
       v.object({
         key: v.string(),
         label: v.string(),
         price: v.number(),
+        customBuild: v.optional(v.boolean()),
       })
     ),
   }),

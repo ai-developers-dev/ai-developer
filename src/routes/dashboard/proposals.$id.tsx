@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Send, Mail } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowLeft, Send, Mail, Download, Copy, Check, Rocket } from 'lucide-react'
 import { sendProposalEmail } from '@/lib/resend-server'
 import {
   computeInstallmentAmounts,
@@ -45,6 +46,10 @@ function ProposalDetailPage() {
   })
   const markSent = useMutation(api.proposals.markSent)
   const sendInvoiceNow = useMutation(api.proposals.sendInvoiceNow)
+  const crmStarterConfig = useQuery(
+    api.proposals.getCrmStarterConfig,
+    { id: id as Id<'proposals'> },
+  )
 
   if (!proposal) {
     return <div className="text-center py-12 text-muted-foreground">Loading...</div>
@@ -243,6 +248,13 @@ function ProposalDetailPage() {
         </Card>
       )}
 
+      {proposal.status === 'accepted' && crmStarterConfig && (
+        <ProvisionCrmCard
+          businessName={proposal.client?.name ?? proposal.title}
+          config={crmStarterConfig as unknown as Record<string, unknown>}
+        />
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Timeline</CardTitle>
@@ -286,4 +298,127 @@ function ProposalDetailPage() {
       </Card>
     </div>
   )
+}
+
+// ============================================================
+// Provision CRM card — appears on accepted proposals with a linked
+// discovery. Downloads a prefilled answers.json + copies the exact CLI
+// command so admin can spin up the CRM Starter project in ~2 minutes.
+// ============================================================
+
+interface ProvisionCrmCardProps {
+  businessName: string
+  config: Record<string, unknown>
+}
+
+function ProvisionCrmCard({ businessName, config }: ProvisionCrmCardProps) {
+  const [copied, setCopied] = useState(false)
+
+  const cmd = `npx create-crm-starter@latest --config ./answers.json`
+  const moduleCount = countModules(config)
+  const integrationCount = countIntegrations(config)
+  const industry = String(config.industry ?? 'general')
+
+  function downloadJson() {
+    const blob = new Blob([JSON.stringify(config, null, 2)], {
+      type: 'application/json',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'answers.json'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  async function copyCmd() {
+    try {
+      await navigator.clipboard.writeText(cmd)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch (e) {
+      console.error('Clipboard write failed', e)
+    }
+  }
+
+  return (
+    <Card className="border-brand-primary/30 bg-brand-primary/5">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Rocket className="w-5 h-5 text-brand-primary" />
+          <CardTitle>Provision CRM</CardTitle>
+        </div>
+        <CardDescription>
+          Ready to build {businessName}. We've translated the discovery into
+          a CRM Starter config — download it and run the scaffolder.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="capitalize">
+            Industry: {industry}
+          </Badge>
+          <Badge variant="outline">{moduleCount} modules</Badge>
+          <Badge variant="outline">{integrationCount} integrations</Badge>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={downloadJson}>
+            <Download className="w-4 h-4 mr-1.5" />
+            Download answers.json
+          </Button>
+          <Button variant="outline" onClick={copyCmd}>
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 mr-1.5 text-green-600" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 mr-1.5" />
+                Copy CLI command
+              </>
+            )}
+          </Button>
+        </div>
+
+        <div className="rounded-md bg-foreground/5 border border-border p-3 text-xs font-mono">
+          <p className="text-muted-foreground mb-1">Then run:</p>
+          <p>
+            cd ~/Desktop
+            <br />
+            {cmd}
+          </p>
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          The scaffolder will create a new Next.js project in the current
+          directory and provision its own Convex deployment. Hand off the
+          login link to the client when it's live.
+        </p>
+      </CardContent>
+    </Card>
+  )
+}
+
+function countModules(c: Record<string, unknown>): number {
+  const moduleKeys = [
+    'landingPage',
+    'customers',
+    'jobs',
+    'estimatesInvoices',
+    'calendarDispatch',
+    'payments',
+    'reviews',
+    'reporting',
+  ]
+  return moduleKeys.filter((k) => c[k] === true).length
+}
+
+function countIntegrations(c: Record<string, unknown>): number {
+  const comms = Array.isArray(c.comms) ? c.comms.length : 0
+  const payments = c.payments === true ? 1 : 0
+  return comms + payments
 }

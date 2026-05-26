@@ -39,41 +39,62 @@ export const DEFAULT_PRICING = {
   onSiteQuotingPrice: 2_000,
   recurringContractsPrice: 3_000,
   photoDocsPrice: 1_000,
+  // Modules CRM Starter ships
+  landingPagePrice: 2_500,
+  reviewsPrice: 1_500,
+  reportingPrice: 2_000,
+  calendarDispatchPrice: 2_500,
   voiceAiCrossSellPrice: 8_000,
   automationsCrossSellPrice: 3_000,
   rushFeePct: 0.2,
   integrations: [
-    { key: "QuickBooks", label: "QuickBooks Online integration", price: 2_500 },
+    {
+      key: "QuickBooks",
+      label: "QuickBooks Online integration",
+      price: 2_500,
+      customBuild: false,
+    },
     {
       key: "Stripe / Square (card payments)",
       label: "Stripe / Square card processing",
       price: 1_000,
+      customBuild: false,
     },
-    { key: "ACH payments", label: "ACH payments", price: 1_500 },
+    {
+      key: "ACH payments",
+      label: "ACH payments",
+      price: 1_500,
+      customBuild: true,
+    },
     {
       key: "Supplier catalog",
       label: "Supplier catalog integration",
       price: 3_000,
+      customBuild: true,
     },
     {
       key: "Google Maps routing",
       label: "Google Maps routing & ETAs",
       price: 1_500,
+      customBuild: true,
     },
     {
       key: "SMS reminders",
       label: "SMS reminders & notifications",
       price: 1_500,
+      customBuild: false,
     },
     {
       key: "Email marketing",
       label: "Email marketing integration",
       price: 1_500,
+      customBuild: false,
     },
     {
       key: "Calendar sync (Google/Outlook)",
       label: "Calendar sync (Google / Outlook)",
       price: 1_000,
+      customBuild: true,
     },
   ],
 };
@@ -138,6 +159,10 @@ export const update = mutation({
     onSiteQuotingPrice: v.optional(v.number()),
     recurringContractsPrice: v.optional(v.number()),
     photoDocsPrice: v.optional(v.number()),
+    landingPagePrice: v.optional(v.number()),
+    reviewsPrice: v.optional(v.number()),
+    reportingPrice: v.optional(v.number()),
+    calendarDispatchPrice: v.optional(v.number()),
     voiceAiCrossSellPrice: v.optional(v.number()),
     automationsCrossSellPrice: v.optional(v.number()),
     rushFeePct: v.optional(v.number()),
@@ -147,6 +172,7 @@ export const update = mutation({
           key: v.string(),
           label: v.string(),
           price: v.number(),
+          customBuild: v.optional(v.boolean()),
         })
       )
     ),

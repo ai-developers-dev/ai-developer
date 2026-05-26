@@ -8,6 +8,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import { discoveryToCrmStarterConfig } from "./crmStarterMapper";
 
 // ============================================================
 // Validators
@@ -346,6 +347,44 @@ export const update = mutation({
     );
 
     await ctx.db.patch(id, cleanUpdates);
+  },
+});
+
+// ============================================================
+// Discovery → CRM Starter config (for the "Provision CRM" button)
+// ============================================================
+
+export const getCrmStarterConfig = query({
+  args: { id: v.id("proposals") },
+  handler: async (ctx, { id }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkUserId", (q) =>
+        q.eq("clerkUserId", identity.subject)
+      )
+      .unique();
+    if (!user || user.role !== "admin") return null;
+
+    const proposal = await ctx.db.get(id);
+    if (!proposal) return null;
+
+    // Find the most recent discovery for this client by matching email.
+    // (We don't store discoveryId directly on the proposal; clientId →
+    // contactEmail → discoverySubmissions.businessEmail.)
+    const client = await ctx.db.get(proposal.clientId);
+    if (!client) return null;
+
+    const discoveries = await ctx.db
+      .query("discoverySubmissions")
+      .collect();
+    const discovery = discoveries
+      .filter((d) => d.businessEmail === client.contactEmail)
+      .sort((a, b) => b._creationTime - a._creationTime)[0];
+
+    if (!discovery) return null;
+    return discoveryToCrmStarterConfig(discovery);
   },
 });
 

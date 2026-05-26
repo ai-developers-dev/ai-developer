@@ -188,6 +188,40 @@ function PricingSettingsPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            Modules included in CRM Starter
+          </CardTitle>
+          <CardDescription>
+            These ship out of the box with our CRM Starter template. Each
+            fires conditionally based on discovery answers.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <PriceRow
+            label="Marketing landing page + online booking (when no website / no online booking)"
+            value={cfg.landingPagePrice ?? 0}
+            onCommit={(v) => update({ landingPagePrice: v })}
+          />
+          <PriceRow
+            label="Automated review request engine (when not collecting reviews routinely)"
+            value={cfg.reviewsPrice ?? 0}
+            onCommit={(v) => update({ reviewsPrice: v })}
+          />
+          <PriceRow
+            label="Reporting dashboard (when 6+ employees)"
+            value={cfg.reportingPrice ?? 0}
+            onCommit={(v) => update({ reportingPrice: v })}
+          />
+          <PriceRow
+            label="Calendar + dispatch board (when 6+ employees or multi-location)"
+            value={cfg.calendarDispatchPrice ?? 0}
+            onCommit={(v) => update({ calendarDispatchPrice: v })}
+          />
+        </CardContent>
+      </Card>
+
       <IntegrationsCard
         value={cfg.integrations}
         onCommit={(next) => update({ integrations: next })}
@@ -370,9 +404,16 @@ function ScaleCard({
   )
 }
 
+interface IntegrationRow {
+  key: string
+  label: string
+  price: number
+  customBuild?: boolean
+}
+
 interface IntegrationsCardProps {
-  value: { key: string; label: string; price: number }[]
-  onCommit: (next: { key: string; label: string; price: number }[]) => void
+  value: IntegrationRow[]
+  onCommit: (next: IntegrationRow[]) => void
 }
 
 function IntegrationsCard({ value, onCommit }: IntegrationsCardProps) {
@@ -402,8 +443,15 @@ function IntegrationsCard({ value, onCommit }: IntegrationsCardProps) {
         key: `custom_${Date.now()}`,
         label: 'New integration',
         price: 0,
+        customBuild: false,
       },
     ]
+    onCommit(next)
+  }
+
+  function toggleCustomBuild(i: number, customBuild: boolean) {
+    const next = value.slice()
+    next[i] = { ...next[i], customBuild }
     onCommit(next)
   }
 
@@ -433,14 +481,17 @@ function IntegrationsCard({ value, onCommit }: IntegrationsCardProps) {
           </p>
         ) : (
           <div className="grid grid-cols-12 gap-2 items-start">
-            <div className="col-span-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="col-span-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Key (form value)
             </div>
-            <div className="col-span-5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="col-span-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Line-item label
             </div>
             <div className="col-span-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Price
+            </div>
+            <div className="col-span-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Custom?
             </div>
             <div className="col-span-1" />
             {value.map((row, i) => (
@@ -454,6 +505,7 @@ function IntegrationsCard({ value, onCommit }: IntegrationsCardProps) {
                 }}
                 onLabelChange={(label) => updateLabel(i, label)}
                 onPriceChange={(price) => updatePrice(i, price)}
+                onCustomBuildChange={(cb) => toggleCustomBuild(i, cb)}
                 onRemove={() => remove(i)}
                 allKeys={integrationOptions}
               />
@@ -466,10 +518,11 @@ function IntegrationsCard({ value, onCommit }: IntegrationsCardProps) {
 }
 
 interface IntegrationRowProps {
-  row: { key: string; label: string; price: number }
+  row: IntegrationRow
   onKeyChange: (k: string) => void
   onLabelChange: (l: string) => void
   onPriceChange: (p: number) => void
+  onCustomBuildChange: (cb: boolean) => void
   onRemove: () => void
   allKeys: string[]
 }
@@ -479,6 +532,7 @@ function IntegrationRow({
   onKeyChange,
   onLabelChange,
   onPriceChange,
+  onCustomBuildChange,
   onRemove,
 }: IntegrationRowProps) {
   const [localKey, setLocalKey] = useState(row.key)
@@ -491,7 +545,7 @@ function IntegrationRow({
 
   return (
     <>
-      <div className="col-span-4">
+      <div className="col-span-3">
         <Input
           value={localKey}
           onChange={(e) => setLocalKey(e.target.value)}
@@ -502,7 +556,7 @@ function IntegrationRow({
           placeholder="e.g. QuickBooks"
         />
       </div>
-      <div className="col-span-5">
+      <div className="col-span-4">
         <Input
           value={localLabel}
           onChange={(e) => setLocalLabel(e.target.value)}
@@ -535,6 +589,17 @@ function IntegrationRow({
             className="pl-6 h-9 text-sm"
           />
         </div>
+      </div>
+      <div className="col-span-2 flex items-center pt-2">
+        <label className="inline-flex items-center gap-1.5 text-xs cursor-pointer">
+          <input
+            type="checkbox"
+            checked={!!row.customBuild}
+            onChange={(e) => onCustomBuildChange(e.target.checked)}
+            className="rounded border-input"
+          />
+          <span className="text-muted-foreground">Custom</span>
+        </label>
       </div>
       <div className="col-span-1 flex justify-end">
         <button
