@@ -454,10 +454,73 @@ export const notify = internalAction({
       });
       if (!res.ok) {
         const text = await res.text();
-        console.error("Resend send failed:", res.status, text);
+        console.error("Resend admin send failed:", res.status, text);
       }
     } catch (err) {
-      console.error("Resend fetch threw:", err);
+      console.error("Resend admin fetch threw:", err);
+    }
+
+    // Customer thank-you email — sent to the address they entered.
+    if (sub.businessEmail) {
+      const firstName =
+        sub.businessName.split(/\s+/)[0] || "there"; // fallback if blank
+      const customerHtml = `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#1c1110;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:40px 20px;">
+    <div style="background:white;border-radius:12px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#d4cebb 0%,#b8b3a0 100%);padding:36px 40px;text-align:center;">
+        <h1 style="color:white;font-size:22px;margin:0;font-weight:700;">AI Developer</h1>
+        <p style="color:rgba(255,255,255,0.85);font-size:13px;margin:6px 0 0;">Discovery received</p>
+      </div>
+      <div style="padding:36px 40px;color:#374151;font-size:15px;line-height:1.6;">
+        <p style="margin:0 0 14px;">Hi ${firstName},</p>
+        <p style="margin:0 0 14px;">
+          Thanks for taking the time to fill out the discovery for
+          <strong>${sub.businessName}</strong>. I read every one of these
+          personally — your answers are the difference between a generic
+          quote and a real one.
+        </p>
+        <p style="margin:0 0 14px;">
+          I'll review your submission and email you back within
+          <strong>24 hours</strong> with a scope + price range tailored to
+          how your shop actually runs. If you'd like to talk sooner, just
+          reply directly to this email.
+        </p>
+        <p style="margin:0 0 14px;">— Doug Allen<br>
+          <span style="color:#9CA3AF;font-size:13px;">Founder, AI Developer</span>
+        </p>
+      </div>
+      <div style="background:#FAFAFA;border-top:1px solid #F3F4F6;padding:18px 40px;text-align:center;">
+        <p style="color:#9CA3AF;font-size:12px;margin:0;">AI Developer — Custom AI software & CRMs for home service businesses.</p>
+      </div>
+    </div>
+  </div>
+</body></html>`;
+
+      try {
+        const res2 = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "AI Developer <onboarding@resend.dev>",
+            to: sub.businessEmail,
+            reply_to: "doug@aideveloper.dev",
+            subject: `Thanks — we'll be in touch within 24 hours`,
+            html: customerHtml,
+          }),
+        });
+        if (!res2.ok) {
+          const text = await res2.text();
+          console.error("Resend customer send failed:", res2.status, text);
+        }
+      } catch (err) {
+        console.error("Resend customer fetch threw:", err);
+      }
     }
   },
 });
