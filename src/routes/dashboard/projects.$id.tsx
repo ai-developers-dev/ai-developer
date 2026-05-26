@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ArrowLeft, Clock, FileText } from 'lucide-react'
-import { sendSecondPaymentInvoice } from '@/lib/resend-server'
 
 export const Route = createFileRoute('/dashboard/projects/$id')({
   component: ProjectDetailPage,
@@ -68,36 +67,11 @@ function ProjectDetailPage() {
         <Select
           value={project.stage}
           onValueChange={async (v) => {
-            const result = await updateStage({
+            await updateStage({
               id: id as Id<'projects'>,
               stage: v as any,
             })
-            // When project completed with a split-payment proposal, send second invoice
-            if (result?.sendSecondInvoiceFor) {
-              const splitProposal = project.proposals.find(
-                (p) => p._id === result.sendSecondInvoiceFor
-              )
-              if (splitProposal) {
-                const client = project.client
-                if (client) {
-                  try {
-                    await sendSecondPaymentInvoice({
-                      data: {
-                        to: client.contactEmail,
-                        clientName: client.name,
-                        proposalTitle: splitProposal.title,
-                        lineItems: (splitProposal as any).lineItems ?? [],
-                        totalAmount: splitProposal.totalAmount,
-                        secondPaymentAmount: (splitProposal as any).secondPaymentAmount ?? splitProposal.totalAmount / 2,
-                        payUrl: `${window.location.origin}/pay/${splitProposal._id}`,
-                      },
-                    })
-                  } catch (err) {
-                    console.error('Failed to send second invoice email:', err)
-                  }
-                }
-              }
-            }
+            // Convex onProjectStageChange auto-sends installment invoices.
           }}
         >
           <SelectTrigger className="w-40">

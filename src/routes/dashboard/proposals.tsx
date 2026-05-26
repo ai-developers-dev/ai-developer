@@ -44,6 +44,12 @@ import {
 } from '@/components/ui/select'
 import { Plus, Trash2, Pencil, FileText, Mail } from 'lucide-react'
 import { sendProposalEmail } from '@/lib/resend-server'
+import { PaymentScheduleEditor } from '@/components/proposals/payment-schedule-editor'
+import {
+  PRESETS,
+  type Installment,
+  type InstallmentInput,
+} from '@/lib/installments'
 
 export const Route = createFileRoute('/dashboard/proposals')({
   component: ProposalsPage,
@@ -115,7 +121,10 @@ function ProposalsPage() {
   const [validUntil, setValidUntil] = useState('')
 
   // New state
-  const [paymentMode, setPaymentMode] = useState<'full' | 'split'>('full')
+  const [installments, setInstallments] = useState<InstallmentInput[]>(
+    PRESETS.full.rows,
+  )
+  const [scheduleLocked, setScheduleLocked] = useState(false)
   const [emailToClient, setEmailToClient] = useState(false)
   const [sending, setSending] = useState(false)
   const [editingProposalId, setEditingProposalId] = useState<Id<'proposals'> | null>(null)
@@ -133,7 +142,8 @@ function ProposalsPage() {
     setDescription('')
     setLineItems([{ ...emptyLineItem }])
     setValidUntil('')
-    setPaymentMode('full')
+    setInstallments(PRESETS.full.rows)
+    setScheduleLocked(false)
     setEmailToClient(false)
     setEditingProposalId(null)
   }
@@ -162,7 +172,26 @@ function ProposalsPage() {
         ? new Date(proposal.validUntil).toISOString().split('T')[0]
         : ''
     )
-    setPaymentMode((proposal as any).paymentMode || 'full')
+    const existingInstallments: Installment[] | undefined = (proposal as any)
+      .installments
+    if (existingInstallments && existingInstallments.length > 0) {
+      setInstallments(
+        existingInstallments
+          .slice()
+          .sort((a, b) => a.order - b.order)
+          .map((r) => ({
+            label: r.label,
+            percent: r.percent,
+            trigger: r.trigger,
+          })),
+      )
+      setScheduleLocked(
+        existingInstallments.some((r) => r.status !== 'pending'),
+      )
+    } else {
+      setInstallments(PRESETS.full.rows)
+      setScheduleLocked(false)
+    }
     setEmailToClient(false)
     setDialogOpen(true)
   }
@@ -261,7 +290,7 @@ function ProposalsPage() {
           lineItems: finalLineItems,
           totalAmount: grandTotal,
           validUntil: validUntil ? new Date(validUntil).getTime() : undefined,
-          paymentMode,
+          installments,
         })
 
         // If email checkbox is checked, mark as sent and email client
@@ -611,33 +640,19 @@ function ProposalsPage() {
                 />
               </div>
 
-              {/* Split Payment toggle */}
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="splitPayment"
-                    checked={paymentMode === 'split'}
-                    onCheckedChange={(checked) =>
-                      setPaymentMode(checked === true ? 'split' : 'full')
-                    }
-                  />
-                  <Label htmlFor="splitPayment" className="text-sm font-normal cursor-pointer">
-                    Split Payment (50/50) — half upfront, half on project completion
-                  </Label>
-                </div>
-                {paymentMode === 'split' && grandTotal > 0 && (
-                  <div className="ml-6 text-xs text-muted-foreground bg-muted/50 rounded-md p-2 space-y-1">
-                    <div className="flex justify-between">
-                      <span>Payment 1 (upfront)</span>
-                      <span className="font-medium">${formatUsd(Math.ceil((grandTotal * 100) / 2) / 100)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Payment 2 (on completion)</span>
-                      <span className="font-medium">${formatUsd(Math.floor((grandTotal * 100) / 2) / 100)}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* Payment Schedule */}
+              <PaymentScheduleEditor
+                totalAmount={grandTotal}
+                value={installments}
+                onChange={setInstallments}
+                locked={scheduleLocked}
+              />
+              {scheduleLocked && (
+                <p className="text-xs text-muted-foreground">
+                  The schedule can&apos;t be changed because at least one
+                  installment is already invoiced or paid.
+                </p>
+              )}
 
               {/* Email to Client checkbox — only when creating */}
               {!editingProposalId && (
@@ -725,15 +740,22 @@ function ProposalsPage() {
                       </td>
                       <td className="py-3 px-4 space-y-1">
                         <div>{statusBadge(proposal.status)}</div>
-                        {(proposal as any).paymentMode === 'split' && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                            {(proposal as any).secondPaymentStatus === 'paid'
-                              ? '2/2 Paid'
-                              : (proposal as any).firstPaymentStatus === 'paid'
-                                ? '1/2 Paid'
-                                : 'Split 50/50'}
-                          </Badge>
-                        )}
+                        {(() => {
+                          const rows = ((proposal as any).installments ??
+                            []) as Installment[]
+                          if (rows.length <= 1) return null
+                          const paid = rows.filter(
+                            (r) => r.status === 'paid',
+                          ).length
+                          return (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1.5 py-0"
+                            >
+                              {paid}/{rows.length} paid
+                            </Badge>
+                          )
+                        })()}
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-1">

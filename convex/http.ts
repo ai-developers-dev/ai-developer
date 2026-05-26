@@ -104,9 +104,18 @@ http.route({
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       const proposalId = session.metadata?.proposalId;
-      const paymentNumber = parseInt(session.metadata?.paymentNumber || "1", 10);
+      const installmentId = session.metadata?.installmentId;
+      const legacyPaymentNumber = session.metadata?.paymentNumber;
 
-      if (proposalId) {
+      if (proposalId && installmentId) {
+        await ctx.runMutation(internal.proposals.markInstallmentPaid, {
+          proposalId,
+          installmentId,
+          paymentIntentId: session.payment_intent,
+        });
+      } else if (proposalId && legacyPaymentNumber) {
+        // Legacy: in-flight sessions created before the installments migration.
+        const paymentNumber = parseInt(legacyPaymentNumber, 10);
         await ctx.runMutation(internal.proposals.markPaid, {
           stripeSessionId: session.id,
           paymentIntentId: session.payment_intent,

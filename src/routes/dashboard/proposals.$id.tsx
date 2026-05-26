@@ -11,8 +11,13 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Send } from 'lucide-react'
+import { ArrowLeft, Send, Mail } from 'lucide-react'
 import { sendProposalEmail } from '@/lib/resend-server'
+import {
+  computeInstallmentAmounts,
+  describeTrigger,
+  type Installment,
+} from '@/lib/installments'
 
 export const Route = createFileRoute('/dashboard/proposals/$id')({
   component: ProposalDetailPage,
@@ -39,9 +44,39 @@ function ProposalDetailPage() {
     id: id as Id<'proposals'>,
   })
   const markSent = useMutation(api.proposals.markSent)
+  const sendInvoiceNow = useMutation(api.proposals.sendInvoiceNow)
 
   if (!proposal) {
     return <div className="text-center py-12 text-muted-foreground">Loading...</div>
+  }
+
+  const installments: Installment[] = ((proposal as any).installments ?? [])
+    .slice()
+    .sort((a: Installment, b: Installment) => a.order - b.order)
+  const installmentAmounts = computeInstallmentAmounts(
+    proposal.totalAmount,
+    installments.map((i) => i.percent),
+  )
+
+  function installmentStatusBadge(status: Installment['status']) {
+    switch (status) {
+      case 'paid':
+        return (
+          <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">
+            Paid
+          </Badge>
+        )
+      case 'invoiced':
+        return (
+          <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">
+            Invoiced
+          </Badge>
+        )
+      case 'skipped':
+        return <Badge variant="secondary">Skipped</Badge>
+      default:
+        return <Badge variant="outline">Pending</Badge>
+    }
   }
 
   async function handleSend() {
@@ -139,6 +174,73 @@ function ProposalDetailPage() {
             Send to Client
           </Button>
         </div>
+      )}
+
+      {installments.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment Schedule</CardTitle>
+            <CardDescription>
+              {installments.length} installment
+              {installments.length === 1 ? '' : 's'} —{' '}
+              {installments.filter((r) => r.status === 'paid').length} paid
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {installments.map((row, i) => (
+                <div
+                  key={row.id}
+                  className="flex items-center justify-between rounded-md border p-3"
+                >
+                  <div className="min-w-0 flex-1 mr-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-sm">{row.label}</span>
+                      {installmentStatusBadge(row.status)}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {row.percent.toFixed(2)}% · {describeTrigger(row.trigger)}
+                      {row.dueAt && row.status === 'invoiced' && (
+                        <>
+                          {' · Sent '}
+                          {new Date(row.dueAt).toLocaleDateString()}
+                        </>
+                      )}
+                      {row.paidAt && row.status === 'paid' && (
+                        <>
+                          {' · Paid '}
+                          {new Date(row.paidAt).toLocaleDateString()}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">
+                      ${installmentAmounts[i]?.toLocaleString()}
+                    </p>
+                    {row.status === 'pending' &&
+                      row.trigger.type !== 'on_acceptance' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs mt-1"
+                          onClick={() =>
+                            sendInvoiceNow({
+                              proposalId: id as Id<'proposals'>,
+                              installmentId: row.id,
+                            })
+                          }
+                        >
+                          <Mail className="w-3 h-3 mr-1" />
+                          Send invoice now
+                        </Button>
+                      )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       <Card>

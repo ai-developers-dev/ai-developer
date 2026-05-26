@@ -134,6 +134,49 @@ export default defineSchema({
     secondStripeSessionId: v.optional(v.string()),
     secondStripePaymentIntentId: v.optional(v.string()),
     secondInvoiceSentAt: v.optional(v.number()),
+    // Flexible N-part payment schedule (supersedes paymentMode/first*/second*).
+    // Legacy fields above kept optional for historical reads; migration backfills installments.
+    installments: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          label: v.string(),
+          percent: v.number(),
+          order: v.number(),
+          trigger: v.union(
+            v.object({ type: v.literal("on_acceptance") }),
+            v.object({
+              type: v.literal("net_days_after_previous"),
+              days: v.number(),
+            }),
+            v.object({ type: v.literal("on_completion") }),
+            v.object({
+              type: v.literal("on_stage"),
+              stage: v.union(
+                v.literal("lead"),
+                v.literal("proposal"),
+                v.literal("review"),
+                v.literal("contracted"),
+                v.literal("in_progress"),
+                v.literal("completed")
+              ),
+            })
+          ),
+          status: v.union(
+            v.literal("pending"),
+            v.literal("invoiced"),
+            v.literal("paid"),
+            v.literal("skipped")
+          ),
+          stripeSessionId: v.optional(v.string()),
+          stripePaymentIntentId: v.optional(v.string()),
+          dueAt: v.optional(v.number()),
+          invoicedAt: v.optional(v.number()),
+          paidAt: v.optional(v.number()),
+          scheduledJobId: v.optional(v.id("_scheduled_functions")),
+        })
+      )
+    ),
   })
     .index("by_clientId", ["clientId"])
     .index("by_projectId", ["projectId"])

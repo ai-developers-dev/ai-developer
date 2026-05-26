@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 const stageValidator = v.union(
   v.literal("lead"),
@@ -225,29 +226,11 @@ export const updateStage = mutation({
 
     await ctx.db.patch(id, { stage });
 
-    // When moving to completed, check for split-payment proposals needing a second invoice
-    if (stage === "completed") {
-      const proposals = await ctx.db
-        .query("proposals")
-        .withIndex("by_projectId", (q) => q.eq("projectId", id))
-        .collect();
-
-      const splitProposal = proposals.find(
-        (p) =>
-          p.paymentMode === "split" &&
-          p.firstPaymentStatus === "paid" &&
-          p.secondPaymentStatus !== "paid" &&
-          p.secondPaymentStatus !== "invoiced"
-      );
-
-      if (splitProposal) {
-        await ctx.db.patch(splitProposal._id, {
-          secondPaymentStatus: "invoiced",
-          secondInvoiceSentAt: Date.now(),
-        });
-        return { sendSecondInvoiceFor: splitProposal._id };
-      }
-    }
+    // Fire any pending installment invoices whose trigger matches this stage.
+    await ctx.scheduler.runAfter(0, internal.proposals.onProjectStageChange, {
+      projectId: id,
+      stage,
+    });
 
     return { sendSecondInvoiceFor: null };
   },
