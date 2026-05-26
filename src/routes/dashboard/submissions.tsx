@@ -20,7 +20,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowRight, X } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { ArrowRight, Trash2, X } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/submissions')({
   component: SubmissionsPage,
@@ -54,6 +65,7 @@ function SubmissionsPage() {
   )
   const updateStatus = useMutation(api.contactSubmissions.updateStatus)
   const convertToClient = useMutation(api.clients.convertFromSubmission)
+  const removeSubmission = useMutation(api.contactSubmissions.remove)
 
   const selected = submissions?.find((s) => s._id === selectedId)
 
@@ -63,6 +75,11 @@ function SubmissionsPage() {
 
   async function handleConvert(id: Id<'contactSubmissions'>) {
     await convertToClient({ submissionId: id })
+    setSelectedId(null)
+  }
+
+  async function handleDelete(id: Id<'contactSubmissions'>) {
+    await removeSubmission({ id })
     setSelectedId(null)
   }
 
@@ -225,6 +242,34 @@ function SubmissionsPage() {
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 )}
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="w-full">
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete Submission
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this submission?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This permanently removes the submission from{' '}
+                        <span className="font-medium">{selected.name}</span>. This
+                        action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(selected._id)}
+                        className="bg-destructive text-white hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
           ) : (
