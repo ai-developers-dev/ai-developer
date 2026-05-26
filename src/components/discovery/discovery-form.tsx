@@ -348,6 +348,62 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="businessAddress">
+                  Business address{' '}
+                  <span className="text-xs text-muted-foreground font-normal">
+                    (optional)
+                  </span>
+                </Label>
+                <Input
+                  id="businessAddress"
+                  value={form.businessAddress}
+                  onChange={(e) => set('businessAddress', e.target.value)}
+                  placeholder="123 Main St, Springfield, IL"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="businessPhone">Phone</Label>
+                  <Input
+                    id="businessPhone"
+                    type="tel"
+                    value={form.businessPhone}
+                    onChange={(e) => set('businessPhone', e.target.value)}
+                    placeholder="(555) 123-4567"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="businessEmail">Email</Label>
+                  <Input
+                    id="businessEmail"
+                    type="email"
+                    value={form.businessEmail}
+                    onChange={(e) => set('businessEmail', e.target.value)}
+                    placeholder="owner@business.com"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Number of employees</Label>
+                <RadioGroup
+                  value={form.employeeCount}
+                  onValueChange={(v) => set('employeeCount', v)}
+                  className="grid grid-cols-2 sm:grid-cols-3 gap-2"
+                >
+                  {EMPLOYEE_COUNT_OPTIONS.map((opt) => (
+                    <RadioOption
+                      key={opt.value}
+                      value={opt.value}
+                      label={opt.label}
+                      selected={form.employeeCount === opt.value}
+                    />
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-2">
                 <Label>Do you have a business website?</Label>
                 <RadioGroup
                   value={form.hasWebsite}
@@ -411,62 +467,6 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                   </div>
                 </>
               )}
-
-              <div className="space-y-2">
-                <Label htmlFor="businessAddress">
-                  Business address{' '}
-                  <span className="text-xs text-muted-foreground font-normal">
-                    (optional)
-                  </span>
-                </Label>
-                <Input
-                  id="businessAddress"
-                  value={form.businessAddress}
-                  onChange={(e) => set('businessAddress', e.target.value)}
-                  placeholder="123 Main St, Springfield, IL"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="businessPhone">Phone</Label>
-                  <Input
-                    id="businessPhone"
-                    type="tel"
-                    value={form.businessPhone}
-                    onChange={(e) => set('businessPhone', e.target.value)}
-                    placeholder="(555) 123-4567"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="businessEmail">Email</Label>
-                  <Input
-                    id="businessEmail"
-                    type="email"
-                    value={form.businessEmail}
-                    onChange={(e) => set('businessEmail', e.target.value)}
-                    placeholder="owner@business.com"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Number of employees</Label>
-                <RadioGroup
-                  value={form.employeeCount}
-                  onValueChange={(v) => set('employeeCount', v)}
-                  className="grid grid-cols-2 sm:grid-cols-3 gap-2"
-                >
-                  {EMPLOYEE_COUNT_OPTIONS.map((opt) => (
-                    <RadioOption
-                      key={opt.value}
-                      value={opt.value}
-                      label={opt.label}
-                      selected={form.employeeCount === opt.value}
-                    />
-                  ))}
-                </RadioGroup>
-              </div>
             </div>
           )}
 
