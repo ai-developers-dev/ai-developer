@@ -38,6 +38,11 @@ import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settin
 import { Route as DashboardProposalsRouteImport } from './routes/dashboard/proposals'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
 import { Route as DashboardClientsRouteImport } from './routes/dashboard/clients'
+import { Route as BlogStopPayingMonthlyFieldServiceSoftwareRouteImport } from './routes/blog.stop-paying-monthly-field-service-software'
+import { Route as BlogServicetitanAlternativeSmallElectriciansRouteImport } from './routes/blog.servicetitan-alternative-small-electricians'
+import { Route as BlogHousecallProVsCustomCrmFeaturesRouteImport } from './routes/blog.housecall-pro-vs-custom-crm-features'
+import { Route as BlogCustomAiVoiceAgentHvacDispatchRouteImport } from './routes/blog.custom-ai-voice-agent-hvac-dispatch'
+import { Route as BlogBuildVsBuyFieldServiceSoftwareRouteImport } from './routes/blog.build-vs-buy-field-service-software'
 import { Route as ServicesCustomCrmPlumbersRouteImport } from './routes/services/custom-crm.plumbers'
 import { Route as ServicesCustomCrmHvacRouteImport } from './routes/services/custom-crm.hvac'
 import { Route as ServicesCustomCrmElectriciansRouteImport } from './routes/services/custom-crm.electricians'
@@ -191,6 +196,36 @@ const DashboardClientsRoute = DashboardClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => DashboardRoute,
 } as any)
+const BlogStopPayingMonthlyFieldServiceSoftwareRoute =
+  BlogStopPayingMonthlyFieldServiceSoftwareRouteImport.update({
+    id: '/stop-paying-monthly-field-service-software',
+    path: '/stop-paying-monthly-field-service-software',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogServicetitanAlternativeSmallElectriciansRoute =
+  BlogServicetitanAlternativeSmallElectriciansRouteImport.update({
+    id: '/servicetitan-alternative-small-electricians',
+    path: '/servicetitan-alternative-small-electricians',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogHousecallProVsCustomCrmFeaturesRoute =
+  BlogHousecallProVsCustomCrmFeaturesRouteImport.update({
+    id: '/housecall-pro-vs-custom-crm-features',
+    path: '/housecall-pro-vs-custom-crm-features',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogCustomAiVoiceAgentHvacDispatchRoute =
+  BlogCustomAiVoiceAgentHvacDispatchRouteImport.update({
+    id: '/custom-ai-voice-agent-hvac-dispatch',
+    path: '/custom-ai-voice-agent-hvac-dispatch',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogBuildVsBuyFieldServiceSoftwareRoute =
+  BlogBuildVsBuyFieldServiceSoftwareRouteImport.update({
+    id: '/build-vs-buy-field-service-software',
+    path: '/build-vs-buy-field-service-software',
+    getParentRoute: () => BlogRoute,
+  } as any)
 const ServicesCustomCrmPlumbersRoute =
   ServicesCustomCrmPlumbersRouteImport.update({
     id: '/plumbers',
@@ -232,13 +267,18 @@ const DashboardProjectsIdRoute = DashboardProjectsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
+  '/blog/build-vs-buy-field-service-software': typeof BlogBuildVsBuyFieldServiceSoftwareRoute
+  '/blog/custom-ai-voice-agent-hvac-dispatch': typeof BlogCustomAiVoiceAgentHvacDispatchRoute
+  '/blog/housecall-pro-vs-custom-crm-features': typeof BlogHousecallProVsCustomCrmFeaturesRoute
+  '/blog/servicetitan-alternative-small-electricians': typeof BlogServicetitanAlternativeSmallElectriciansRoute
+  '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
@@ -270,11 +310,16 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
+  '/blog/build-vs-buy-field-service-software': typeof BlogBuildVsBuyFieldServiceSoftwareRoute
+  '/blog/custom-ai-voice-agent-hvac-dispatch': typeof BlogCustomAiVoiceAgentHvacDispatchRoute
+  '/blog/housecall-pro-vs-custom-crm-features': typeof BlogHousecallProVsCustomCrmFeaturesRoute
+  '/blog/servicetitan-alternative-small-electricians': typeof BlogServicetitanAlternativeSmallElectriciansRoute
+  '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
@@ -307,13 +352,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
+  '/blog/build-vs-buy-field-service-software': typeof BlogBuildVsBuyFieldServiceSoftwareRoute
+  '/blog/custom-ai-voice-agent-hvac-dispatch': typeof BlogCustomAiVoiceAgentHvacDispatchRoute
+  '/blog/housecall-pro-vs-custom-crm-features': typeof BlogHousecallProVsCustomCrmFeaturesRoute
+  '/blog/servicetitan-alternative-small-electricians': typeof BlogServicetitanAlternativeSmallElectriciansRoute
+  '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
@@ -354,6 +404,11 @@ export interface FileRouteTypes {
     | '/portal'
     | '/post-login'
     | '/privacy'
+    | '/blog/build-vs-buy-field-service-software'
+    | '/blog/custom-ai-voice-agent-hvac-dispatch'
+    | '/blog/housecall-pro-vs-custom-crm-features'
+    | '/blog/servicetitan-alternative-small-electricians'
+    | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/projects'
     | '/dashboard/proposals'
@@ -390,6 +445,11 @@ export interface FileRouteTypes {
     | '/contact'
     | '/post-login'
     | '/privacy'
+    | '/blog/build-vs-buy-field-service-software'
+    | '/blog/custom-ai-voice-agent-hvac-dispatch'
+    | '/blog/housecall-pro-vs-custom-crm-features'
+    | '/blog/servicetitan-alternative-small-electricians'
+    | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/projects'
     | '/dashboard/proposals'
@@ -428,6 +488,11 @@ export interface FileRouteTypes {
     | '/portal'
     | '/post-login'
     | '/privacy'
+    | '/blog/build-vs-buy-field-service-software'
+    | '/blog/custom-ai-voice-agent-hvac-dispatch'
+    | '/blog/housecall-pro-vs-custom-crm-features'
+    | '/blog/servicetitan-alternative-small-electricians'
+    | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/projects'
     | '/dashboard/proposals'
@@ -460,7 +525,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   CaseStudiesRoute: typeof CaseStudiesRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
@@ -684,6 +749,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardClientsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/blog/stop-paying-monthly-field-service-software': {
+      id: '/blog/stop-paying-monthly-field-service-software'
+      path: '/stop-paying-monthly-field-service-software'
+      fullPath: '/blog/stop-paying-monthly-field-service-software'
+      preLoaderRoute: typeof BlogStopPayingMonthlyFieldServiceSoftwareRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/servicetitan-alternative-small-electricians': {
+      id: '/blog/servicetitan-alternative-small-electricians'
+      path: '/servicetitan-alternative-small-electricians'
+      fullPath: '/blog/servicetitan-alternative-small-electricians'
+      preLoaderRoute: typeof BlogServicetitanAlternativeSmallElectriciansRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/housecall-pro-vs-custom-crm-features': {
+      id: '/blog/housecall-pro-vs-custom-crm-features'
+      path: '/housecall-pro-vs-custom-crm-features'
+      fullPath: '/blog/housecall-pro-vs-custom-crm-features'
+      preLoaderRoute: typeof BlogHousecallProVsCustomCrmFeaturesRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/custom-ai-voice-agent-hvac-dispatch': {
+      id: '/blog/custom-ai-voice-agent-hvac-dispatch'
+      path: '/custom-ai-voice-agent-hvac-dispatch'
+      fullPath: '/blog/custom-ai-voice-agent-hvac-dispatch'
+      preLoaderRoute: typeof BlogCustomAiVoiceAgentHvacDispatchRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/build-vs-buy-field-service-software': {
+      id: '/blog/build-vs-buy-field-service-software'
+      path: '/build-vs-buy-field-service-software'
+      fullPath: '/blog/build-vs-buy-field-service-software'
+      preLoaderRoute: typeof BlogBuildVsBuyFieldServiceSoftwareRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/services/custom-crm/plumbers': {
       id: '/services/custom-crm/plumbers'
       path: '/plumbers'
@@ -735,6 +835,29 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface BlogRouteChildren {
+  BlogBuildVsBuyFieldServiceSoftwareRoute: typeof BlogBuildVsBuyFieldServiceSoftwareRoute
+  BlogCustomAiVoiceAgentHvacDispatchRoute: typeof BlogCustomAiVoiceAgentHvacDispatchRoute
+  BlogHousecallProVsCustomCrmFeaturesRoute: typeof BlogHousecallProVsCustomCrmFeaturesRoute
+  BlogServicetitanAlternativeSmallElectriciansRoute: typeof BlogServicetitanAlternativeSmallElectriciansRoute
+  BlogStopPayingMonthlyFieldServiceSoftwareRoute: typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogBuildVsBuyFieldServiceSoftwareRoute:
+    BlogBuildVsBuyFieldServiceSoftwareRoute,
+  BlogCustomAiVoiceAgentHvacDispatchRoute:
+    BlogCustomAiVoiceAgentHvacDispatchRoute,
+  BlogHousecallProVsCustomCrmFeaturesRoute:
+    BlogHousecallProVsCustomCrmFeaturesRoute,
+  BlogServicetitanAlternativeSmallElectriciansRoute:
+    BlogServicetitanAlternativeSmallElectriciansRoute,
+  BlogStopPayingMonthlyFieldServiceSoftwareRoute:
+    BlogStopPayingMonthlyFieldServiceSoftwareRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface DashboardProjectsRouteChildren {
   DashboardProjectsIdRoute: typeof DashboardProjectsIdRoute
@@ -829,7 +952,7 @@ const ServicesCustomCrmRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   CaseStudiesRoute: CaseStudiesRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,

@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '@/components/layout/page-header.js'
 import { CTASection } from '@/components/sections/cta-section.js'
-import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +19,39 @@ export const Route = createFileRoute('/case-studies')({
 })
 
 const caseStudies = [
+  {
+    industry: 'Electrician',
+    title: 'Custom CRM Replaces Housecall Pro for a 5-Truck Electrical Shop',
+    description:
+      'A residential electrical contractor was paying $700/month for software that still required spreadsheets to track permits and EV charger specs. We built a CRM with native permit tracking, panel + EV fields, and on-site quoting — and they cancelled the SaaS the next month.',
+    metrics: [
+      { label: 'Software cost', value: '-100%' },
+      { label: 'Build payback', value: '14 months' },
+    ],
+    services: ['Custom CRM', 'QuickBooks Integration'],
+  },
+  {
+    industry: 'Plumber',
+    title: 'After-Hours AI Dispatch for a 4-Truck Plumbing Shop',
+    description:
+      'Emergency calls were going to voicemail after hours and being lost to competitors. We deployed a voice AI agent that triages urgent water leaks to the on-call tech and books routine calls into the live schedule — all integrated with their custom CRM.',
+    metrics: [
+      { label: 'After-hours calls captured', value: '+38%' },
+      { label: 'Office phone time', value: '-22 hrs/wk' },
+    ],
+    services: ['Voice AI', 'Custom CRM'],
+  },
+  {
+    industry: 'HVAC',
+    title: 'Maintenance Plan Engine for a Regional HVAC Contractor',
+    description:
+      'Annual tune-ups were being tracked in a spreadsheet — and forgotten. We built a maintenance plan engine inside their custom CRM that auto-schedules visits, sends reminders, and pre-generates invoices on completion.',
+    metrics: [
+      { label: 'Maintenance revenue', value: '+27%' },
+      { label: 'Missed renewals', value: '~0' },
+    ],
+    services: ['Custom CRM', 'Automation'],
+  },
   {
     industry: 'Healthcare',
     title: 'AI-Powered Patient Intake for a Regional Clinic',
@@ -60,9 +92,9 @@ function CaseStudiesPage() {
     <>
       <PageHeader
         badge="Case Studies"
-        title="Real Results for Real Businesses"
-        highlightWord="Real Results"
-        description="We don't just build software — we deliver measurable outcomes. Here's how we've helped businesses like yours."
+        title="Custom CRM & AI Wins for Home Service Shops"
+        highlightWord="Home Service"
+        description="Electricians, plumbers, HVAC, and beyond — measurable outcomes from custom CRMs, voice AI dispatch, and AI automations."
       />
 
       <section className="py-20">

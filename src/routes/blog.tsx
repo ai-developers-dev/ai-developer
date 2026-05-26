@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '@/components/layout/page-header.js'
 import { CTASection } from '@/components/sections/cta-section.js'
-import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Link } from '@tanstack/react-router'
 import { ArrowRight, Calendar } from 'lucide-react'
 import { pageSeo } from '@/lib/seo'
 
@@ -21,36 +21,56 @@ export const Route = createFileRoute('/blog')({
 
 const posts = [
   {
-    category: 'AI Development',
-    title: 'How AI Is Changing the Economics of Software Development',
+    category: 'Custom CRM',
+    title: 'Stop Paying Monthly for Field Service Software (We Did the Math)',
     excerpt:
-      'Traditional software projects take months and cost six figures. AI-powered development is rewriting those rules — here\'s what that means for your business.',
-    date: 'Feb 20, 2026',
+      "Field service SaaS keeps creeping up — per-tech fees, modules, integrations. Here's what a 5-truck shop actually pays over 5 years, and what a custom CRM costs instead.",
+    date: 'May 22, 2026',
+    href: '/blog/stop-paying-monthly-field-service-software',
+  },
+  {
+    category: 'Electricians',
+    title: 'The Honest ServiceTitan Alternative for Small Electrical Teams',
+    excerpt:
+      "ServiceTitan is built for $5M+ shops. If you're running 2-10 trucks, here's what to actually look at — and why a custom CRM beats every off-the-shelf option.",
+    date: 'May 15, 2026',
+    href: '/blog/servicetitan-alternative-small-electricians',
   },
   {
     category: 'Voice AI',
-    title: 'Voice AI Agents: Beyond the Hype',
+    title: 'How a Custom AI Voice Agent Books HVAC Dispatch 24/7',
     excerpt:
-      'Voice AI has moved from novelty to necessity. We break down real-world use cases where voice agents are saving businesses thousands of hours per year.',
-    date: 'Feb 12, 2026',
+      "What a working voice AI dispatcher actually does for an HVAC shop — call answering, intake, scheduling, and emergency triage. Plus the tradeoffs nobody talks about.",
+    date: 'May 8, 2026',
+    href: '/blog/custom-ai-voice-agent-hvac-dispatch',
   },
   {
-    category: 'Automation',
-    title: '5 Workflows Every Small Business Should Automate Today',
+    category: 'Custom CRM',
+    title:
+      "5 Features Housecall Pro Doesn't Have That a Custom CRM Always Does",
     excerpt:
-      'Still doing things manually? These five automation opportunities can free up your team to focus on what actually grows your business.',
-    date: 'Feb 4, 2026',
+      "If you've outgrown Housecall Pro but ServiceTitan is overkill, these are the five things a custom build does that your SaaS won't — and what they're worth.",
+    date: 'May 1, 2026',
+    href: '/blog/housecall-pro-vs-custom-crm-features',
   },
-]
+  {
+    category: 'Custom CRM',
+    title: "Building vs. Buying Field Service Software: A Contractor's Guide",
+    excerpt:
+      "Six months ago, building your own field service app would've been crazy. Today it's the smartest move a 3-truck shop can make. Here's how to decide.",
+    date: 'Apr 24, 2026',
+    href: '/blog/build-vs-buy-field-service-software',
+  },
+] as const
 
 function BlogPage() {
   return (
     <>
       <PageHeader
         badge="Blog"
-        title="Insights & Updates"
-        highlightWord="Insights"
-        description="Practical advice on AI development, automation, and building better software — straight from our team."
+        title="Custom CRM, AI Voice, and Field Service Insights"
+        highlightWord="Custom CRM"
+        description="Practical writing on building custom CRMs, AI voice agents, and field service software for electricians, plumbers, and HVAC."
       />
 
       <section className="py-20">
@@ -58,7 +78,7 @@ function BlogPage() {
           <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
               <StaggerItem key={post.title}>
-                <a href="#" className="block group h-full">
+                <Link to={post.href} className="block group h-full">
                   <Card className="h-full border-subtle-border bg-surface transition-shadow group-hover:shadow-lg">
                     <CardContent className="pt-6">
                       <Badge
@@ -88,7 +108,7 @@ function BlogPage() {
                       </div>
                     </CardContent>
                   </Card>
-                </a>
+                </Link>
               </StaggerItem>
             ))}
           </StaggerChildren>
