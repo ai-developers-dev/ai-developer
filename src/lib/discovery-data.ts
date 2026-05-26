@@ -191,13 +191,85 @@ export const INTEGRATIONS_OPTIONS: string[] = [
   'Calendar sync (Google/Outlook)',
 ]
 
-export const BUDGET_OPTIONS = [
-  { value: 'under_15k', label: 'Under $15,000' },
-  { value: '15-25k', label: '$15,000 – $25,000' },
-  { value: '25-40k', label: '$25,000 – $40,000' },
-  { value: '40k+', label: '$40,000+' },
-  { value: 'guidance', label: 'Need guidance on budget' },
+// Where do leads currently come from? Multi-select.
+export const LEAD_SOURCES_OPTIONS: string[] = [
+  'Google (organic search)',
+  'Google Ads',
+  'Google Local Services Ads',
+  'Facebook',
+  'Facebook Ads',
+  'Instagram',
+  'Angi (formerly Angie’s List)',
+  'Yelp',
+  'HomeAdvisor',
+  'Thumbtack',
+  'Nextdoor',
+  'Bing',
+  'YouTube',
+  'Customer referrals (word-of-mouth)',
+  'Repeat customers',
+  'Direct mail / mailers',
+  'Local TV / radio',
+  'Truck wraps / vehicle signage',
+  'Yard signs',
+  'Door knocking',
+  'Trade shows / events',
+  'BBB / Better Business Bureau',
+  'Local chamber of commerce',
+  'Networking groups (BNI, etc.)',
+]
+
+// Multi-select chips — only shown if they entered a website URL.
+export const WEBSITE_FEATURES_OPTIONS: string[] = [
+  'Live chat / chatbot',
+  'Online appointment booking',
+  'Customer portal / account login',
+  'Online payments',
+  'Online quote request form',
+  'Service area map',
+  'Review widgets (Google / Yelp)',
+  'Blog / content',
+]
+
+export const MISSED_CALL_OPTIONS = [
+  { value: 'voicemail', label: 'Goes to voicemail' },
+  { value: 'answering_service', label: 'Answering service' },
+  { value: 'ai_receptionist', label: 'AI receptionist' },
+  { value: 'callback_later', label: 'We call back later' },
+  { value: 'unanswered', label: 'Calls go unanswered' },
+  { value: 'other', label: 'Other' },
 ] as const
+
+export const AFTER_HOURS_OPTIONS = [
+  { value: 'staff_on_call', label: 'Staff on-call rotation' },
+  { value: 'answering_service', label: 'Answering service' },
+  { value: 'ai_agent', label: 'AI agent' },
+  { value: 'voicemail', label: 'Voicemail only' },
+  { value: 'no_after_hours', label: 'No after-hours service' },
+  { value: 'other', label: 'Other' },
+] as const
+
+// Single-select radio for collectGoogleReviews
+export const GOOGLE_REVIEWS_OPTIONS = [
+  { value: 'yes_routinely', label: 'Yes — routinely (after most jobs)' },
+  { value: 'occasionally', label: 'Sometimes (when we remember)' },
+  { value: 'no', label: 'No, not currently' },
+] as const
+
+// Multi-select for current AI / automations in use
+export const CURRENT_AUTOMATIONS_OPTIONS: string[] = [
+  'Zapier / Make',
+  'ChatGPT / Claude (manual use)',
+  'AI chatbot on website',
+  'AI voice receptionist',
+  'AI scheduling assistant',
+  'Email automation (Mailchimp, Klaviyo, etc.)',
+  'SMS automation',
+  'Review-request automation',
+  'Lead scoring / qualification AI',
+  'Custom AI agent (built in-house or by a vendor)',
+  'Nothing yet',
+]
 
 export const LAUNCH_OPTIONS = [
   { value: 'asap', label: 'ASAP' },

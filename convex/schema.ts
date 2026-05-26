@@ -31,7 +31,8 @@ export default defineSchema({
   discoverySubmissions: defineTable({
     // Step 1 — business basics
     businessName: v.string(),
-    businessAddress: v.string(),
+    businessAddress: v.optional(v.string()),
+    websiteUrl: v.optional(v.string()),
     businessPhone: v.string(),
     businessEmail: v.string(),
     employeeCount: v.union(
@@ -53,6 +54,7 @@ export default defineSchema({
     servicesOffered: v.array(v.string()),
     currentCrm: v.string(),
     otherTools: v.array(v.string()),
+    leadSources: v.array(v.string()),
     topBottleneck: v.union(
       v.literal("scheduling"),
       v.literal("quoting"),
@@ -91,16 +93,32 @@ export default defineSchema({
       v.literal("20-50"),
       v.literal("over_50")
     ),
+    collectsGoogleReviews: v.union(
+      v.literal("yes_routinely"),
+      v.literal("occasionally"),
+      v.literal("no")
+    ),
+    websiteFeatures: v.array(v.string()),
+    missedCallHandling: v.union(
+      v.literal("voicemail"),
+      v.literal("answering_service"),
+      v.literal("ai_receptionist"),
+      v.literal("callback_later"),
+      v.literal("unanswered"),
+      v.literal("other")
+    ),
+    afterHoursHandling: v.union(
+      v.literal("staff_on_call"),
+      v.literal("answering_service"),
+      v.literal("ai_agent"),
+      v.literal("voicemail"),
+      v.literal("no_after_hours"),
+      v.literal("other")
+    ),
     // Step 4 — tech + project
     accountingSystem: v.string(),
     requiredIntegrations: v.array(v.string()),
-    budgetRange: v.union(
-      v.literal("under_15k"),
-      v.literal("15-25k"),
-      v.literal("25-40k"),
-      v.literal("40k+"),
-      v.literal("guidance")
-    ),
+    currentAutomations: v.array(v.string()),
     desiredLaunch: v.union(
       v.literal("asap"),
       v.literal("3_months"),

@@ -131,12 +131,26 @@ const PRETTY: Record<string, Record<string, string>> = {
     '20-50': '20-50%',
     over_50: '>50%',
   },
-  budgetRange: {
-    under_15k: '<$15k',
-    '15-25k': '$15-25k',
-    '25-40k': '$25-40k',
-    '40k+': '$40k+',
-    guidance: 'Need guidance',
+  collectsGoogleReviews: {
+    yes_routinely: 'Yes — routinely',
+    occasionally: 'Sometimes',
+    no: 'No',
+  },
+  missedCallHandling: {
+    voicemail: 'Goes to voicemail',
+    answering_service: 'Answering service',
+    ai_receptionist: 'AI receptionist',
+    callback_later: 'Callback later',
+    unanswered: 'Calls go unanswered',
+    other: 'Other',
+  },
+  afterHoursHandling: {
+    staff_on_call: 'Staff on-call rotation',
+    answering_service: 'Answering service',
+    ai_agent: 'AI agent',
+    voicemail: 'Voicemail only',
+    no_after_hours: 'No after-hours service',
+    other: 'Other',
   },
   desiredLaunch: {
     asap: 'ASAP',
@@ -264,13 +278,13 @@ function DiscoveriesPage() {
                           variant="outline"
                           className="text-[10px] px-1.5 py-0"
                         >
-                          {pretty('budgetRange', sub.budgetRange)}
+                          {pretty('employeeCount', sub.employeeCount)} emp
                         </Badge>
                         <Badge
                           variant="outline"
                           className="text-[10px] px-1.5 py-0"
                         >
-                          {pretty('employeeCount', sub.employeeCount)} emp
+                          {pretty('desiredLaunch', sub.desiredLaunch)}
                         </Badge>
                       </div>
                     </button>
@@ -336,7 +350,8 @@ function DiscoveriesPage() {
 
                 {/* Section: Business */}
                 <Section title="Business basics">
-                  <Pair label="Address" value={selected.businessAddress} />
+                  <Pair label="Website" value={selected.websiteUrl || '—'} />
+                  <Pair label="Address" value={selected.businessAddress || '—'} />
                   <Pair
                     label="Employees"
                     value={pretty('employeeCount', selected.employeeCount)}
@@ -366,6 +381,14 @@ function DiscoveriesPage() {
                     value={
                       selected.otherTools.length
                         ? selected.otherTools.join(', ')
+                        : '—'
+                    }
+                  />
+                  <Pair
+                    label="Lead sources"
+                    value={
+                      selected.leadSources.length
+                        ? selected.leadSources.join(', ')
                         : '—'
                     }
                   />
@@ -409,6 +432,35 @@ function DiscoveriesPage() {
                       selected.recurringContracts,
                     )}
                   />
+                  <Pair
+                    label="Google reviews"
+                    value={pretty(
+                      'collectsGoogleReviews',
+                      selected.collectsGoogleReviews,
+                    )}
+                  />
+                  <Pair
+                    label="Website features"
+                    value={
+                      selected.websiteFeatures.length
+                        ? selected.websiteFeatures.join(', ')
+                        : '—'
+                    }
+                  />
+                  <Pair
+                    label="Missed-call handling"
+                    value={pretty(
+                      'missedCallHandling',
+                      selected.missedCallHandling,
+                    )}
+                  />
+                  <Pair
+                    label="After-hours handling"
+                    value={pretty(
+                      'afterHoursHandling',
+                      selected.afterHoursHandling,
+                    )}
+                  />
                 </Section>
 
                 {/* Section: Tech & project */}
@@ -426,8 +478,12 @@ function DiscoveriesPage() {
                     }
                   />
                   <Pair
-                    label="Budget"
-                    value={pretty('budgetRange', selected.budgetRange)}
+                    label="Current AI / automations"
+                    value={
+                      selected.currentAutomations.length
+                        ? selected.currentAutomations.join(', ')
+                        : '—'
+                    }
                   />
                   <Pair
                     label="Desired launch"

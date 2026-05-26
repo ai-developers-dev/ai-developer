@@ -71,12 +71,28 @@ const recurringContractsV = v.union(
   v.literal("over_50")
 );
 
-const budgetRangeV = v.union(
-  v.literal("under_15k"),
-  v.literal("15-25k"),
-  v.literal("25-40k"),
-  v.literal("40k+"),
-  v.literal("guidance")
+const collectsGoogleReviewsV = v.union(
+  v.literal("yes_routinely"),
+  v.literal("occasionally"),
+  v.literal("no")
+);
+
+const missedCallHandlingV = v.union(
+  v.literal("voicemail"),
+  v.literal("answering_service"),
+  v.literal("ai_receptionist"),
+  v.literal("callback_later"),
+  v.literal("unanswered"),
+  v.literal("other")
+);
+
+const afterHoursHandlingV = v.union(
+  v.literal("staff_on_call"),
+  v.literal("answering_service"),
+  v.literal("ai_agent"),
+  v.literal("voicemail"),
+  v.literal("no_after_hours"),
+  v.literal("other")
 );
 
 const desiredLaunchV = v.union(
@@ -102,7 +118,8 @@ const statusV = v.union(
 export const submit = mutation({
   args: {
     businessName: v.string(),
-    businessAddress: v.string(),
+    businessAddress: v.optional(v.string()),
+    websiteUrl: v.optional(v.string()),
     businessPhone: v.string(),
     businessEmail: v.string(),
     employeeCount: employeeCountV,
@@ -110,15 +127,20 @@ export const submit = mutation({
     servicesOffered: v.array(v.string()),
     currentCrm: v.string(),
     otherTools: v.array(v.string()),
+    leadSources: v.array(v.string()),
     topBottleneck: topBottleneckV,
     locationCount: locationCountV,
     serviceRadiusMiles: serviceRadiusMilesV,
     techsQuoteOnSite: techsQuoteOnSiteV,
     changeOrderFrequency: changeOrderFrequencyV,
     recurringContracts: recurringContractsV,
+    collectsGoogleReviews: collectsGoogleReviewsV,
+    websiteFeatures: v.array(v.string()),
+    missedCallHandling: missedCallHandlingV,
+    afterHoursHandling: afterHoursHandlingV,
     accountingSystem: v.string(),
     requiredIntegrations: v.array(v.string()),
-    budgetRange: budgetRangeV,
+    currentAutomations: v.array(v.string()),
     desiredLaunch: desiredLaunchV,
     successDefinition: v.optional(v.string()),
     source: v.optional(v.string()),
@@ -288,12 +310,26 @@ const PRETTY_LABELS: Record<string, Record<string, string>> = {
     "20-50": "20-50% of revenue",
     over_50: ">50% of revenue",
   },
-  budgetRange: {
-    under_15k: "Under $15k",
-    "15-25k": "$15-25k",
-    "25-40k": "$25-40k",
-    "40k+": "$40k+",
-    guidance: "Need guidance",
+  collectsGoogleReviews: {
+    yes_routinely: "Yes — routinely",
+    occasionally: "Sometimes",
+    no: "No",
+  },
+  missedCallHandling: {
+    voicemail: "Goes to voicemail",
+    answering_service: "Answering service",
+    ai_receptionist: "AI receptionist",
+    callback_later: "We call back later",
+    unanswered: "Calls go unanswered",
+    other: "Other",
+  },
+  afterHoursHandling: {
+    staff_on_call: "Staff on-call rotation",
+    answering_service: "Answering service",
+    ai_agent: "AI agent",
+    voicemail: "Voicemail only",
+    no_after_hours: "No after-hours service",
+    other: "Other",
   },
   desiredLaunch: {
     asap: "ASAP",
@@ -338,14 +374,15 @@ export const notify = internalAction({
       <div style="background:linear-gradient(135deg,#d4cebb 0%,#b8b3a0 100%);padding:32px 40px;">
         <h1 style="color:white;font-size:22px;margin:0;font-weight:700;">New Discovery Submission</h1>
         <p style="color:rgba(255,255,255,0.85);font-size:13px;margin:6px 0 0;">
-          ${sub.businessName} · ${label("primaryTrade", sub.primaryTrade)} · ${label("budgetRange", sub.budgetRange)}
+          ${sub.businessName} · ${label("primaryTrade", sub.primaryTrade)} · ${(sub.employeeCount ?? "?")} employees
         </p>
       </div>
       <div style="padding:28px 40px;">
         <h3 style="color:#333123;font-size:15px;margin:0 0 8px;font-weight:600;border-bottom:2px solid #E5E7EB;padding-bottom:6px;">Business</h3>
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
           ${row("Business name", sub.businessName)}
-          ${row("Address", sub.businessAddress)}
+          ${row("Website", sub.websiteUrl || "—")}
+          ${row("Address", sub.businessAddress || "—")}
           ${row("Phone", sub.businessPhone)}
           ${row("Email", sub.businessEmail)}
           ${row("Employees", label("employeeCount", sub.employeeCount))}
@@ -357,6 +394,7 @@ export const notify = internalAction({
           ${row("Services offered", (sub.servicesOffered || []).join(", ") || "—")}
           ${row("Current CRM", sub.currentCrm || "—")}
           ${row("Other tools", (sub.otherTools || []).join(", ") || "—")}
+          ${row("Lead sources", (sub.leadSources || []).join(", ") || "—")}
           ${row("Top bottleneck", label("topBottleneck", sub.topBottleneck))}
         </table>
 
@@ -367,13 +405,17 @@ export const notify = internalAction({
           ${row("On-site quoting", label("techsQuoteOnSite", sub.techsQuoteOnSite))}
           ${row("Change-order freq", label("changeOrderFrequency", sub.changeOrderFrequency))}
           ${row("Recurring contracts", label("recurringContracts", sub.recurringContracts))}
+          ${row("Collects Google reviews", label("collectsGoogleReviews", sub.collectsGoogleReviews))}
+          ${row("Website features", (sub.websiteFeatures || []).join(", ") || "—")}
+          ${row("Missed-call handling", label("missedCallHandling", sub.missedCallHandling))}
+          ${row("After-hours handling", label("afterHoursHandling", sub.afterHoursHandling))}
         </table>
 
         <h3 style="color:#333123;font-size:15px;margin:0 0 8px;font-weight:600;border-bottom:2px solid #E5E7EB;padding-bottom:6px;">Tech & project</h3>
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
           ${row("Accounting system", sub.accountingSystem || "—")}
           ${row("Required integrations", (sub.requiredIntegrations || []).join(", ") || "—")}
-          ${row("Budget range", label("budgetRange", sub.budgetRange))}
+          ${row("Current AI / automations", (sub.currentAutomations || []).join(", ") || "—")}
           ${row("Desired launch", label("desiredLaunch", sub.desiredLaunch))}
           ${row("Source", sub.source || "direct")}
         </table>
@@ -402,7 +444,7 @@ export const notify = internalAction({
         body: JSON.stringify({
           from: "AI Developer <onboarding@resend.dev>",
           to: "doug@aideveloper.dev",
-          subject: `Discovery: ${sub.businessName} (${label("primaryTrade", sub.primaryTrade)} · ${label("budgetRange", sub.budgetRange)})`,
+          subject: `Discovery: ${sub.businessName} (${label("primaryTrade", sub.primaryTrade)} · ${sub.employeeCount} employees)`,
           html,
         }),
       });
