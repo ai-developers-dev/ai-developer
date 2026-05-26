@@ -37,18 +37,19 @@ import {
   SERVICE_RADIUS_OPTIONS,
   SERVICES_BY_TRADE,
   TRADE_OPTIONS,
-  WEBSITE_FEATURES_OPTIONS,
+  YES_NO_OPTIONS,
   type Trade,
 } from '@/lib/discovery-data'
 
-// Bumped to v3 — schema reshaped: dropped budget, added website URL +
-// features + missed-call + after-hours + lead sources + Google reviews +
-// current AI/automations. Old drafts are now discarded on load.
-const DRAFT_KEY = 'discovery_form_draft_v3'
+// Bumped to v4 — replaced websiteFeatures multi-select with explicit
+// hasWebsite + chat + online-booking yes/no questions. Older drafts
+// would be missing required hasWebsite and are discarded on load.
+const DRAFT_KEY = 'discovery_form_draft_v4'
 
 interface FormState {
   // Step 1 — business basics
   businessName: string
+  hasWebsite: '' | 'yes' | 'no'
   websiteUrl: string
   businessAddress: string
   businessPhone: string
@@ -62,7 +63,8 @@ interface FormState {
   serviceRadiusMiles: string
   topBottleneck: string
   // Step 3 — customers, calls & jobs
-  websiteFeatures: string[]
+  websiteHasChat: '' | 'yes' | 'no'
+  websiteHasOnlineBooking: '' | 'yes' | 'no'
   collectsGoogleReviews: string
   techsQuoteOnSite: string
   missedCallHandling: string
@@ -82,6 +84,7 @@ interface FormState {
 
 const INITIAL: FormState = {
   businessName: '',
+  hasWebsite: '',
   websiteUrl: '',
   businessAddress: '',
   businessPhone: '',
@@ -93,7 +96,8 @@ const INITIAL: FormState = {
   locationCount: '',
   serviceRadiusMiles: '',
   topBottleneck: '',
-  websiteFeatures: [],
+  websiteHasChat: '',
+  websiteHasOnlineBooking: '',
   collectsGoogleReviews: '',
   techsQuoteOnSite: '',
   missedCallHandling: '',
@@ -191,12 +195,14 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
     }
 
     if (!form.businessName.trim()) errs[1] = 'Business name is required.'
+    else if (!form.hasWebsite)
+      errs[1] = 'Tell us whether you have a website.'
+    else if (form.hasWebsite === 'yes' && !form.websiteUrl.trim())
+      errs[1] = 'Please share your website URL.'
     else if (!form.businessPhone.trim()) errs[1] = 'Business phone is required.'
     else if (!isEmailValid(form.businessEmail))
       errs[1] = 'A valid email is required.'
     else if (!form.employeeCount) errs[1] = 'Pick the employee count.'
-    // Website URL + address are both optional. If both blank, that's allowed
-    // but worth flagging — let it through, we can ask in the email.
 
     if (!form.primaryTrade) errs[2] = 'Pick your primary trade.'
     else if (form.servicesOffered.length === 0)
@@ -207,8 +213,12 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
     else if (!form.serviceRadiusMiles) errs[2] = 'Pick your service radius.'
     else if (!form.topBottleneck) errs[2] = 'Pick your biggest bottleneck.'
 
-    // Step 3: website features only required when websiteUrl is present.
-    if (!form.collectsGoogleReviews)
+    // Step 3: chat + booking only required when they said they have a website.
+    if (form.hasWebsite === 'yes' && !form.websiteHasChat)
+      errs[3] = 'Does your website have a chat feature?'
+    else if (form.hasWebsite === 'yes' && !form.websiteHasOnlineBooking)
+      errs[3] = 'Can customers request appointments on your website?'
+    else if (!form.collectsGoogleReviews)
       errs[3] = 'Pick your Google reviews answer.'
     else if (!form.techsQuoteOnSite)
       errs[3] = 'Pick your on-site quoting answer.'
@@ -247,7 +257,11 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
       await submit({
         businessName: form.businessName.trim(),
         businessAddress: form.businessAddress.trim() || undefined,
-        websiteUrl: form.websiteUrl.trim() || undefined,
+        hasWebsite: form.hasWebsite as 'yes' | 'no',
+        websiteUrl:
+          form.hasWebsite === 'yes'
+            ? form.websiteUrl.trim() || undefined
+            : undefined,
         businessPhone: form.businessPhone.trim(),
         businessEmail: form.businessEmail.trim(),
         employeeCount: form.employeeCount as any,
@@ -263,7 +277,14 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
         changeOrderFrequency: form.changeOrderFrequency as any,
         recurringContracts: form.recurringContracts as any,
         collectsGoogleReviews: form.collectsGoogleReviews as any,
-        websiteFeatures: form.websiteFeatures,
+        websiteHasChat:
+          form.hasWebsite === 'yes'
+            ? (form.websiteHasChat as 'yes' | 'no')
+            : undefined,
+        websiteHasOnlineBooking:
+          form.hasWebsite === 'yes'
+            ? (form.websiteHasOnlineBooking as 'yes' | 'no')
+            : undefined,
         missedCallHandling: form.missedCallHandling as any,
         afterHoursHandling: form.afterHoursHandling as any,
         accountingSystem: form.accountingSystem,
@@ -309,7 +330,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
   const servicesList = form.primaryTrade
     ? SERVICES_BY_TRADE[form.primaryTrade]
     : []
-  const hasWebsite = form.websiteUrl.trim().length > 0
+  const hasWebsiteYes = form.hasWebsite === 'yes'
 
   return (
     <div ref={containerRef} className="max-w-3xl mx-auto space-y-6 scroll-mt-8">
@@ -335,26 +356,43 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="websiteUrl">
-                  Website URL{' '}
-                  <span className="text-xs text-muted-foreground font-normal">
-                    (optional)
-                  </span>
-                </Label>
-                <Input
-                  id="websiteUrl"
-                  type="url"
-                  value={form.websiteUrl}
-                  onChange={(e) => set('websiteUrl', e.target.value)}
-                  placeholder="https://yourbusiness.com"
-                />
+                <Label>Do you have a business website?</Label>
+                <RadioGroup
+                  value={form.hasWebsite}
+                  onValueChange={(v) => set('hasWebsite', v as 'yes' | 'no')}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  {YES_NO_OPTIONS.map((opt) => (
+                    <RadioOption
+                      key={opt.value}
+                      value={opt.value}
+                      label={opt.label}
+                      selected={form.hasWebsite === opt.value}
+                    />
+                  ))}
+                </RadioGroup>
               </div>
+
+              {hasWebsiteYes && (
+                <div className="space-y-2">
+                  <Label htmlFor="websiteUrl">Website URL</Label>
+                  <Input
+                    id="websiteUrl"
+                    type="url"
+                    value={form.websiteUrl}
+                    onChange={(e) => set('websiteUrl', e.target.value)}
+                    placeholder="https://yourbusiness.com"
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="businessAddress">
                   Business address{' '}
                   <span className="text-xs text-muted-foreground font-normal">
-                    {hasWebsite ? '(optional — your website covers it)' : '(optional)'}
+                    {hasWebsiteYes
+                      ? '(optional — your website covers it)'
+                      : '(optional)'}
                   </span>
                 </Label>
                 <Input
@@ -513,13 +551,51 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 How customers reach you — and what happens when they do
               </h2>
 
-              {hasWebsite && (
-                <MultiSelectChips
-                  label="What features does your website have today? (pick all that apply)"
-                  options={WEBSITE_FEATURES_OPTIONS}
-                  value={form.websiteFeatures}
-                  onChange={(v) => set('websiteFeatures', v)}
-                />
+              {hasWebsiteYes && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Does your website have a chat feature?</Label>
+                    <RadioGroup
+                      value={form.websiteHasChat}
+                      onValueChange={(v) =>
+                        set('websiteHasChat', v as 'yes' | 'no')
+                      }
+                      className="grid grid-cols-2 gap-2"
+                    >
+                      {YES_NO_OPTIONS.map((opt) => (
+                        <RadioOption
+                          key={opt.value}
+                          value={opt.value}
+                          label={opt.label}
+                          selected={form.websiteHasChat === opt.value}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>
+                      Can customers request an appointment / job on your
+                      website?
+                    </Label>
+                    <RadioGroup
+                      value={form.websiteHasOnlineBooking}
+                      onValueChange={(v) =>
+                        set('websiteHasOnlineBooking', v as 'yes' | 'no')
+                      }
+                      className="grid grid-cols-2 gap-2"
+                    >
+                      {YES_NO_OPTIONS.map((opt) => (
+                        <RadioOption
+                          key={opt.value}
+                          value={opt.value}
+                          label={opt.label}
+                          selected={form.websiteHasOnlineBooking === opt.value}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">

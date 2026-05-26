@@ -219,17 +219,11 @@ export const LEAD_SOURCES_OPTIONS: string[] = [
   'Networking groups (BNI, etc.)',
 ]
 
-// Multi-select chips — only shown if they entered a website URL.
-export const WEBSITE_FEATURES_OPTIONS: string[] = [
-  'Live chat / chatbot',
-  'Online appointment booking',
-  'Customer portal / account login',
-  'Online payments',
-  'Online quote request form',
-  'Service area map',
-  'Review widgets (Google / Yelp)',
-  'Blog / content',
-]
+// Yes/No options for the website-feature follow-ups.
+export const YES_NO_OPTIONS = [
+  { value: 'yes', label: 'Yes' },
+  { value: 'no', label: 'No' },
+] as const
 
 export const MISSED_CALL_OPTIONS = [
   { value: 'voicemail', label: 'Goes to voicemail' },

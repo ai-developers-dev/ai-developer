@@ -350,7 +350,13 @@ function DiscoveriesPage() {
 
                 {/* Section: Business */}
                 <Section title="Business basics">
-                  <Pair label="Website" value={selected.websiteUrl || '—'} />
+                  <Pair
+                    label="Has website?"
+                    value={selected.hasWebsite === 'yes' ? 'Yes' : 'No'}
+                  />
+                  {selected.hasWebsite === 'yes' && (
+                    <Pair label="Website URL" value={selected.websiteUrl || '—'} />
+                  )}
                   <Pair label="Address" value={selected.businessAddress || '—'} />
                   <Pair
                     label="Employees"
@@ -439,14 +445,30 @@ function DiscoveriesPage() {
                       selected.collectsGoogleReviews,
                     )}
                   />
-                  <Pair
-                    label="Website features"
-                    value={
-                      selected.websiteFeatures.length
-                        ? selected.websiteFeatures.join(', ')
-                        : '—'
-                    }
-                  />
+                  {selected.hasWebsite === 'yes' && (
+                    <>
+                      <Pair
+                        label="Website has chat?"
+                        value={
+                          selected.websiteHasChat
+                            ? selected.websiteHasChat === 'yes'
+                              ? 'Yes'
+                              : 'No'
+                            : '—'
+                        }
+                      />
+                      <Pair
+                        label="Online appointment booking?"
+                        value={
+                          selected.websiteHasOnlineBooking
+                            ? selected.websiteHasOnlineBooking === 'yes'
+                              ? 'Yes'
+                              : 'No'
+                            : '—'
+                        }
+                      />
+                    </>
+                  )}
                   <Pair
                     label="Missed-call handling"
                     value={pretty(

@@ -119,6 +119,7 @@ export const submit = mutation({
   args: {
     businessName: v.string(),
     businessAddress: v.optional(v.string()),
+    hasWebsite: v.union(v.literal("yes"), v.literal("no")),
     websiteUrl: v.optional(v.string()),
     businessPhone: v.string(),
     businessEmail: v.string(),
@@ -135,7 +136,10 @@ export const submit = mutation({
     changeOrderFrequency: changeOrderFrequencyV,
     recurringContracts: recurringContractsV,
     collectsGoogleReviews: collectsGoogleReviewsV,
-    websiteFeatures: v.array(v.string()),
+    websiteHasChat: v.optional(v.union(v.literal("yes"), v.literal("no"))),
+    websiteHasOnlineBooking: v.optional(
+      v.union(v.literal("yes"), v.literal("no"))
+    ),
     missedCallHandling: missedCallHandlingV,
     afterHoursHandling: afterHoursHandlingV,
     accountingSystem: v.string(),
@@ -381,7 +385,8 @@ export const notify = internalAction({
         <h3 style="color:#333123;font-size:15px;margin:0 0 8px;font-weight:600;border-bottom:2px solid #E5E7EB;padding-bottom:6px;">Business</h3>
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
           ${row("Business name", sub.businessName)}
-          ${row("Website", sub.websiteUrl || "—")}
+          ${row("Has website?", sub.hasWebsite === "yes" ? "Yes" : "No")}
+          ${row("Website URL", sub.websiteUrl || "—")}
           ${row("Address", sub.businessAddress || "—")}
           ${row("Phone", sub.businessPhone)}
           ${row("Email", sub.businessEmail)}
@@ -406,7 +411,8 @@ export const notify = internalAction({
           ${row("Change-order freq", label("changeOrderFrequency", sub.changeOrderFrequency))}
           ${row("Recurring contracts", label("recurringContracts", sub.recurringContracts))}
           ${row("Collects Google reviews", label("collectsGoogleReviews", sub.collectsGoogleReviews))}
-          ${row("Website features", (sub.websiteFeatures || []).join(", ") || "—")}
+          ${row("Website has chat?", sub.hasWebsite === "yes" ? (sub.websiteHasChat === "yes" ? "Yes" : sub.websiteHasChat === "no" ? "No" : "—") : "(no website)")}
+          ${row("Online appointment booking?", sub.hasWebsite === "yes" ? (sub.websiteHasOnlineBooking === "yes" ? "Yes" : sub.websiteHasOnlineBooking === "no" ? "No" : "—") : "(no website)")}
           ${row("Missed-call handling", label("missedCallHandling", sub.missedCallHandling))}
           ${row("After-hours handling", label("afterHoursHandling", sub.afterHoursHandling))}
         </table>

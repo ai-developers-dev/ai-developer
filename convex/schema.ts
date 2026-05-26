@@ -32,6 +32,7 @@ export default defineSchema({
     // Step 1 — business basics
     businessName: v.string(),
     businessAddress: v.optional(v.string()),
+    hasWebsite: v.union(v.literal("yes"), v.literal("no")),
     websiteUrl: v.optional(v.string()),
     businessPhone: v.string(),
     businessEmail: v.string(),
@@ -98,7 +99,10 @@ export default defineSchema({
       v.literal("occasionally"),
       v.literal("no")
     ),
-    websiteFeatures: v.array(v.string()),
+    websiteHasChat: v.optional(v.union(v.literal("yes"), v.literal("no"))),
+    websiteHasOnlineBooking: v.optional(
+      v.union(v.literal("yes"), v.literal("no"))
+    ),
     missedCallHandling: v.union(
       v.literal("voicemail"),
       v.literal("answering_service"),
