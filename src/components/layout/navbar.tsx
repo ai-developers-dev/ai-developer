@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Brain,
   Zap,
+  Users,
   ChevronDown,
   LayoutDashboard,
   LogIn,
@@ -64,6 +65,12 @@ const services = [
     label: 'AI Automations',
     href: '/services/ai-automations',
     description: 'Automate repetitive workflows',
+  },
+  {
+    icon: Users,
+    label: 'Custom CRM',
+    href: '/services/custom-crm',
+    description: 'Built for how your trade runs',
   },
 ]
 

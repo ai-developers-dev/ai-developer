@@ -25,6 +25,7 @@ import { Route as SignInSplatRouteImport } from './routes/sign-in.$'
 import { Route as ServicesWebsitesRouteImport } from './routes/services/websites'
 import { Route as ServicesWebAppsRouteImport } from './routes/services/web-apps'
 import { Route as ServicesVoiceAiRouteImport } from './routes/services/voice-ai'
+import { Route as ServicesCustomCrmRouteImport } from './routes/services/custom-crm'
 import { Route as ServicesChatAiRouteImport } from './routes/services/chat-ai'
 import { Route as ServicesAiAutomationsRouteImport } from './routes/services/ai-automations'
 import { Route as ServicesAiAssistantsRouteImport } from './routes/services/ai-assistants'
@@ -120,6 +121,11 @@ const ServicesWebAppsRoute = ServicesWebAppsRouteImport.update({
 const ServicesVoiceAiRoute = ServicesVoiceAiRouteImport.update({
   id: '/services/voice-ai',
   path: '/services/voice-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesCustomCrmRoute = ServicesCustomCrmRouteImport.update({
+  id: '/services/custom-crm',
+  path: '/services/custom-crm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesChatAiRoute = ServicesChatAiRouteImport.update({
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/services/ai-assistants': typeof ServicesAiAssistantsRoute
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
+  '/services/custom-crm': typeof ServicesCustomCrmRoute
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/services/ai-assistants': typeof ServicesAiAssistantsRoute
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
+  '/services/custom-crm': typeof ServicesCustomCrmRoute
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/services/ai-assistants': typeof ServicesAiAssistantsRoute
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
+  '/services/custom-crm': typeof ServicesCustomCrmRoute
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -328,6 +337,7 @@ export interface FileRouteTypes {
     | '/services/ai-assistants'
     | '/services/ai-automations'
     | '/services/chat-ai'
+    | '/services/custom-crm'
     | '/services/voice-ai'
     | '/services/web-apps'
     | '/services/websites'
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
     | '/services/ai-assistants'
     | '/services/ai-automations'
     | '/services/chat-ai'
+    | '/services/custom-crm'
     | '/services/voice-ai'
     | '/services/web-apps'
     | '/services/websites'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/services/ai-assistants'
     | '/services/ai-automations'
     | '/services/chat-ai'
+    | '/services/custom-crm'
     | '/services/voice-ai'
     | '/services/web-apps'
     | '/services/websites'
@@ -421,6 +433,7 @@ export interface RootRouteChildren {
   ServicesAiAssistantsRoute: typeof ServicesAiAssistantsRoute
   ServicesAiAutomationsRoute: typeof ServicesAiAutomationsRoute
   ServicesChatAiRoute: typeof ServicesChatAiRoute
+  ServicesCustomCrmRoute: typeof ServicesCustomCrmRoute
   ServicesVoiceAiRoute: typeof ServicesVoiceAiRoute
   ServicesWebAppsRoute: typeof ServicesWebAppsRoute
   ServicesWebsitesRoute: typeof ServicesWebsitesRoute
@@ -540,6 +553,13 @@ declare module '@tanstack/react-router' {
       path: '/services/voice-ai'
       fullPath: '/services/voice-ai'
       preLoaderRoute: typeof ServicesVoiceAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/custom-crm': {
+      id: '/services/custom-crm'
+      path: '/services/custom-crm'
+      fullPath: '/services/custom-crm'
+      preLoaderRoute: typeof ServicesCustomCrmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/chat-ai': {
@@ -746,6 +766,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesAiAssistantsRoute: ServicesAiAssistantsRoute,
   ServicesAiAutomationsRoute: ServicesAiAutomationsRoute,
   ServicesChatAiRoute: ServicesChatAiRoute,
+  ServicesCustomCrmRoute: ServicesCustomCrmRoute,
   ServicesVoiceAiRoute: ServicesVoiceAiRoute,
   ServicesWebAppsRoute: ServicesWebAppsRoute,
   ServicesWebsitesRoute: ServicesWebsitesRoute,
