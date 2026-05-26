@@ -1,9 +1,16 @@
-import { Globe, Code, Phone, MessageSquare, Brain, Zap } from 'lucide-react'
+import { Globe, Code, Phone, MessageSquare, Brain, Zap, Users } from 'lucide-react'
 import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 
 const services = [
+  {
+    icon: Users,
+    title: 'Custom CRM',
+    href: '/services/custom-crm',
+    description:
+      'A CRM you own forever, built for electricians, plumbers, and HVAC. Stop paying monthly for software that almost fits.',
+  },
   {
     icon: Globe,
     title: 'Custom Websites',

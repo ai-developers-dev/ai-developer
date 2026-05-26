@@ -5,19 +5,16 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Workflow, GitBranch, Database, FileBarChart, Plug } from 'lucide-react'
+import { JsonLd, pageSeo, serviceSchema, breadcrumbSchema } from '@/lib/seo'
+
+const SEO_PATH = '/services/ai-automations'
+const SEO_TITLE = 'Custom AI Automation Services — AI Developer'
+const SEO_DESCRIPTION =
+  'AI automations that eliminate busywork — lead routing, data entry, report generation, and email sequences, built to fit your stack.'
 
 export const Route = createFileRoute('/services/ai-automations')({
   component: AIAutomationsPage,
-  head: () => ({
-    meta: [
-      { title: 'AI Automations That Eliminate Busywork — AI Developer' },
-      {
-        name: 'description',
-        content:
-          'Automate repetitive workflows — from lead routing and data entry to report generation and email sequences.',
-      },
-    ],
-  }),
+  head: () => pageSeo({ title: SEO_TITLE, description: SEO_DESCRIPTION, path: SEO_PATH }),
 })
 
 const benefits = [
@@ -50,6 +47,8 @@ const benefits = [
 function AIAutomationsPage() {
   return (
     <>
+      <JsonLd data={serviceSchema({ name: 'Custom AI Automation Services', description: SEO_DESCRIPTION, path: SEO_PATH })} />
+      <JsonLd data={breadcrumbSchema({ items: [{ label: 'Home', path: '/' }, { label: 'Services', path: '/about' }, { label: 'AI Automations', path: SEO_PATH }] })} />
       <PageHeader
         badge="AI Automations"
         title="AI Automations That Eliminate Busywork"

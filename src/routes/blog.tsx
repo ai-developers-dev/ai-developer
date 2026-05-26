@@ -6,19 +6,17 @@ import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-ch
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Calendar } from 'lucide-react'
+import { pageSeo } from '@/lib/seo'
 
 export const Route = createFileRoute('/blog')({
   component: BlogPage,
-  head: () => ({
-    meta: [
-      { title: 'Blog — AI Developer Insights & Updates' },
-      {
-        name: 'description',
-        content:
-          'Stay up to date with the latest insights on AI development, web applications, voice AI, and automation from the AI Developer team.',
-      },
-    ],
-  }),
+  head: () =>
+    pageSeo({
+      title: 'AI Development Blog — Custom Software Insights',
+      description:
+        'Insights on building custom CRMs, AI agents, and automations for small business — from the AI Developer team.',
+      path: '/blog',
+    }),
 })
 
 const posts = [

@@ -38,6 +38,9 @@ import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settin
 import { Route as DashboardProposalsRouteImport } from './routes/dashboard/proposals'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
 import { Route as DashboardClientsRouteImport } from './routes/dashboard/clients'
+import { Route as ServicesCustomCrmPlumbersRouteImport } from './routes/services/custom-crm.plumbers'
+import { Route as ServicesCustomCrmHvacRouteImport } from './routes/services/custom-crm.hvac'
+import { Route as ServicesCustomCrmElectriciansRouteImport } from './routes/services/custom-crm.electricians'
 import { Route as PortalProposalsIdRouteImport } from './routes/portal/proposals.$id'
 import { Route as DashboardProposalsNewRouteImport } from './routes/dashboard/proposals.new'
 import { Route as DashboardProposalsIdRouteImport } from './routes/dashboard/proposals.$id'
@@ -188,6 +191,23 @@ const DashboardClientsRoute = DashboardClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => DashboardRoute,
 } as any)
+const ServicesCustomCrmPlumbersRoute =
+  ServicesCustomCrmPlumbersRouteImport.update({
+    id: '/plumbers',
+    path: '/plumbers',
+    getParentRoute: () => ServicesCustomCrmRoute,
+  } as any)
+const ServicesCustomCrmHvacRoute = ServicesCustomCrmHvacRouteImport.update({
+  id: '/hvac',
+  path: '/hvac',
+  getParentRoute: () => ServicesCustomCrmRoute,
+} as any)
+const ServicesCustomCrmElectriciansRoute =
+  ServicesCustomCrmElectriciansRouteImport.update({
+    id: '/electricians',
+    path: '/electricians',
+    getParentRoute: () => ServicesCustomCrmRoute,
+  } as any)
 const PortalProposalsIdRoute = PortalProposalsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -231,7 +251,7 @@ export interface FileRoutesByFullPath {
   '/services/ai-assistants': typeof ServicesAiAssistantsRoute
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
-  '/services/custom-crm': typeof ServicesCustomCrmRoute
+  '/services/custom-crm': typeof ServicesCustomCrmRouteWithChildren
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -243,6 +263,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/proposals/$id': typeof DashboardProposalsIdRoute
   '/dashboard/proposals/new': typeof DashboardProposalsNewRoute
   '/portal/proposals/$id': typeof PortalProposalsIdRoute
+  '/services/custom-crm/electricians': typeof ServicesCustomCrmElectriciansRoute
+  '/services/custom-crm/hvac': typeof ServicesCustomCrmHvacRoute
+  '/services/custom-crm/plumbers': typeof ServicesCustomCrmPlumbersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -264,7 +287,7 @@ export interface FileRoutesByTo {
   '/services/ai-assistants': typeof ServicesAiAssistantsRoute
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
-  '/services/custom-crm': typeof ServicesCustomCrmRoute
+  '/services/custom-crm': typeof ServicesCustomCrmRouteWithChildren
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -276,6 +299,9 @@ export interface FileRoutesByTo {
   '/dashboard/proposals/$id': typeof DashboardProposalsIdRoute
   '/dashboard/proposals/new': typeof DashboardProposalsNewRoute
   '/portal/proposals/$id': typeof PortalProposalsIdRoute
+  '/services/custom-crm/electricians': typeof ServicesCustomCrmElectriciansRoute
+  '/services/custom-crm/hvac': typeof ServicesCustomCrmHvacRoute
+  '/services/custom-crm/plumbers': typeof ServicesCustomCrmPlumbersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -300,7 +326,7 @@ export interface FileRoutesById {
   '/services/ai-assistants': typeof ServicesAiAssistantsRoute
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
-  '/services/custom-crm': typeof ServicesCustomCrmRoute
+  '/services/custom-crm': typeof ServicesCustomCrmRouteWithChildren
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -312,6 +338,9 @@ export interface FileRoutesById {
   '/dashboard/proposals/$id': typeof DashboardProposalsIdRoute
   '/dashboard/proposals/new': typeof DashboardProposalsNewRoute
   '/portal/proposals/$id': typeof PortalProposalsIdRoute
+  '/services/custom-crm/electricians': typeof ServicesCustomCrmElectriciansRoute
+  '/services/custom-crm/hvac': typeof ServicesCustomCrmHvacRoute
+  '/services/custom-crm/plumbers': typeof ServicesCustomCrmPlumbersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -349,6 +378,9 @@ export interface FileRouteTypes {
     | '/dashboard/proposals/$id'
     | '/dashboard/proposals/new'
     | '/portal/proposals/$id'
+    | '/services/custom-crm/electricians'
+    | '/services/custom-crm/hvac'
+    | '/services/custom-crm/plumbers'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -382,6 +414,9 @@ export interface FileRouteTypes {
     | '/dashboard/proposals/$id'
     | '/dashboard/proposals/new'
     | '/portal/proposals/$id'
+    | '/services/custom-crm/electricians'
+    | '/services/custom-crm/hvac'
+    | '/services/custom-crm/plumbers'
   id:
     | '__root__'
     | '/'
@@ -417,6 +452,9 @@ export interface FileRouteTypes {
     | '/dashboard/proposals/$id'
     | '/dashboard/proposals/new'
     | '/portal/proposals/$id'
+    | '/services/custom-crm/electricians'
+    | '/services/custom-crm/hvac'
+    | '/services/custom-crm/plumbers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -433,7 +471,7 @@ export interface RootRouteChildren {
   ServicesAiAssistantsRoute: typeof ServicesAiAssistantsRoute
   ServicesAiAutomationsRoute: typeof ServicesAiAutomationsRoute
   ServicesChatAiRoute: typeof ServicesChatAiRoute
-  ServicesCustomCrmRoute: typeof ServicesCustomCrmRoute
+  ServicesCustomCrmRoute: typeof ServicesCustomCrmRouteWithChildren
   ServicesVoiceAiRoute: typeof ServicesVoiceAiRoute
   ServicesWebAppsRoute: typeof ServicesWebAppsRoute
   ServicesWebsitesRoute: typeof ServicesWebsitesRoute
@@ -646,6 +684,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardClientsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/services/custom-crm/plumbers': {
+      id: '/services/custom-crm/plumbers'
+      path: '/plumbers'
+      fullPath: '/services/custom-crm/plumbers'
+      preLoaderRoute: typeof ServicesCustomCrmPlumbersRouteImport
+      parentRoute: typeof ServicesCustomCrmRoute
+    }
+    '/services/custom-crm/hvac': {
+      id: '/services/custom-crm/hvac'
+      path: '/hvac'
+      fullPath: '/services/custom-crm/hvac'
+      preLoaderRoute: typeof ServicesCustomCrmHvacRouteImport
+      parentRoute: typeof ServicesCustomCrmRoute
+    }
+    '/services/custom-crm/electricians': {
+      id: '/services/custom-crm/electricians'
+      path: '/electricians'
+      fullPath: '/services/custom-crm/electricians'
+      preLoaderRoute: typeof ServicesCustomCrmElectriciansRouteImport
+      parentRoute: typeof ServicesCustomCrmRoute
+    }
     '/portal/proposals/$id': {
       id: '/portal/proposals/$id'
       path: '/$id'
@@ -752,6 +811,21 @@ const PortalRouteChildren: PortalRouteChildren = {
 const PortalRouteWithChildren =
   PortalRoute._addFileChildren(PortalRouteChildren)
 
+interface ServicesCustomCrmRouteChildren {
+  ServicesCustomCrmElectriciansRoute: typeof ServicesCustomCrmElectriciansRoute
+  ServicesCustomCrmHvacRoute: typeof ServicesCustomCrmHvacRoute
+  ServicesCustomCrmPlumbersRoute: typeof ServicesCustomCrmPlumbersRoute
+}
+
+const ServicesCustomCrmRouteChildren: ServicesCustomCrmRouteChildren = {
+  ServicesCustomCrmElectriciansRoute: ServicesCustomCrmElectriciansRoute,
+  ServicesCustomCrmHvacRoute: ServicesCustomCrmHvacRoute,
+  ServicesCustomCrmPlumbersRoute: ServicesCustomCrmPlumbersRoute,
+}
+
+const ServicesCustomCrmRouteWithChildren =
+  ServicesCustomCrmRoute._addFileChildren(ServicesCustomCrmRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -766,7 +840,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesAiAssistantsRoute: ServicesAiAssistantsRoute,
   ServicesAiAutomationsRoute: ServicesAiAutomationsRoute,
   ServicesChatAiRoute: ServicesChatAiRoute,
-  ServicesCustomCrmRoute: ServicesCustomCrmRoute,
+  ServicesCustomCrmRoute: ServicesCustomCrmRouteWithChildren,
   ServicesVoiceAiRoute: ServicesVoiceAiRoute,
   ServicesWebAppsRoute: ServicesWebAppsRoute,
   ServicesWebsitesRoute: ServicesWebsitesRoute,

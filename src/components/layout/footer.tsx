@@ -3,6 +3,10 @@ import { Github, Twitter, Linkedin } from 'lucide-react'
 
 const footerLinks = {
   Services: [
+    { label: 'Custom CRM', href: '/services/custom-crm' },
+    { label: 'CRM for Electricians', href: '/services/custom-crm/electricians' },
+    { label: 'CRM for Plumbers', href: '/services/custom-crm/plumbers' },
+    { label: 'CRM for HVAC', href: '/services/custom-crm/hvac' },
     { label: 'Custom Websites', href: '/services/websites' },
     { label: 'Web Applications', href: '/services/web-apps' },
     { label: 'Voice AI Agents', href: '/services/voice-ai' },

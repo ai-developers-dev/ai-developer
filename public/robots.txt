@@ -1,3 +1,11 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /sign-in/
+Disallow: /sign-up/
+Disallow: /pay/
+Disallow: /post-login
+
+Sitemap: https://aideveloper.dev/sitemap.xml

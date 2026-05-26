@@ -5,19 +5,16 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { AppWindow, Radio, Shield, Plug, Layers } from 'lucide-react'
+import { JsonLd, pageSeo, serviceSchema, breadcrumbSchema } from '@/lib/seo'
+
+const SEO_PATH = '/services/web-apps'
+const SEO_TITLE = 'Custom Web Applications Built to Scale — AI Developer'
+const SEO_DESCRIPTION =
+  'Full-stack custom web applications with real-time features, secure auth, and the integrations your business needs — built faster with AI.'
 
 export const Route = createFileRoute('/services/web-apps')({
   component: WebAppsPage,
-  head: () => ({
-    meta: [
-      { title: 'Web Applications Built to Scale — AI Developer' },
-      {
-        name: 'description',
-        content:
-          'Full-stack web applications with real-time features, secure authentication, and the integrations your business needs.',
-      },
-    ],
-  }),
+  head: () => pageSeo({ title: SEO_TITLE, description: SEO_DESCRIPTION, path: SEO_PATH }),
 })
 
 const benefits = [
@@ -50,6 +47,8 @@ const benefits = [
 function WebAppsPage() {
   return (
     <>
+      <JsonLd data={serviceSchema({ name: 'Custom Web Application Development', description: SEO_DESCRIPTION, path: SEO_PATH })} />
+      <JsonLd data={breadcrumbSchema({ items: [{ label: 'Home', path: '/' }, { label: 'Services', path: '/about' }, { label: 'Web Apps', path: SEO_PATH }] })} />
       <PageHeader
         badge="Web Apps"
         title="Web Applications Built to Scale"

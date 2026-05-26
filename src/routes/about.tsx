@@ -5,19 +5,17 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Brain, Shield, Users } from 'lucide-react'
+import { pageSeo } from '@/lib/seo'
 
 export const Route = createFileRoute('/about')({
   component: AboutPage,
-  head: () => ({
-    meta: [
-      { title: 'About AI Developer — Our Mission & Values' },
-      {
-        name: 'description',
-        content:
-          'Meet the team behind AI Developer. We combine AI-powered development with expert engineering to deliver world-class software at a fraction of the traditional cost.',
-      },
-    ],
-  }),
+  head: () =>
+    pageSeo({
+      title: 'About AI Developer — Our Mission & Values',
+      description:
+        'Meet the team behind AI Developer. We combine AI-powered development with expert engineering to deliver custom software at a fraction of the traditional cost.',
+      path: '/about',
+    }),
 })
 
 const values = [

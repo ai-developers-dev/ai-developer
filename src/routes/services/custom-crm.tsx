@@ -15,18 +15,21 @@ import {
   Wrench,
   PlugZap,
 } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { ArrowRight } from 'lucide-react'
+import { JsonLd, pageSeo, serviceSchema, breadcrumbSchema } from '@/lib/seo'
+
+const SEO_PATH = '/services/custom-crm'
+const SEO_TITLE = 'Custom CRM for Home Service Businesses — AI Developer'
+const SEO_DESCRIPTION =
+  'A custom CRM you own forever — built for electricians, plumbers, and HVAC. Jobs, dispatch, quotes, and invoicing in one place. No monthly fees.'
 
 export const Route = createFileRoute('/services/custom-crm')({
   component: CustomCrmPage,
-  head: () => ({
-    meta: [
-      { title: 'Custom CRMs for Home Service Businesses — AI Developer' },
-      {
-        name: 'description',
-        content:
-          'A custom CRM built for how home service businesses — electricians, plumbers, and HVAC — actually work. Jobs, dispatch, quotes, and invoicing in one place.',
-      },
-    ],
+  head: () => pageSeo({
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
+    path: SEO_PATH,
   }),
 })
 
@@ -72,24 +75,44 @@ const features = [
 const trades = [
   {
     name: 'Electricians',
+    href: '/services/custom-crm/electricians',
     detail:
       'Panel upgrades, service tickets, permits, EV chargers, and new construction phases — tracked end-to-end.',
   },
   {
     name: 'Plumbers',
+    href: '/services/custom-crm/plumbers',
     detail:
       'Drain calls, water heater installs, repipes, and emergency dispatch with photo-rich job histories.',
   },
   {
     name: 'HVAC',
+    href: '/services/custom-crm/hvac',
     detail:
       'Seasonal maintenance plans, install jobs, refrigerant tracking, and recurring service agreements.',
   },
-]
+] as const
 
 function CustomCrmPage() {
   return (
     <>
+      <JsonLd
+        data={serviceSchema({
+          name: 'Custom CRM for Home Service Businesses',
+          description: SEO_DESCRIPTION,
+          path: SEO_PATH,
+          serviceType: 'Custom Software Development',
+        })}
+      />
+      <JsonLd
+        data={breadcrumbSchema({
+          items: [
+            { label: 'Home', path: '/' },
+            { label: 'Services', path: '/about' },
+            { label: 'Custom CRM', path: SEO_PATH },
+          ],
+        })}
+      />
       <PageHeader
         badge="Custom CRM"
         title="A CRM Built for Home Service Businesses"
@@ -196,16 +219,24 @@ function CustomCrmPage() {
           <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {trades.map((t) => (
               <StaggerItem key={t.name}>
-                <Card className="h-full border-subtle-border bg-surface">
-                  <CardContent className="pt-6">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {t.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {t.detail}
-                    </p>
-                  </CardContent>
-                </Card>
+                <Link to={t.href} className="block h-full group">
+                  <Card className="h-full border-subtle-border bg-surface group-hover:border-brand-primary/40 transition-colors">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xl font-semibold text-foreground">
+                          {t.name}
+                        </h3>
+                        <ArrowRight className="w-4 h-4 text-brand-primary group-hover:translate-x-1 transition-transform" />
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                        {t.detail}
+                      </p>
+                      <span className="font-label text-[10px] tracking-[0.2em] uppercase text-brand-tertiary">
+                        See CRM for {t.name} →
+                      </span>
+                    </CardContent>
+                  </Card>
+                </Link>
               </StaggerItem>
             ))}
           </StaggerChildren>

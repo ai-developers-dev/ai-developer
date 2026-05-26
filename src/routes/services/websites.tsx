@@ -5,19 +5,16 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Globe, Smartphone, Search, Zap, TrendingUp } from 'lucide-react'
+import { JsonLd, pageSeo, serviceSchema, breadcrumbSchema } from '@/lib/seo'
+
+const SEO_PATH = '/services/websites'
+const SEO_TITLE = 'Custom Websites That Convert — AI Developer'
+const SEO_DESCRIPTION =
+  'High-performance, responsive custom websites designed to turn visitors into customers — built faster and cheaper with AI-powered development.'
 
 export const Route = createFileRoute('/services/websites')({
   component: WebsitesPage,
-  head: () => ({
-    meta: [
-      { title: 'Custom Websites That Convert — AI Developer' },
-      {
-        name: 'description',
-        content:
-          'High-performance, responsive websites designed to turn visitors into customers — built faster with AI-powered development.',
-      },
-    ],
-  }),
+  head: () => pageSeo({ title: SEO_TITLE, description: SEO_DESCRIPTION, path: SEO_PATH }),
 })
 
 const benefits = [
@@ -50,6 +47,8 @@ const benefits = [
 function WebsitesPage() {
   return (
     <>
+      <JsonLd data={serviceSchema({ name: 'Custom Website Development', description: SEO_DESCRIPTION, path: SEO_PATH })} />
+      <JsonLd data={breadcrumbSchema({ items: [{ label: 'Home', path: '/' }, { label: 'Services', path: '/about' }, { label: 'Websites', path: SEO_PATH }] })} />
       <PageHeader
         badge="Websites"
         title="Custom Websites That Convert"

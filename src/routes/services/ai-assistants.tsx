@@ -5,19 +5,16 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Bot, FileText, BarChart3, BookOpen, Lightbulb } from 'lucide-react'
+import { JsonLd, pageSeo, serviceSchema, breadcrumbSchema } from '@/lib/seo'
+
+const SEO_PATH = '/services/ai-assistants'
+const SEO_TITLE = 'Custom AI Assistants for Your Team — AI Developer'
+const SEO_DESCRIPTION =
+  'Custom AI assistants that summarize data, draft documents, and accelerate decisions — purpose-built for how your team actually works.'
 
 export const Route = createFileRoute('/services/ai-assistants')({
   component: AIAssistantsPage,
-  head: () => ({
-    meta: [
-      { title: 'AI Assistants That Work Alongside Your Team — AI Developer' },
-      {
-        name: 'description',
-        content:
-          'Custom AI assistants that summarize data, draft documents, answer questions, and accelerate decisions across your organization.',
-      },
-    ],
-  }),
+  head: () => pageSeo({ title: SEO_TITLE, description: SEO_DESCRIPTION, path: SEO_PATH }),
 })
 
 const benefits = [
@@ -50,6 +47,8 @@ const benefits = [
 function AIAssistantsPage() {
   return (
     <>
+      <JsonLd data={serviceSchema({ name: 'Custom AI Assistant Development', description: SEO_DESCRIPTION, path: SEO_PATH })} />
+      <JsonLd data={breadcrumbSchema({ items: [{ label: 'Home', path: '/' }, { label: 'Services', path: '/about' }, { label: 'AI Assistants', path: SEO_PATH }] })} />
       <PageHeader
         badge="AI Assistants"
         title="AI Assistants That Work Alongside Your Team"

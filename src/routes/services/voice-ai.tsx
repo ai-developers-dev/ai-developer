@@ -5,19 +5,16 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Phone, Clock, MessageCircle, Calendar, UserCheck } from 'lucide-react'
+import { JsonLd, pageSeo, serviceSchema, breadcrumbSchema } from '@/lib/seo'
+
+const SEO_PATH = '/services/voice-ai'
+const SEO_TITLE = 'Voice AI Agents for Small Business — AI Developer'
+const SEO_DESCRIPTION =
+  'AI phone agents that answer calls 24/7, book appointments, qualify leads, and handle customer inquiries — built for small business.'
 
 export const Route = createFileRoute('/services/voice-ai')({
   component: VoiceAIPage,
-  head: () => ({
-    meta: [
-      { title: 'Voice AI Agents That Handle Calls — AI Developer' },
-      {
-        name: 'description',
-        content:
-          'AI-powered phone agents that answer calls, book appointments, qualify leads, and handle customer inquiries around the clock.',
-      },
-    ],
-  }),
+  head: () => pageSeo({ title: SEO_TITLE, description: SEO_DESCRIPTION, path: SEO_PATH }),
 })
 
 const benefits = [
@@ -50,6 +47,8 @@ const benefits = [
 function VoiceAIPage() {
   return (
     <>
+      <JsonLd data={serviceSchema({ name: 'Voice AI Agent Development', description: SEO_DESCRIPTION, path: SEO_PATH })} />
+      <JsonLd data={breadcrumbSchema({ items: [{ label: 'Home', path: '/' }, { label: 'Services', path: '/about' }, { label: 'Voice AI Agents', path: SEO_PATH }] })} />
       <PageHeader
         badge="Voice AI"
         title="Voice AI Agents That Handle Calls"

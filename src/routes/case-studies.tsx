@@ -6,19 +6,17 @@ import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-ch
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TrendingUp } from 'lucide-react'
+import { pageSeo } from '@/lib/seo'
 
 export const Route = createFileRoute('/case-studies')({
   component: CaseStudiesPage,
-  head: () => ({
-    meta: [
-      { title: 'Case Studies — AI Developer Results' },
-      {
-        name: 'description',
-        content:
-          'See how AI Developer has helped businesses launch faster, cut costs, and automate operations with custom AI solutions.',
-      },
-    ],
-  }),
+  head: () =>
+    pageSeo({
+      title: 'Case Studies — Custom Software Results — AI Developer',
+      description:
+        'See how AI Developer has helped businesses launch faster, cut costs, and replace monthly SaaS with custom software they own.',
+      path: '/case-studies',
+    }),
 })
 
 const caseStudies = [

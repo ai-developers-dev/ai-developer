@@ -6,19 +6,17 @@ import { FasterCheaperSection } from '@/components/sections/faster-cheaper.js'
 import { HowItWorks } from '@/components/sections/how-it-works.js'
 import { CTASection } from '@/components/sections/cta-section.js'
 import { VoiceAgentSection } from '@/components/sections/voice-agent-section.js'
+import { pageSeo } from '@/lib/seo'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
-  head: () => ({
-    meta: [
-      { title: 'AI Developer — Websites, Apps & AI Solutions Built Faster' },
-      {
-        name: 'description',
-        content:
-          'AI Developer builds custom websites, web apps, voice AI agents, chat AI agents, AI assistants, and AI automations — faster and cheaper with AI.',
-      },
-    ],
-  }),
+  head: () =>
+    pageSeo({
+      title: 'AI Developer — Custom AI Software & CRMs Built Faster',
+      description:
+        'AI Developer builds custom websites, web apps, voice AI agents, and home service CRMs — owned forever, no monthly SaaS fees.',
+      path: '/',
+    }),
 })
 
 function HomePage() {

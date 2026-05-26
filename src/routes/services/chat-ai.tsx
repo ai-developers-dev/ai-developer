@@ -5,19 +5,16 @@ import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { StaggerChildren, StaggerItem } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { MessageSquare, Share2, Zap, TrendingUp, ArrowUpRight } from 'lucide-react'
+import { JsonLd, pageSeo, serviceSchema, breadcrumbSchema } from '@/lib/seo'
+
+const SEO_PATH = '/services/chat-ai'
+const SEO_TITLE = 'Custom Chat AI Agents for Sales & Support — AI Developer'
+const SEO_DESCRIPTION =
+  'Custom AI chatbots on your website, SMS, and social channels — handle support, qualify leads, and close sales conversations 24/7.'
 
 export const Route = createFileRoute('/services/chat-ai')({
   component: ChatAIPage,
-  head: () => ({
-    meta: [
-      { title: 'Chat AI Agents for Instant Engagement — AI Developer' },
-      {
-        name: 'description',
-        content:
-          'Intelligent chatbots deployed on your website, SMS, or social channels — handling customer support and sales conversations instantly.',
-      },
-    ],
-  }),
+  head: () => pageSeo({ title: SEO_TITLE, description: SEO_DESCRIPTION, path: SEO_PATH }),
 })
 
 const benefits = [
@@ -50,6 +47,8 @@ const benefits = [
 function ChatAIPage() {
   return (
     <>
+      <JsonLd data={serviceSchema({ name: 'Chat AI Agent Development', description: SEO_DESCRIPTION, path: SEO_PATH })} />
+      <JsonLd data={breadcrumbSchema({ items: [{ label: 'Home', path: '/' }, { label: 'Services', path: '/about' }, { label: 'Chat AI Agents', path: SEO_PATH }] })} />
       <PageHeader
         badge="Chat AI"
         title="Chat AI Agents for Instant Engagement"

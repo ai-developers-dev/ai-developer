@@ -18,18 +18,17 @@ import {
 } from '@/components/ui/select'
 import { ArrowRight, CheckCircle2, Clock, Mail, Rocket } from 'lucide-react'
 
+import { pageSeo } from '@/lib/seo'
+
 export const Route = createFileRoute('/contact')({
   component: ContactPage,
-  head: () => ({
-    meta: [
-      { title: 'Contact AI Developer — Get a Free Quote' },
-      {
-        name: 'description',
-        content:
-          'Get in touch with AI Developer for a free project quote. We respond within 24 hours and most projects kick off within one week.',
-      },
-    ],
-  }),
+  head: () =>
+    pageSeo({
+      title: 'Contact AI Developer — Get a Free Quote',
+      description:
+        'Get in touch with AI Developer for a free project quote on a custom CRM, AI agent, or web app. We respond within 24 hours.',
+      path: '/contact',
+    }),
 })
 
 function ContactPage() {
@@ -152,6 +151,7 @@ function ContactPage() {
                               <SelectValue placeholder="Select a service" />
                             </SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="custom-crm">Custom CRM (home service)</SelectItem>
                               <SelectItem value="website">Custom Website</SelectItem>
                               <SelectItem value="web-app">Web Application</SelectItem>
                               <SelectItem value="voice-ai">Voice AI Agent</SelectItem>
