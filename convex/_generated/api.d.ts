@@ -10,6 +10,7 @@
 
 import type * as clients from "../clients.js";
 import type * as contactSubmissions from "../contactSubmissions.js";
+import type * as discoverySubmissions from "../discoverySubmissions.js";
 import type * as http from "../http.js";
 import type * as projects from "../projects.js";
 import type * as proposals from "../proposals.js";
@@ -26,6 +27,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   clients: typeof clients;
   contactSubmissions: typeof contactSubmissions;
+  discoverySubmissions: typeof discoverySubmissions;
   http: typeof http;
   projects: typeof projects;
   proposals: typeof proposals;

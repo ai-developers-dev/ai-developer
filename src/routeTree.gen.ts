@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PostLoginRouteImport } from './routes/post-login'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CaseStudiesRouteImport } from './routes/case-studies'
@@ -37,6 +38,7 @@ import { Route as DashboardSubmissionsRouteImport } from './routes/dashboard/sub
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardProposalsRouteImport } from './routes/dashboard/proposals'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
+import { Route as DashboardDiscoveriesRouteImport } from './routes/dashboard/discoveries'
 import { Route as DashboardClientsRouteImport } from './routes/dashboard/clients'
 import { Route as BlogStopPayingMonthlyFieldServiceSoftwareRouteImport } from './routes/blog.stop-paying-monthly-field-service-software'
 import { Route as BlogServicetitanAlternativeSmallElectriciansRouteImport } from './routes/blog.servicetitan-alternative-small-electricians'
@@ -64,6 +66,11 @@ const PostLoginRoute = PostLoginRouteImport.update({
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -191,6 +198,11 @@ const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDiscoveriesRoute = DashboardDiscoveriesRouteImport.update({
+  id: '/discoveries',
+  path: '/discoveries',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardClientsRoute = DashboardClientsRouteImport.update({
   id: '/clients',
   path: '/clients',
@@ -271,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/discover': typeof DiscoverRoute
   '/portal': typeof PortalRouteWithChildren
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
@@ -280,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/blog/servicetitan-alternative-small-electricians': typeof BlogServicetitanAlternativeSmallElectriciansRoute
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
+  '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -313,6 +327,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRouteWithChildren
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
+  '/discover': typeof DiscoverRoute
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
   '/blog/build-vs-buy-field-service-software': typeof BlogBuildVsBuyFieldServiceSoftwareRoute
@@ -321,6 +336,7 @@ export interface FileRoutesByTo {
   '/blog/servicetitan-alternative-small-electricians': typeof BlogServicetitanAlternativeSmallElectriciansRoute
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
+  '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -356,6 +372,7 @@ export interface FileRoutesById {
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/discover': typeof DiscoverRoute
   '/portal': typeof PortalRouteWithChildren
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
@@ -365,6 +382,7 @@ export interface FileRoutesById {
   '/blog/servicetitan-alternative-small-electricians': typeof BlogServicetitanAlternativeSmallElectriciansRoute
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
+  '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -401,6 +419,7 @@ export interface FileRouteTypes {
     | '/case-studies'
     | '/contact'
     | '/dashboard'
+    | '/discover'
     | '/portal'
     | '/post-login'
     | '/privacy'
@@ -410,6 +429,7 @@ export interface FileRouteTypes {
     | '/blog/servicetitan-alternative-small-electricians'
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
+    | '/dashboard/discoveries'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/settings'
@@ -443,6 +463,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/case-studies'
     | '/contact'
+    | '/discover'
     | '/post-login'
     | '/privacy'
     | '/blog/build-vs-buy-field-service-software'
@@ -451,6 +472,7 @@ export interface FileRouteTypes {
     | '/blog/servicetitan-alternative-small-electricians'
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
+    | '/dashboard/discoveries'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/settings'
@@ -485,6 +507,7 @@ export interface FileRouteTypes {
     | '/case-studies'
     | '/contact'
     | '/dashboard'
+    | '/discover'
     | '/portal'
     | '/post-login'
     | '/privacy'
@@ -494,6 +517,7 @@ export interface FileRouteTypes {
     | '/blog/servicetitan-alternative-small-electricians'
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
+    | '/dashboard/discoveries'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/settings'
@@ -529,6 +553,7 @@ export interface RootRouteChildren {
   CaseStudiesRoute: typeof CaseStudiesRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  DiscoverRoute: typeof DiscoverRoute
   PortalRoute: typeof PortalRouteWithChildren
   PostLoginRoute: typeof PostLoginRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -565,6 +590,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -742,6 +774,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/discoveries': {
+      id: '/dashboard/discoveries'
+      path: '/discoveries'
+      fullPath: '/dashboard/discoveries'
+      preLoaderRoute: typeof DashboardDiscoveriesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/clients': {
       id: '/dashboard/clients'
       path: '/clients'
@@ -885,6 +924,7 @@ const DashboardProposalsRouteWithChildren =
 
 interface DashboardRouteChildren {
   DashboardClientsRoute: typeof DashboardClientsRoute
+  DashboardDiscoveriesRoute: typeof DashboardDiscoveriesRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
   DashboardProposalsRoute: typeof DashboardProposalsRouteWithChildren
   DashboardSettingsRoute: typeof DashboardSettingsRoute
@@ -895,6 +935,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardClientsRoute: DashboardClientsRoute,
+  DashboardDiscoveriesRoute: DashboardDiscoveriesRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
   DashboardProposalsRoute: DashboardProposalsRouteWithChildren,
   DashboardSettingsRoute: DashboardSettingsRoute,
@@ -956,6 +997,7 @@ const rootRouteChildren: RootRouteChildren = {
   CaseStudiesRoute: CaseStudiesRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  DiscoverRoute: DiscoverRoute,
   PortalRoute: PortalRouteWithChildren,
   PostLoginRoute: PostLoginRoute,
   PrivacyRoute: PrivacyRoute,

@@ -28,6 +28,100 @@ export default defineSchema({
     .index("by_email", ["email"])
     .index("by_role", ["role"]),
 
+  discoverySubmissions: defineTable({
+    // Step 1 — business basics
+    businessName: v.string(),
+    businessAddress: v.string(),
+    businessPhone: v.string(),
+    businessEmail: v.string(),
+    employeeCount: v.union(
+      v.literal("1"),
+      v.literal("2-5"),
+      v.literal("6-10"),
+      v.literal("11-20"),
+      v.literal("21-50"),
+      v.literal("50+")
+    ),
+    // Step 2 — what you do + current tools
+    primaryTrade: v.union(
+      v.literal("electrician"),
+      v.literal("plumber"),
+      v.literal("hvac"),
+      v.literal("multi-trade"),
+      v.literal("other")
+    ),
+    servicesOffered: v.array(v.string()),
+    currentCrm: v.string(),
+    otherTools: v.array(v.string()),
+    topBottleneck: v.union(
+      v.literal("scheduling"),
+      v.literal("quoting"),
+      v.literal("payment"),
+      v.literal("job_tracking"),
+      v.literal("crew_coordination"),
+      v.literal("customer_communication"),
+      v.literal("other")
+    ),
+    // Step 3 — operations complexity
+    locationCount: v.union(
+      v.literal("single"),
+      v.literal("2-3"),
+      v.literal("4+"),
+      v.literal("multi-state")
+    ),
+    serviceRadiusMiles: v.union(
+      v.literal("under_25"),
+      v.literal("25-50"),
+      v.literal("50-100"),
+      v.literal("100+")
+    ),
+    techsQuoteOnSite: v.union(
+      v.literal("always"),
+      v.literal("sometimes"),
+      v.literal("never")
+    ),
+    changeOrderFrequency: v.union(
+      v.literal("rarely"),
+      v.literal("sometimes_30"),
+      v.literal("often_50")
+    ),
+    recurringContracts: v.union(
+      v.literal("none"),
+      v.literal("under_20"),
+      v.literal("20-50"),
+      v.literal("over_50")
+    ),
+    // Step 4 — tech + project
+    accountingSystem: v.string(),
+    requiredIntegrations: v.array(v.string()),
+    budgetRange: v.union(
+      v.literal("under_15k"),
+      v.literal("15-25k"),
+      v.literal("25-40k"),
+      v.literal("40k+"),
+      v.literal("guidance")
+    ),
+    desiredLaunch: v.union(
+      v.literal("asap"),
+      v.literal("3_months"),
+      v.literal("3-6_months"),
+      v.literal("6-12_months"),
+      v.literal("flexible")
+    ),
+    successDefinition: v.optional(v.string()),
+    // Source attribution (which page they came from)
+    source: v.optional(v.string()),
+    // Triage
+    status: v.union(
+      v.literal("new"),
+      v.literal("contacted"),
+      v.literal("quoted"),
+      v.literal("converted"),
+      v.literal("archived")
+    ),
+    notes: v.optional(v.string()),
+  }).index("by_status", ["status"]),
+
   contactSubmissions: defineTable({
     name: v.string(),
     email: v.string(),

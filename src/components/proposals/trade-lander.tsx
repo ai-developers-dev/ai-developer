@@ -7,6 +7,7 @@ import {
 } from '@/components/animations/stagger-children.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Link } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
 import {
   Users,
   CalendarClock,
@@ -167,9 +168,25 @@ export function TradeLander(props: { content: TradeContent }) {
                 Get a CRM you own forever.
               </span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed mb-8">
               {c.closing}
             </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button asChild size="lg" className="text-base">
+                <Link
+                  to="/discover"
+                  search={{
+                    source: c.path.split('/').pop() ?? undefined,
+                  }}
+                >
+                  Get a Custom Quote
+                  <ArrowRight className="w-4 h-4 ml-1.5" />
+                </Link>
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                12 minutes · real scope + price in 24 hours
+              </p>
+            </div>
           </FadeInView>
         </div>
       </section>

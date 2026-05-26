@@ -257,12 +257,25 @@ function CustomCrmPage() {
                 Get your own custom CRM that you own forever.
               </span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed mb-8">
               No per-seat licensing, no quarterly price hikes, no losing your
               data when you switch vendors. Pay once, own the code, keep
               everything — customers, history, integrations — for the life of
               your business.
             </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                to="/discover"
+                search={{ source: 'custom-crm' }}
+                className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-3 rounded-lg font-semibold text-base transition-colors"
+              >
+                Get a Custom Quote
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <p className="text-xs text-muted-foreground">
+                12 minutes · real scope + price in 24 hours
+              </p>
+            </div>
           </FadeInView>
         </div>
       </section>

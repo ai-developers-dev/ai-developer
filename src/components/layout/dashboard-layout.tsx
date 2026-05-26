@@ -6,6 +6,7 @@ import { api } from '../../../convex/_generated/api'
 import {
   LayoutDashboard,
   Inbox,
+  ClipboardList,
   FolderKanban,
   FileText,
   Clock,
@@ -40,6 +41,7 @@ import {
 const navItems = [
   { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
   { icon: Inbox, label: 'Submissions', href: '/dashboard/submissions' },
+  { icon: ClipboardList, label: 'Discoveries', href: '/dashboard/discoveries' },
   { icon: FolderKanban, label: 'Projects', href: '/dashboard/projects' },
   { icon: FileText, label: 'Proposals', href: '/dashboard/proposals' },
   { icon: Clock, label: 'Time Tracking', href: '/dashboard/time-tracking' },

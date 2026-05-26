@@ -73,6 +73,31 @@ function ContactPage() {
         description="Tell us about your project and we'll get back to you within 24 hours with a free quote."
       />
 
+      <section className="py-12 -mt-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeInView>
+            <div className="rounded-2xl border border-brand-primary/30 bg-brand-primary/5 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  Looking for a Custom CRM quote?
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Our 12-minute discovery form gives you a real scope + price
+                  in 24 hours.
+                </p>
+              </div>
+              <a
+                href="/discover"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-primary hover:text-brand-primary/80 transition-colors whitespace-nowrap"
+              >
+                Try the discovery form
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </FadeInView>
+        </div>
+      </section>
+
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
