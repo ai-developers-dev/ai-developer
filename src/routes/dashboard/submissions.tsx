@@ -213,7 +213,7 @@ function SubmissionsPage() {
           if (!o) setOpenId(null)
         }}
       >
-        <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           {selected && (
             <>
               <DialogHeader>
@@ -224,22 +224,22 @@ function SubmissionsPage() {
                 <DialogDescription>{selected.email}</DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4 py-2">
-                {selected.company && (
-                  <Pair label="Company" value={selected.company} />
-                )}
-                <Pair label="Service" value={selected.service} />
-                {selected.budget && (
-                  <Pair label="Budget" value={selected.budget} />
-                )}
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Description
-                  </p>
+              <div className="space-y-5 py-2">
+                <Section title="Inquiry">
+                  {selected.company && (
+                    <Pair label="Company" value={selected.company} />
+                  )}
+                  <Pair label="Service" value={selected.service} />
+                  {selected.budget && (
+                    <Pair label="Budget" value={selected.budget} />
+                  )}
+                </Section>
+
+                <Section title="Description">
                   <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                     {selected.description}
                   </p>
-                </div>
+                </Section>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t">
                   <div className="space-y-1">
@@ -330,6 +330,23 @@ function SubmissionsPage() {
           )}
         </DialogContent>
       </Dialog>
+    </div>
+  )
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider border-b border-border pb-1">
+        {title}
+      </p>
+      <div className="space-y-1.5">{children}</div>
     </div>
   )
 }
