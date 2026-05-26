@@ -86,10 +86,16 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8">
+        <div className="mt-16 pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <p className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-brand-tertiary/80 hover:text-brand-tertiary transition-opacity">
             &copy; {new Date().getFullYear()} AI DEVELOPER. ENGINEERED FOR PRECISION.
           </p>
+          <Link
+            to="/about"
+            className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/40 hover:text-brand-secondary transition-colors"
+          >
+            Founded by Doug Allen
+          </Link>
         </div>
       </div>
     </footer>

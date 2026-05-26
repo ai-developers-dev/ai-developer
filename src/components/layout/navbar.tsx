@@ -152,7 +152,7 @@ export function Navbar() {
               to="/about"
               className="font-label uppercase tracking-[0.2em] text-xs text-nav-text/60 hover:text-nav-text-hover transition-colors py-2"
             >
-              Process
+              About
             </Link>
 
             <Link
@@ -235,7 +235,7 @@ export function Navbar() {
                     className="font-label uppercase tracking-[0.2em] text-xs text-nav-text hover:text-brand-tertiary transition-colors px-2 py-2"
                     onClick={() => setOpen(false)}
                   >
-                    Process
+                    About
                   </Link>
 
                   <Link

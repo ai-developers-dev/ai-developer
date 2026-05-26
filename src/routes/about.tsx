@@ -77,11 +77,22 @@ function AboutPage() {
             <FadeInView className="lg:col-span-5">
               <div className="relative">
                 <div className="absolute -inset-2 bg-gradient-to-br from-brand-primary/30 to-brand-tertiary/20 rounded-2xl blur-2xl opacity-60" />
-                <img
-                  src="/images/doug-allen.jpg"
-                  alt="Doug Allen — Founder & CEO of AI Developer"
-                  className="relative rounded-2xl shadow-xl w-full max-w-md object-cover"
-                />
+                <div className="relative rounded-2xl shadow-xl w-full max-w-md aspect-[4/5] bg-gradient-to-br from-[#1c1110] to-[#2a1f1d] overflow-hidden flex items-center justify-center">
+                  <img
+                    src="/images/doug-allen.jpg"
+                    alt="Doug Allen — Founder & CEO of AI Developer"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      // If the image isn't uploaded yet, hide the broken icon
+                      // so the gradient + initials fallback shows cleanly.
+                      ;(e.currentTarget as HTMLImageElement).style.display =
+                        'none'
+                    }}
+                  />
+                  <span className="font-heading text-6xl font-bold text-white/15 select-none">
+                    DA
+                  </span>
+                </div>
                 <div className="mt-6">
                   <p className="font-label text-[11px] tracking-[0.25em] uppercase text-brand-tertiary mb-1">
                     Founder &amp; CEO
