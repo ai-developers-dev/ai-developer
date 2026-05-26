@@ -41,10 +41,9 @@ import {
   type Trade,
 } from '@/lib/discovery-data'
 
-// Bumped to v5 — dropped websiteUrl entirely; chat + online-booking
-// follow-ups moved from Step 3 to Step 1 so they appear immediately
-// when the user picks "Yes" to "Do you have a website?".
-const DRAFT_KEY = 'discovery_form_draft_v5'
+// Bumped to v6 — topBottleneck (single radio) became topBottlenecks
+// (multi-select chips). Old singular drafts can't deserialize cleanly.
+const DRAFT_KEY = 'discovery_form_draft_v6'
 
 interface FormState {
   // Step 1 — business basics (incl. website yes/no + chat/booking follow-ups)
@@ -62,7 +61,7 @@ interface FormState {
   leadSources: string[]
   locationCount: string
   serviceRadiusMiles: string
-  topBottleneck: string
+  topBottlenecks: string[]
   // Step 3 — customers, calls & jobs
   collectsGoogleReviews: string
   techsQuoteOnSite: string
@@ -95,7 +94,7 @@ const INITIAL: FormState = {
   leadSources: [],
   locationCount: '',
   serviceRadiusMiles: '',
-  topBottleneck: '',
+  topBottlenecks: [],
   collectsGoogleReviews: '',
   techsQuoteOnSite: '',
   missedCallHandling: '',
@@ -212,7 +211,8 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
       errs[2] = 'Pick at least one place your leads come from.'
     else if (!form.locationCount) errs[2] = 'Pick your location count.'
     else if (!form.serviceRadiusMiles) errs[2] = 'Pick your service radius.'
-    else if (!form.topBottleneck) errs[2] = 'Pick your biggest bottleneck.'
+    else if (form.topBottlenecks.length === 0)
+      errs[2] = 'Pick at least one bottleneck.'
 
     if (!form.collectsGoogleReviews)
       errs[3] = 'Pick your Google reviews answer.'
@@ -262,7 +262,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
         currentCrm: resolvedCrm,
         otherTools: form.otherTools,
         leadSources: form.leadSources,
-        topBottleneck: form.topBottleneck as any,
+        topBottlenecks: form.topBottlenecks,
         locationCount: form.locationCount as any,
         serviceRadiusMiles: form.serviceRadiusMiles as any,
         techsQuoteOnSite: form.techsQuoteOnSite as any,
@@ -549,23 +549,24 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
                 </RadioGroup>
               </div>
 
-              <div className="space-y-2">
-                <Label>Biggest operational bottleneck today</Label>
-                <RadioGroup
-                  value={form.topBottleneck}
-                  onValueChange={(v) => set('topBottleneck', v)}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-2"
-                >
-                  {BOTTLENECK_OPTIONS.map((opt) => (
-                    <RadioOption
-                      key={opt.value}
-                      value={opt.value}
-                      label={opt.label}
-                      selected={form.topBottleneck === opt.value}
-                    />
-                  ))}
-                </RadioGroup>
-              </div>
+              <MultiSelectChips
+                label="Biggest operational bottlenecks today (pick all that apply)"
+                options={BOTTLENECK_OPTIONS.map((o) => o.label)}
+                value={form.topBottlenecks.map(
+                  (v) =>
+                    BOTTLENECK_OPTIONS.find((o) => o.value === v)?.label ?? v,
+                )}
+                onChange={(labels) =>
+                  set(
+                    'topBottlenecks',
+                    labels.map(
+                      (l) =>
+                        BOTTLENECK_OPTIONS.find((o) => o.label === l)?.value ??
+                        l,
+                    ),
+                  )
+                }
+              />
             </div>
           )}
 

@@ -28,15 +28,8 @@ const primaryTradeV = v.union(
   v.literal("other")
 );
 
-const topBottleneckV = v.union(
-  v.literal("scheduling"),
-  v.literal("quoting"),
-  v.literal("payment"),
-  v.literal("job_tracking"),
-  v.literal("crew_coordination"),
-  v.literal("customer_communication"),
-  v.literal("other")
-);
+// Bottlenecks are stored as an array of strings — the form lets the user
+// pick more than one. Values come from BOTTLENECK_OPTIONS on the client.
 
 const locationCountV = v.union(
   v.literal("single"),
@@ -128,7 +121,7 @@ export const submit = mutation({
     currentCrm: v.string(),
     otherTools: v.array(v.string()),
     leadSources: v.array(v.string()),
-    topBottleneck: topBottleneckV,
+    topBottlenecks: v.array(v.string()),
     locationCount: locationCountV,
     serviceRadiusMiles: serviceRadiusMilesV,
     techsQuoteOnSite: techsQuoteOnSiteV,
@@ -276,7 +269,7 @@ const PRETTY_LABELS: Record<string, Record<string, string>> = {
     "multi-trade": "Multi-trade",
     other: "Other",
   },
-  topBottleneck: {
+  topBottlenecks: {
     scheduling: "Scheduling / dispatch",
     quoting: "Quoting & estimating",
     payment: "Payment collection",
@@ -400,7 +393,10 @@ export const notify = internalAction({
           ${row("Current CRM", sub.currentCrm || "—")}
           ${row("Other tools", (sub.otherTools || []).join(", ") || "—")}
           ${row("Lead sources", (sub.leadSources || []).join(", ") || "—")}
-          ${row("Top bottleneck", label("topBottleneck", sub.topBottleneck))}
+          ${row("Top bottlenecks", (() => {
+            const list = sub.topBottlenecks?.length ? sub.topBottlenecks : sub.topBottleneck ? [sub.topBottleneck] : [];
+            return list.length ? list.map((b: string) => label("topBottlenecks", b)).join(", ") : "—";
+          })())}
         </table>
 
         <h3 style="color:#333123;font-size:15px;margin:0 0 8px;font-weight:600;border-bottom:2px solid #E5E7EB;padding-bottom:6px;">Operations</h3>

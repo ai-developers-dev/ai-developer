@@ -94,7 +94,7 @@ const PRETTY: Record<string, Record<string, string>> = {
     'multi-trade': 'Multi-trade',
     other: 'Other',
   },
-  topBottleneck: {
+  topBottlenecks: {
     scheduling: 'Scheduling / dispatch',
     quoting: 'Quoting & estimating',
     payment: 'Payment collection',
@@ -421,7 +421,17 @@ function DiscoveriesPage() {
                   />
                   <Pair
                     label="Top bottleneck"
-                    value={pretty('topBottleneck', selected.topBottleneck)}
+                    value={(() => {
+                      const list =
+                        selected.topBottlenecks && selected.topBottlenecks.length
+                          ? selected.topBottlenecks
+                          : selected.topBottleneck
+                            ? [selected.topBottleneck]
+                            : []
+                      return list.length
+                        ? list.map((b) => pretty('topBottlenecks', b)).join(', ')
+                        : '—'
+                    })()}
                   />
                 </Section>
 

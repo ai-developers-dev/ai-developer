@@ -55,15 +55,19 @@ export default defineSchema({
     currentCrm: v.string(),
     otherTools: v.array(v.string()),
     leadSources: v.array(v.string()),
-    topBottleneck: v.union(
-      v.literal("scheduling"),
-      v.literal("quoting"),
-      v.literal("payment"),
-      v.literal("job_tracking"),
-      v.literal("crew_coordination"),
-      v.literal("customer_communication"),
-      v.literal("other")
+    // Legacy single-value field — kept optional so older rows still validate.
+    topBottleneck: v.optional(
+      v.union(
+        v.literal("scheduling"),
+        v.literal("quoting"),
+        v.literal("payment"),
+        v.literal("job_tracking"),
+        v.literal("crew_coordination"),
+        v.literal("customer_communication"),
+        v.literal("other")
+      )
     ),
+    topBottlenecks: v.optional(v.array(v.string())),
     // Step 3 — operations complexity
     locationCount: v.union(
       v.literal("single"),
