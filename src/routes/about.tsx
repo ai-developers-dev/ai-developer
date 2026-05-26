@@ -28,7 +28,7 @@ const PERSON_SCHEMA = {
   jobTitle: 'Founder & CEO',
   worksFor: { '@type': 'Organization', name: 'AI Developer', url: SITE_URL },
   email: 'doug@aideveloper.dev',
-  image: `${SITE_URL}/images/doug-allen.jpg`,
+  image: `${SITE_URL}/images/doug-allen.png`,
 }
 
 const values = [
@@ -79,7 +79,7 @@ function AboutPage() {
                 <div className="absolute -inset-2 bg-gradient-to-br from-brand-primary/30 to-brand-tertiary/20 rounded-2xl blur-2xl opacity-60" />
                 <div className="relative rounded-2xl shadow-xl w-full max-w-md aspect-[4/5] bg-gradient-to-br from-[#1c1110] to-[#2a1f1d] overflow-hidden flex items-center justify-center">
                   <img
-                    src="/images/doug-allen.jpg"
+                    src="/images/doug-allen.png"
                     alt="Doug Allen — Founder & CEO of AI Developer"
                     className="absolute inset-0 w-full h-full object-cover"
                     onError={(e) => {
