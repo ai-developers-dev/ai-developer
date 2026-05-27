@@ -950,7 +950,7 @@ function ProposalsPage() {
               {previewProposalId && (
                 <Button asChild variant="outline" size="sm">
                   <a
-                    href={`/pay/${previewProposalId}`}
+                    href={`/pay/${previewProposalId}?preview=true`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -963,7 +963,7 @@ function ProposalsPage() {
           </DialogHeader>
           {previewProposalId && (
             <iframe
-              src={`/pay/${previewProposalId}`}
+              src={`/pay/${previewProposalId}?preview=true`}
               title="Client proposal preview"
               className="w-full h-[75vh] border-0"
             />

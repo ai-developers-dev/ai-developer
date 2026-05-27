@@ -14,13 +14,14 @@ import {
   describeTrigger,
   type Installment,
 } from '@/lib/installments'
-import { CheckCircle2, Clock, Lock, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, Clock, Lock, ShieldCheck, X } from 'lucide-react'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
 export const Route = createFileRoute('/pay/$id')({
   validateSearch: (search: Record<string, unknown>) => ({
     success: search.success === 'true',
+    preview: search.preview === 'true',
   }),
   component: PublicPayPage,
 })
@@ -79,7 +80,7 @@ function renderInline(s: string): React.ReactNode {
 
 function PublicPayPage() {
   const { id } = Route.useParams()
-  const { success } = useSearch({ from: '/pay/$id' })
+  const { success, preview } = useSearch({ from: '/pay/$id' })
   const proposal = useQuery(api.proposals.getPublic, {
     id: id as Id<'proposals'>,
   })
@@ -90,6 +91,7 @@ function PublicPayPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showPreviewCheckout, setShowPreviewCheckout] = useState(false)
 
   // Force light theme on this route — clients land here from email
   // links and expect a clean invoice, not the admin's dark dashboard.
@@ -147,6 +149,10 @@ function PublicPayPage() {
 
   async function handlePay() {
     if (!proposal || !proposal.clientEmail || !active) return
+    if (preview) {
+      setShowPreviewCheckout(true)
+      return
+    }
     setError(null)
     setLoading(true)
 
@@ -415,6 +421,179 @@ function PublicPayPage() {
         <p className="text-center text-xs text-slate-400 mt-6">
           AI Developer · Custom AI software &amp; CRMs built faster
         </p>
+      </div>
+
+      {preview && showPreviewCheckout && active && (
+        <MockCheckoutOverlay
+          amount={activeAmount}
+          label={active.label}
+          proposalTitle={proposal.title}
+          clientEmail={proposal.clientEmail ?? 'client@example.com'}
+          onClose={() => setShowPreviewCheckout(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function MockCheckoutOverlay({
+  amount,
+  label,
+  proposalTitle,
+  clientEmail,
+  onClose,
+}: {
+  amount: number
+  label: string
+  proposalTitle: string
+  clientEmail: string
+  onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Preview ribbon */}
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 bg-amber-100 border border-amber-300 text-amber-900 text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full">
+          Preview — not a real checkout
+        </div>
+
+        <button
+          onClick={onClose}
+          aria-label="Close preview"
+          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 overflow-auto">
+          {/* Left — order summary (Stripe style) */}
+          <div className="p-8 bg-slate-50">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center text-sm font-bold">
+                A
+              </div>
+              <p className="text-sm font-semibold text-slate-700">
+                AI Developer
+              </p>
+            </div>
+            <p className="text-sm text-slate-500 mb-1">Pay AI Developer</p>
+            <p className="text-4xl font-bold text-slate-900 tabular-nums mb-6">
+              ${formatCurrency(amount)}
+            </p>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-slate-900 font-medium truncate">
+                    {proposalTitle}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+                </div>
+                <p className="text-slate-900 font-medium tabular-nums shrink-0">
+                  ${formatCurrency(amount)}
+                </p>
+              </div>
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+                <p className="text-slate-700 font-medium">Total due</p>
+                <p className="text-slate-900 font-bold tabular-nums">
+                  ${formatCurrency(amount)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right — payment form (Stripe style mock) */}
+          <div className="p-8 bg-white">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 mb-4">
+              Contact information
+            </p>
+            <div className="mb-5">
+              <label className="block text-xs font-medium text-slate-600 mb-1">
+                Email
+              </label>
+              <div className="px-3 py-2.5 rounded-lg border border-slate-300 bg-slate-50 text-sm text-slate-700">
+                {clientEmail}
+              </div>
+            </div>
+
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 mb-4 mt-6">
+              Payment method
+            </p>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="px-3 py-1.5 rounded-md border-2 border-slate-900 text-xs font-semibold text-slate-900">
+                Card
+              </div>
+              <div className="px-3 py-1.5 rounded-md border border-slate-200 text-xs font-medium text-slate-500">
+                Cash App Pay
+              </div>
+              <div className="px-3 py-1.5 rounded-md border border-slate-200 text-xs font-medium text-slate-500">
+                Link
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  Card number
+                </label>
+                <div className="px-3 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-400 flex items-center justify-between">
+                  <span>1234 1234 1234 1234</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-7 h-5 rounded bg-gradient-to-br from-blue-600 to-blue-800" />
+                    <div className="w-7 h-5 rounded bg-gradient-to-br from-red-500 to-orange-500" />
+                    <div className="w-7 h-5 rounded bg-gradient-to-br from-blue-500 to-cyan-500" />
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">
+                    Expiration
+                  </label>
+                  <div className="px-3 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-400">
+                    MM / YY
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">
+                    CVC
+                  </label>
+                  <div className="px-3 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-400">
+                    CVC
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  Cardholder name
+                </label>
+                <div className="px-3 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-400">
+                  Full name on card
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  Country
+                </label>
+                <div className="px-3 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-700">
+                  United States
+                </div>
+              </div>
+            </div>
+
+            <button
+              disabled
+              className="w-full mt-6 inline-flex items-center justify-center gap-2 bg-slate-900 text-white font-semibold text-sm px-6 py-3.5 rounded-lg opacity-90 cursor-not-allowed"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              Pay ${formatCurrency(amount)}
+            </button>
+
+            <div className="flex items-center justify-center gap-1.5 mt-3 text-[11px] text-slate-400">
+              <ShieldCheck className="w-3 h-3" />
+              Powered by Stripe
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
