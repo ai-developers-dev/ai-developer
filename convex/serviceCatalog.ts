@@ -103,6 +103,59 @@ const DEFAULTS: Array<{
       { name: "Custom n8n pipeline", price: 3_000 },
     ],
   },
+  {
+    name: "SEO",
+    slug: "seo",
+    description:
+      "Local and global SEO with AI-assisted content writing. Built to rank and convert.",
+    icon: "Search",
+    items: [
+      {
+        name: "Local SEO setup (GBP + citations + map pack)",
+        price: 2_500,
+      },
+      {
+        name: "National / global SEO program (technical + on-page)",
+        price: 4_000,
+      },
+      {
+        name: "Technical SEO audit + fixes (Core Web Vitals, schema, crawl)",
+        price: 2_000,
+      },
+      {
+        name: "Keyword research + content strategy",
+        price: 1_500,
+      },
+      {
+        name: "AI-assisted long-form article (1,500–3,000 words, human-edited)",
+        price: 350,
+      },
+      {
+        name: "Service + location landing page",
+        price: 500,
+      },
+      {
+        name: "Monthly SEO retainer — Local (4 articles + GBP management)",
+        price: 1_500,
+      },
+      {
+        name: "Monthly SEO retainer — Growth (8 articles + link-building + reporting)",
+        price: 3_500,
+      },
+      {
+        name: "Monthly SEO retainer — Authority (12+ articles + digital PR)",
+        price: 6_500,
+      },
+      {
+        name: "Backlink outreach campaign",
+        price: 2_000,
+      },
+      {
+        name: "Rank tracking + monthly reporting dashboard",
+        price: 750,
+      },
+    ],
+  },
 ];
 
 // ============================================================

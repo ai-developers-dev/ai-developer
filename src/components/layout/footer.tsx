@@ -13,6 +13,7 @@ const footerLinks = {
     { label: 'Chat AI Agents', href: '/services/chat-ai' },
     { label: 'AI Assistants', href: '/services/ai-assistants' },
     { label: 'AI Automations', href: '/services/ai-automations' },
+    { label: 'SEO Services', href: '/services/seo' },
   ],
   Company: [
     { label: 'About', href: '/about' },

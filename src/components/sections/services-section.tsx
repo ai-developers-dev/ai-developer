@@ -1,4 +1,4 @@
-import { Globe, Code, Phone, MessageSquare, Brain, Zap, Users } from 'lucide-react'
+import { Globe, Code, Phone, MessageSquare, Brain, Zap, Users, Search } from 'lucide-react'
 import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
@@ -52,6 +52,13 @@ const services = [
     href: '/services/ai-automations',
     description:
       'Automate repetitive workflows — from lead routing and data entry to report generation and email sequences.',
+  },
+  {
+    icon: Search,
+    title: 'SEO',
+    href: '/services/seo',
+    description:
+      'Local and global SEO with AI-assisted content writing. Rank in the map pack, capture buyer-intent search, and turn Google into a real lead channel.',
   },
 ]
 

@@ -13,6 +13,7 @@ import {
   Brain,
   Zap,
   Users,
+  Search,
   ChevronDown,
   LayoutDashboard,
   LogIn,
@@ -71,6 +72,12 @@ const services = [
     label: 'Custom CRM',
     href: '/services/custom-crm',
     description: 'Built for how your trade runs',
+  },
+  {
+    icon: Search,
+    label: 'SEO',
+    href: '/services/seo',
+    description: 'Local & global search + content',
   },
 ]
 
