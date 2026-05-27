@@ -353,6 +353,29 @@ export default defineSchema({
     ),
   }),
 
+  // Service catalog — two-level tree (categories → items) editable from
+  // /dashboard/services. Used today as a managed catalog; future work
+  // will wire it into the proposal generator and discovery form.
+  serviceCategories: defineTable({
+    name: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    icon: v.optional(v.string()),
+    displayOrder: v.number(),
+    isActive: v.boolean(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_displayOrder", ["displayOrder"]),
+
+  serviceItems: defineTable({
+    categoryId: v.id("serviceCategories"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    defaultPrice: v.number(),
+    isActive: v.boolean(),
+    displayOrder: v.number(),
+  }).index("by_categoryId", ["categoryId"]),
+
   services: defineTable({
     name: v.string(),
     description: v.optional(v.string()),

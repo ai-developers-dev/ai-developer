@@ -36,6 +36,7 @@ import { Route as PayIdRouteImport } from './routes/pay.$id'
 import { Route as DashboardTimeTrackingRouteImport } from './routes/dashboard/time-tracking'
 import { Route as DashboardSubmissionsRouteImport } from './routes/dashboard/submissions'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardServicesRouteImport } from './routes/dashboard/services'
 import { Route as DashboardProposalsRouteImport } from './routes/dashboard/proposals'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
 import { Route as DashboardPricingRouteImport } from './routes/dashboard/pricing'
@@ -189,6 +190,11 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardServicesRoute = DashboardServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProposalsRoute = DashboardProposalsRouteImport.update({
   id: '/proposals',
   path: '/proposals',
@@ -303,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/pricing': typeof DashboardPricingRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
+  '/dashboard/services': typeof DashboardServicesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/submissions': typeof DashboardSubmissionsRoute
   '/dashboard/time-tracking': typeof DashboardTimeTrackingRoute
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/dashboard/pricing': typeof DashboardPricingRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
+  '/dashboard/services': typeof DashboardServicesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/submissions': typeof DashboardSubmissionsRoute
   '/dashboard/time-tracking': typeof DashboardTimeTrackingRoute
@@ -394,6 +402,7 @@ export interface FileRoutesById {
   '/dashboard/pricing': typeof DashboardPricingRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
+  '/dashboard/services': typeof DashboardServicesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/submissions': typeof DashboardSubmissionsRoute
   '/dashboard/time-tracking': typeof DashboardTimeTrackingRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/dashboard/pricing'
     | '/dashboard/projects'
     | '/dashboard/proposals'
+    | '/dashboard/services'
     | '/dashboard/settings'
     | '/dashboard/submissions'
     | '/dashboard/time-tracking'
@@ -486,6 +496,7 @@ export interface FileRouteTypes {
     | '/dashboard/pricing'
     | '/dashboard/projects'
     | '/dashboard/proposals'
+    | '/dashboard/services'
     | '/dashboard/settings'
     | '/dashboard/submissions'
     | '/dashboard/time-tracking'
@@ -532,6 +543,7 @@ export interface FileRouteTypes {
     | '/dashboard/pricing'
     | '/dashboard/projects'
     | '/dashboard/proposals'
+    | '/dashboard/services'
     | '/dashboard/settings'
     | '/dashboard/submissions'
     | '/dashboard/time-tracking'
@@ -772,6 +784,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/services': {
+      id: '/dashboard/services'
+      path: '/services'
+      fullPath: '/dashboard/services'
+      preLoaderRoute: typeof DashboardServicesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/proposals': {
       id: '/dashboard/proposals'
       path: '/proposals'
@@ -947,6 +966,7 @@ interface DashboardRouteChildren {
   DashboardPricingRoute: typeof DashboardPricingRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
   DashboardProposalsRoute: typeof DashboardProposalsRouteWithChildren
+  DashboardServicesRoute: typeof DashboardServicesRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSubmissionsRoute: typeof DashboardSubmissionsRoute
   DashboardTimeTrackingRoute: typeof DashboardTimeTrackingRoute
@@ -959,6 +979,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardPricingRoute: DashboardPricingRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
   DashboardProposalsRoute: DashboardProposalsRouteWithChildren,
+  DashboardServicesRoute: DashboardServicesRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSubmissionsRoute: DashboardSubmissionsRoute,
   DashboardTimeTrackingRoute: DashboardTimeTrackingRoute,

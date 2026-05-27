@@ -13,6 +13,7 @@ import {
   Users,
   Settings,
   DollarSign,
+  Layers,
   ChevronsUpDown,
   Command,
 } from 'lucide-react'
@@ -48,6 +49,7 @@ const navItems = [
   { icon: Clock, label: 'Time Tracking', href: '/dashboard/time-tracking' },
   { icon: Users, label: 'Clients', href: '/dashboard/clients' },
   { icon: DollarSign, label: 'Pricing', href: '/dashboard/pricing' },
+  { icon: Layers, label: 'Services', href: '/dashboard/services' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ]
 

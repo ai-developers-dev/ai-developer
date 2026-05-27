@@ -17,6 +17,7 @@ import type * as pricingSettings from "../pricingSettings.js";
 import type * as projects from "../projects.js";
 import type * as proposalGenerator from "../proposalGenerator.js";
 import type * as proposals from "../proposals.js";
+import type * as serviceCatalog from "../serviceCatalog.js";
 import type * as services from "../services.js";
 import type * as timeEntries from "../timeEntries.js";
 import type * as users from "../users.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   projects: typeof projects;
   proposalGenerator: typeof proposalGenerator;
   proposals: typeof proposals;
+  serviceCatalog: typeof serviceCatalog;
   services: typeof services;
   timeEntries: typeof timeEntries;
   users: typeof users;
