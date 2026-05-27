@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus, Trash2, Pencil, FileText, Mail } from 'lucide-react'
+import { Plus, Trash2, Pencil, FileText, Mail, Eye, ExternalLink } from 'lucide-react'
 import { sendProposalEmail } from '@/lib/resend-server'
 import { PaymentScheduleEditor } from '@/components/proposals/payment-schedule-editor'
 import {
@@ -130,6 +130,7 @@ function ProposalsPage() {
   const [editingProposalId, setEditingProposalId] = useState<Id<'proposals'> | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Id<'proposals'> | null>(null)
   const [pdfProposal, setPdfProposal] = useState<(typeof proposals extends (infer T)[] | undefined ? T : never) | null>(null)
+  const [previewProposalId, setPreviewProposalId] = useState<Id<'proposals'> | null>(null)
   const [sendingEmailId, setSendingEmailId] = useState<Id<'proposals'> | null>(null)
 
   const clientProjects = projects?.filter((p) => p.clientId === clientId) ?? []
@@ -782,6 +783,15 @@ function ProposalsPage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-brand-primary/60 hover:text-brand-primary hover:bg-brand-primary/10"
+                            title="Preview as Client"
+                            onClick={() => setPreviewProposalId(proposal._id)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-brand-primary/60 hover:text-brand-primary hover:bg-brand-primary/10"
                             title="PDF Preview"
                             onClick={() => setPdfProposal(proposal)}
                           >
@@ -919,6 +929,45 @@ function ProposalsPage() {
               Save as PDF
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview-as-Client dialog: iframes the public /pay/<id> route so
+          the admin sees exactly what the client sees on the pay page. */}
+      <Dialog
+        open={!!previewProposalId}
+        onOpenChange={(o) => !o && setPreviewProposalId(null)}
+      >
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="px-6 pt-5 pb-2">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <DialogTitle>Preview as Client</DialogTitle>
+                <DialogDescription>
+                  Exactly what the customer sees when they click the pay link.
+                </DialogDescription>
+              </div>
+              {previewProposalId && (
+                <Button asChild variant="outline" size="sm">
+                  <a
+                    href={`/pay/${previewProposalId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open in new tab
+                    <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                  </a>
+                </Button>
+              )}
+            </div>
+          </DialogHeader>
+          {previewProposalId && (
+            <iframe
+              src={`/pay/${previewProposalId}`}
+              title="Client proposal preview"
+              className="w-full h-[75vh] border-0"
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
