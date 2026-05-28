@@ -215,6 +215,46 @@ export const listCategoriesWithItems = query({
   },
 });
 
+// Flat list of active catalog items for the proposal builder's Service
+// dropdown. Unlike listCategoriesWithItems (admin-only, nested), this is
+// available to any authenticated user so non-admins can build proposals,
+// and it returns each item flattened with its category name for grouping.
+export const listItemsForProposals = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const categories = await ctx.db.query("serviceCategories").collect();
+    const items = await ctx.db.query("serviceItems").collect();
+
+    const categoryById = new Map(categories.map((c) => [c._id, c]));
+
+    return items
+      .filter((i) => i.isActive)
+      .map((i) => {
+        const cat = categoryById.get(i.categoryId);
+        return {
+          _id: i._id,
+          name: i.name,
+          description: i.description,
+          defaultPrice: i.defaultPrice,
+          categoryId: i.categoryId,
+          categoryName: cat?.name ?? "Other",
+          categoryOrder: cat?.displayOrder ?? 999,
+          categoryActive: cat?.isActive ?? true,
+          displayOrder: i.displayOrder,
+        };
+      })
+      .filter((i) => i.categoryActive)
+      .sort((a, b) =>
+        a.categoryOrder !== b.categoryOrder
+          ? a.categoryOrder - b.categoryOrder
+          : a.displayOrder - b.displayOrder,
+      );
+  },
+});
+
 // ============================================================
 // Mutations
 // ============================================================
