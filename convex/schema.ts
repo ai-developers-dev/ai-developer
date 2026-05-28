@@ -374,6 +374,11 @@ export default defineSchema({
     defaultPrice: v.number(),
     isActive: v.boolean(),
     displayOrder: v.number(),
+    // Stripe sync — populated by stripeCatalogSync after each add/update.
+    // stripePriceId is regenerated whenever defaultPrice changes
+    // (Stripe Prices are immutable; old ones are archived).
+    stripeProductId: v.optional(v.string()),
+    stripePriceId: v.optional(v.string()),
   }).index("by_categoryId", ["categoryId"]),
 
   services: defineTable({

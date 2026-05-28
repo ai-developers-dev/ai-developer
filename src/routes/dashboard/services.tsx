@@ -33,7 +33,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Trash2, RefreshCw } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/services')({
   component: ServicesPage,
@@ -61,6 +61,10 @@ type CategoryWithItems = {
 function ServicesPage() {
   const data = useQuery(api.serviceCatalog.listCategoriesWithItems)
   const seed = useMutation(api.serviceCatalog.seedDefaultsIfEmpty)
+  const backfill = useMutation(api.serviceCatalog.backfillStripeCatalog)
+  const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'done'>(
+    'idle',
+  )
 
   // Auto-seed on first load when admin opens an empty catalog.
   useEffect(() => {
@@ -68,6 +72,18 @@ function ServicesPage() {
       void seed({})
     }
   }, [data, seed])
+
+  async function handleSyncStripe() {
+    setSyncState('syncing')
+    try {
+      await backfill({})
+      setSyncState('done')
+      setTimeout(() => setSyncState('idle'), 2500)
+    } catch (err) {
+      console.error('Stripe sync failed:', err)
+      setSyncState('idle')
+    }
+  }
 
   if (data === undefined) {
     return (
@@ -85,9 +101,26 @@ function ServicesPage() {
           <p className="text-muted-foreground">
             Catalog of everything you sell, organized by category. Add new
             services, tweak prices, or remove what you don't offer anymore.
+            Changes auto-sync to Stripe.
           </p>
         </div>
-        <NewCategoryButton />
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            onClick={handleSyncStripe}
+            disabled={syncState === 'syncing'}
+          >
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${syncState === 'syncing' ? 'animate-spin' : ''}`}
+            />
+            {syncState === 'syncing'
+              ? 'Syncing…'
+              : syncState === 'done'
+                ? 'Synced ✓'
+                : 'Sync to Stripe'}
+          </Button>
+          <NewCategoryButton />
+        </div>
       </div>
 
       {data.length === 0 ? (

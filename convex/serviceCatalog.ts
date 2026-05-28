@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 // ============================================================
 // Default catalog — seeded once on first load of /dashboard/services
@@ -248,7 +249,19 @@ export const seedDefaultsIfEmpty = mutation({
         });
       }
     }
+    // Push everything to Stripe in the background once the seed lands.
+    await ctx.scheduler.runAfter(0, internal.stripeCatalogSync.syncAll, {});
     return { seeded: true, categoryCount: DEFAULTS.length };
+  },
+});
+
+// Admin-triggered: re-sync the whole catalog into Stripe.
+// Used by the "Sync to Stripe" button on /dashboard/services.
+export const backfillStripeCatalog = mutation({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    await ctx.scheduler.runAfter(0, internal.stripeCatalogSync.syncAll, {});
   },
 });
 
@@ -306,7 +319,19 @@ export const removeCategory = mutation({
       .query("serviceItems")
       .withIndex("by_categoryId", (q) => q.eq("categoryId", id))
       .collect();
-    for (const item of items) await ctx.db.delete(item._id);
+    for (const item of items) {
+      if (item.stripeProductId) {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.stripeCatalogSync.archiveStripeEntities,
+          {
+            stripeProductId: item.stripeProductId,
+            stripePriceId: item.stripePriceId,
+          },
+        );
+      }
+      await ctx.db.delete(item._id);
+    }
     await ctx.db.delete(id);
   },
 });
@@ -330,7 +355,7 @@ export const addItem = mutation({
       (m, s) => Math.max(m, s.displayOrder),
       -1,
     );
-    return await ctx.db.insert("serviceItems", {
+    const itemId = await ctx.db.insert("serviceItems", {
       categoryId: args.categoryId,
       name: args.name,
       description: args.description,
@@ -338,6 +363,10 @@ export const addItem = mutation({
       isActive: true,
       displayOrder: maxOrder + 1,
     });
+    await ctx.scheduler.runAfter(0, internal.stripeCatalogSync.syncItem, {
+      itemId,
+    });
+    return itemId;
   },
 });
 
@@ -356,6 +385,9 @@ export const updateItem = mutation({
       if (v !== undefined) patch[k] = v;
     }
     await ctx.db.patch(id, patch);
+    await ctx.scheduler.runAfter(0, internal.stripeCatalogSync.syncItem, {
+      itemId: id,
+    });
   },
 });
 
@@ -363,6 +395,17 @@ export const removeItem = mutation({
   args: { id: v.id("serviceItems") },
   handler: async (ctx, { id }) => {
     await requireAdmin(ctx);
+    const item = await ctx.db.get(id);
+    if (item?.stripeProductId) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.stripeCatalogSync.archiveStripeEntities,
+        {
+          stripeProductId: item.stripeProductId,
+          stripePriceId: item.stripePriceId,
+        },
+      );
+    }
     await ctx.db.delete(id);
   },
 });
