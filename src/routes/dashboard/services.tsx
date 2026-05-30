@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
@@ -60,18 +60,11 @@ type CategoryWithItems = {
 
 function ServicesPage() {
   const data = useQuery(api.serviceCatalog.listCategoriesWithItems)
-  const seed = useMutation(api.serviceCatalog.seedDefaultsIfEmpty)
   const backfill = useMutation(api.serviceCatalog.backfillStripeCatalog)
+  const clearAll = useMutation(api.serviceCatalog.clearAll)
   const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'done'>(
     'idle',
   )
-
-  // Auto-seed on first load when admin opens an empty catalog.
-  useEffect(() => {
-    if (data && data.length === 0) {
-      void seed({})
-    }
-  }, [data, seed])
 
   async function handleSyncStripe() {
     setSyncState('syncing')
@@ -83,6 +76,10 @@ function ServicesPage() {
       console.error('Stripe sync failed:', err)
       setSyncState('idle')
     }
+  }
+
+  async function handleClearAll() {
+    await clearAll({})
   }
 
   if (data === undefined) {
@@ -105,6 +102,34 @@ function ServicesPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {data.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="text-destructive hover:text-destructive">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear All
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear entire catalog?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will delete all {data.length} categories and their
+                    services. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleClearAll}
+                    className="bg-destructive text-white hover:bg-destructive/90"
+                  >
+                    Clear All
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
           <Button
             variant="outline"
             onClick={handleSyncStripe}
@@ -125,7 +150,7 @@ function ServicesPage() {
 
       {data.length === 0 ? (
         <p className="text-sm text-muted-foreground py-12 text-center">
-          Seeding default categories…
+          No services yet. Click "New category" to add your first one.
         </p>
       ) : (
         <div className="space-y-4">
