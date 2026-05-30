@@ -38,7 +38,9 @@ import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -103,7 +105,7 @@ const emptyLineItem: LineItem = { description: '', quantity: 1, unitPrice: 0 }
 function ProposalsPage() {
   const proposals = useQuery(api.proposals.list, {})
   const clients = useQuery(api.clients.list)
-  const services = useQuery(api.services.list, {})
+  const services = useQuery(api.serviceCatalog.listItemsForProposals, {})
   const createProposal = useMutation(api.proposals.create)
   const updateProposal = useMutation(api.proposals.update)
   const removeProposal = useMutation(api.proposals.remove)
@@ -206,7 +208,7 @@ function ProposalsPage() {
     updated[0] = {
       description: service.name + (service.description ? ` - ${service.description}` : ''),
       quantity: 1,
-      unitPrice: service.defaultRate ?? 0,
+      unitPrice: service.defaultPrice ?? 0,
     }
     setLineItems(updated)
 
@@ -501,12 +503,33 @@ function ProposalsPage() {
                       <SelectValue placeholder="Select a service" />
                     </SelectTrigger>
                     <SelectContent>
-                      {services?.map((service) => (
-                        <SelectItem key={service._id} value={service._id}>
-                          {service.name}
-                          {service.defaultRate ? ` ($${formatUsd(service.defaultRate)})` : ''}
-                        </SelectItem>
-                      ))}
+                      {(() => {
+                        const groups: {
+                          name: string
+                          items: NonNullable<typeof services>
+                        }[] = []
+                        for (const service of services ?? []) {
+                          let group = groups.find((g) => g.name === service.categoryName)
+                          if (!group) {
+                            group = { name: service.categoryName, items: [] }
+                            groups.push(group)
+                          }
+                          group.items.push(service)
+                        }
+                        return groups.map((group) => (
+                          <SelectGroup key={group.name}>
+                            <SelectLabel>{group.name}</SelectLabel>
+                            {group.items.map((service) => (
+                              <SelectItem key={service._id} value={service._id}>
+                                {service.name}
+                                {service.defaultPrice
+                                  ? ` ($${formatUsd(service.defaultPrice)})`
+                                  : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        ))
+                      })()}
                     </SelectContent>
                   </Select>
                 </div>
