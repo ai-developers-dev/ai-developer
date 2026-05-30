@@ -12,7 +12,6 @@ import {
   Clock,
   Users,
   Settings,
-  DollarSign,
   Layers,
   ChevronsUpDown,
   Command,
@@ -48,7 +47,6 @@ const navItems = [
   { icon: FileText, label: 'Proposals', href: '/dashboard/proposals' },
   { icon: Clock, label: 'Time Tracking', href: '/dashboard/time-tracking' },
   { icon: Users, label: 'Clients', href: '/dashboard/clients' },
-  { icon: DollarSign, label: 'Pricing', href: '/dashboard/pricing' },
   { icon: Layers, label: 'Services', href: '/dashboard/services' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ]
