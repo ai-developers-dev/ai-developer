@@ -105,7 +105,16 @@ const emptyLineItem: LineItem = { description: '', quantity: 1, unitPrice: 0 }
 function ProposalsPage() {
   const proposals = useQuery(api.proposals.list, {})
   const clients = useQuery(api.clients.list)
-  const services = useQuery(api.serviceCatalog.listItemsForProposals, {})
+  // Use listCategoriesWithItems (already deployed) and flatten on the frontend
+  const catalogData = useQuery(api.serviceCatalog.listCategoriesWithItems, {})
+  const services = catalogData?.flatMap((cat) =>
+    cat.items
+      .filter((item) => item.isActive)
+      .map((item) => ({
+        ...item,
+        categoryName: cat.name,
+      }))
+  )
   const createProposal = useMutation(api.proposals.create)
   const updateProposal = useMutation(api.proposals.update)
   const removeProposal = useMutation(api.proposals.remove)
