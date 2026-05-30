@@ -61,10 +61,13 @@ type CategoryWithItems = {
 function ServicesPage() {
   const data = useQuery(api.serviceCatalog.listCategoriesWithItems)
   const backfill = useMutation(api.serviceCatalog.backfillStripeCatalog)
-  const clearAll = useMutation(api.serviceCatalog.clearAll)
+  // Use the already-deployed removeCategory (it cascades to its items) so the
+  // Clear All button works without needing a fresh Convex backend deploy.
+  const removeCategory = useMutation(api.serviceCatalog.removeCategory)
   const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'done'>(
     'idle',
   )
+  const [clearing, setClearing] = useState(false)
 
   async function handleSyncStripe() {
     setSyncState('syncing')
@@ -79,7 +82,21 @@ function ServicesPage() {
   }
 
   async function handleClearAll() {
-    await clearAll({})
+    if (!data) return
+    setClearing(true)
+    try {
+      for (const cat of data) {
+        await removeCategory({ id: cat._id })
+      }
+    } catch (err) {
+      console.error('Clear all failed:', err)
+      alert(
+        'Could not clear the catalog: ' +
+          (err instanceof Error ? err.message : String(err)),
+      )
+    } finally {
+      setClearing(false)
+    }
   }
 
   if (data === undefined) {
@@ -105,9 +122,13 @@ function ServicesPage() {
           {data.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="outline" className="text-destructive hover:text-destructive">
+                <Button
+                  variant="outline"
+                  className="text-destructive hover:text-destructive"
+                  disabled={clearing}
+                >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Clear All
+                  {clearing ? 'Clearing…' : 'Clear All'}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>

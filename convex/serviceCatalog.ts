@@ -307,33 +307,3 @@ export const removeItem = mutation({
     await ctx.db.delete(id);
   },
 });
-
-// Wipe the entire catalog — use this to start fresh.
-export const clearAll = mutation({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-    const categories = await ctx.db.query("serviceCategories").collect();
-    const items = await ctx.db.query("serviceItems").collect();
-
-    for (const item of items) {
-      if (item.stripeProductId) {
-        await ctx.scheduler.runAfter(
-          0,
-          internal.stripeCatalogSync.archiveStripeEntities,
-          {
-            stripeProductId: item.stripeProductId,
-            stripePriceId: item.stripePriceId,
-          },
-        );
-      }
-      await ctx.db.delete(item._id);
-    }
-
-    for (const cat of categories) {
-      await ctx.db.delete(cat._id);
-    }
-
-    return { deleted: { categories: categories.length, items: items.length } };
-  },
-});
