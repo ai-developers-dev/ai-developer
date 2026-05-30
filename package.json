@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "npx convex dev --once && npx convex dev & vite dev --port 3000",
-    "build": "npx convex deploy --cmd 'vite build'",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"
   },
