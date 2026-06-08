@@ -213,16 +213,48 @@ function ProposalsPage() {
     const service = services?.find((s) => s._id === serviceIdValue)
     if (!service) return
 
-    const updated = [...lineItems]
-    updated[0] = {
+    const newItem: LineItem = {
       description: service.name + (service.description ? ` - ${service.description}` : ''),
       quantity: 1,
       unitPrice: service.defaultPrice ?? 0,
     }
-    setLineItems(updated)
+
+    setLineItems((prev) => {
+      const hasContent = prev.some((li) => li.description.trim() !== '')
+      if (!hasContent) {
+        return [newItem]
+      }
+      return [...prev, newItem]
+    })
 
     if (!title || title === autoTitle(clientId, '')) {
       setTitle(autoTitle(clientId, service.name))
+    }
+  }
+
+  function handleCategorySelect(categoryId: string) {
+    const category = catalogData?.find((c) => c._id === categoryId)
+    if (!category) return
+
+    const activeItems = category.items.filter((item) => item.isActive)
+    if (activeItems.length === 0) return
+
+    const newItems: LineItem[] = activeItems.map((item) => ({
+      description: item.name + (item.description ? ` - ${item.description}` : ''),
+      quantity: 1,
+      unitPrice: item.defaultPrice ?? 0,
+    }))
+
+    setLineItems((prev) => {
+      const hasContent = prev.some((li) => li.description.trim() !== '')
+      if (!hasContent) {
+        return newItems
+      }
+      return [...prev, ...newItems]
+    })
+
+    if (!title) {
+      setTitle(autoTitle(clientId, category.name))
     }
   }
 
@@ -483,65 +515,88 @@ function ProposalsPage() {
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
-              {/* Client & Service selects */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Client *</Label>
-                  <Select
-                    value={clientId}
-                    onValueChange={handleClientChange}
-                    disabled={!!editingProposalId}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a client" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clients?.map((client) => (
-                        <SelectItem key={client._id} value={client._id}>
-                          {client.businessName || client.name}
-                          {client.contactEmail ? ` (${client.contactEmail})` : ''}
+              {/* Client select */}
+              <div className="space-y-2">
+                <Label>Client *</Label>
+                <Select
+                  value={clientId}
+                  onValueChange={handleClientChange}
+                  disabled={!!editingProposalId}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clients?.map((client) => (
+                      <SelectItem key={client._id} value={client._id}>
+                        {client.businessName || client.name}
+                        {client.contactEmail ? ` (${client.contactEmail})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Category select - adds ALL items from category */}
+              <div className="space-y-2">
+                <Label>Add Category (all items)</Label>
+                <Select value="" onValueChange={handleCategorySelect}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a category to add all its items" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {catalogData?.map((category) => {
+                      const activeCount = category.items.filter((i) => i.isActive).length
+                      return (
+                        <SelectItem key={category._id} value={category._id}>
+                          {category.name} ({activeCount} item{activeCount !== 1 ? 's' : ''})
                         </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Service</Label>
-                  <Select value={serviceId} onValueChange={handleServiceChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a service" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(() => {
-                        const groups: {
-                          name: string
-                          items: NonNullable<typeof services>
-                        }[] = []
-                        for (const service of services ?? []) {
-                          let group = groups.find((g) => g.name === service.categoryName)
-                          if (!group) {
-                            group = { name: service.categoryName, items: [] }
-                            groups.push(group)
-                          }
-                          group.items.push(service)
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Selecting a category adds all its pricing items to the proposal at once
+                </p>
+              </div>
+
+              {/* Single service select - adds one item */}
+              <div className="space-y-2">
+                <Label>Add Single Service</Label>
+                <Select value={serviceId} onValueChange={handleServiceChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Or add individual services" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(() => {
+                      const groups: {
+                        name: string
+                        items: NonNullable<typeof services>
+                      }[] = []
+                      for (const service of services ?? []) {
+                        let group = groups.find((g) => g.name === service.categoryName)
+                        if (!group) {
+                          group = { name: service.categoryName, items: [] }
+                          groups.push(group)
                         }
-                        return groups.map((group) => (
-                          <SelectGroup key={group.name}>
-                            <SelectLabel>{group.name}</SelectLabel>
-                            {group.items.map((service) => (
-                              <SelectItem key={service._id} value={service._id}>
-                                {service.name}
-                                {service.defaultPrice
-                                  ? ` ($${formatUsd(service.defaultPrice)})`
-                                  : ''}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        ))
-                      })()}
-                    </SelectContent>
-                  </Select>
-                </div>
+                        group.items.push(service)
+                      }
+                      return groups.map((group) => (
+                        <SelectGroup key={group.name}>
+                          <SelectLabel>{group.name}</SelectLabel>
+                          {group.items.map((service) => (
+                            <SelectItem key={service._id} value={service._id}>
+                              {service.name}
+                              {service.defaultPrice
+                                ? ` ($${formatUsd(service.defaultPrice)})`
+                                : ''}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ))
+                    })()}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Project (filtered by selected client) */}
