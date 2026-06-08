@@ -453,6 +453,7 @@ function ProposalsPage() {
       }
       // Build installments for email if available
       const existingInstallments: Installment[] | undefined = (proposal as any).installments
+      console.log('[handleSendEmail] Proposal installments:', existingInstallments)
       let emailInstallments: { label: string; percent: number; amount: number }[] | undefined
       if (existingInstallments && existingInstallments.length > 0) {
         const amounts = computeInstallmentAmounts(
@@ -464,6 +465,9 @@ function ProposalsPage() {
           percent: inst.percent,
           amount: amounts[idx],
         }))
+        console.log('[handleSendEmail] Email installments to send:', emailInstallments)
+      } else {
+        console.log('[handleSendEmail] No installments found on proposal')
       }
       await sendProposalEmail({
         data: {

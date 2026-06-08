@@ -49,20 +49,31 @@ function buildLineItemRows(lineItems: LineItemInput[]): string {
   `}).join('')
 }
 
-function buildPaymentScheduleRows(installments: InstallmentInput[]): string {
-  if (!installments || installments.length <= 1) return ''
+function buildPaymentScheduleRows(installments: InstallmentInput[] | undefined): string {
+  if (!installments || installments.length === 0) return ''
 
+  // Always show payment schedule if there are installments (even if just 1)
+  // This helps users understand the payment terms
   return `
-    <div style="margin-bottom:28px;">
-      <p style="color:#374151;font-size:14px;font-weight:600;margin:0 0 12px;">Payment Schedule</p>
+    <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:20px;margin-bottom:28px;">
+      <p style="color:#374151;font-size:15px;font-weight:700;margin:0 0 16px;text-transform:uppercase;letter-spacing:0.05em;">Payment Schedule</p>
       <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0">
-        ${installments.map((inst, i) => `
+        <thead>
           <tr>
-            <td style="padding:10px 16px;background:${i % 2 === 0 ? '#F9FAFB' : '#FFFFFF'};font-size:14px;color:#374151;border-radius:${i === 0 ? '8px 0 0 0' : i === installments.length - 1 ? '0 0 0 8px' : '0'};">${inst.label}</td>
-            <td style="padding:10px 16px;background:${i % 2 === 0 ? '#F9FAFB' : '#FFFFFF'};font-size:14px;color:#6B7280;text-align:center;">${inst.percent}%</td>
-            <td style="padding:10px 16px;background:${i % 2 === 0 ? '#F9FAFB' : '#FFFFFF'};font-size:14px;color:#333123;text-align:right;font-weight:600;border-radius:${i === 0 ? '0 8px 0 0' : i === installments.length - 1 ? '0 0 8px 0' : '0'};">$${formatCurrency(inst.amount)}</td>
+            <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;border-bottom:1px solid #E5E7EB;">Payment</th>
+            <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;border-bottom:1px solid #E5E7EB;">%</th>
+            <th style="padding:8px 12px;text-align:right;font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;border-bottom:1px solid #E5E7EB;">Amount</th>
           </tr>
-        `).join('')}
+        </thead>
+        <tbody>
+          ${installments.map((inst, i) => `
+            <tr>
+              <td style="padding:12px;font-size:14px;color:#374151;border-bottom:${i < installments.length - 1 ? '1px solid #F3F4F6' : 'none'};">${inst.label}</td>
+              <td style="padding:12px;font-size:14px;color:#6B7280;text-align:center;border-bottom:${i < installments.length - 1 ? '1px solid #F3F4F6' : 'none'};">${inst.percent}%</td>
+              <td style="padding:12px;font-size:14px;color:#333123;text-align:right;font-weight:600;border-bottom:${i < installments.length - 1 ? '1px solid #F3F4F6' : 'none'};">$${formatCurrency(inst.amount)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
       </table>
     </div>
   `
@@ -75,6 +86,9 @@ export const sendProposalEmail = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { Resend } = await import('resend')
 
+    // Debug: log installments received
+    console.log('[sendProposalEmail] Installments received:', JSON.stringify(data.installments, null, 2))
+
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) {
       throw new Error('RESEND_API_KEY not configured')
@@ -86,6 +100,10 @@ export const sendProposalEmail = createServerFn({ method: 'POST' })
     const validUntilFormatted = data.validUntil
       ? new Date(data.validUntil).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
       : null
+
+    // Build payment schedule HTML
+    const paymentScheduleHtml = buildPaymentScheduleRows(data.installments)
+    console.log('[sendProposalEmail] Payment schedule HTML length:', paymentScheduleHtml.length)
 
     const { data: result, error } = await resend.emails.send({
       from: 'AI Developer <onboarding@resend.dev>',
@@ -157,7 +175,7 @@ export const sendProposalEmail = createServerFn({ method: 'POST' })
                   </div>
 
                   <!-- Payment Schedule -->
-                  ${buildPaymentScheduleRows(data.installments || [])}
+                  ${paymentScheduleHtml}
 
                   ${validUntilFormatted ? `
                   <p style="color:#9CA3AF;font-size:13px;text-align:center;margin:0 0 28px;">
