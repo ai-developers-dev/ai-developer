@@ -126,6 +126,7 @@ function ProposalsPage() {
   const [clientId, setClientId] = useState('')
   const [projectId, setProjectId] = useState('')
   const [serviceId, setServiceId] = useState('')
+  const [categoryId, setCategoryId] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...emptyLineItem }])
@@ -154,6 +155,7 @@ function ProposalsPage() {
     setClientId('')
     setProjectId('')
     setServiceId('')
+    setCategoryId('')
     setTitle('')
     setDescription('')
     setLineItems([{ ...emptyLineItem }])
@@ -238,8 +240,9 @@ function ProposalsPage() {
     }
   }
 
-  function handleCategorySelect(categoryId: string) {
-    const category = catalogData?.find((c) => c._id === categoryId)
+  function handleCategorySelect(catId: string) {
+    setCategoryId(catId)
+    const category = catalogData?.find((c) => c._id === catId)
     if (!category) return
 
     const activeItems = category.items.filter((item) => item.isActive)
@@ -565,7 +568,7 @@ function ProposalsPage() {
               {/* Category select - adds ALL items from category */}
               <div className="space-y-2">
                 <Label>Add Category (all items)</Label>
-                <Select value="" onValueChange={handleCategorySelect}>
+                <Select value={categoryId} onValueChange={handleCategorySelect}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a category to add all its items" />
                   </SelectTrigger>
