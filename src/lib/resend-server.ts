@@ -104,7 +104,7 @@ export const sendProposalEmail = createServerFn({ method: 'POST' })
     const paymentScheduleHtml = buildPaymentScheduleSection(data.installments)
 
     const { data: result, error } = await resend.emails.send({
-      from: 'AI Developer <onboarding@resend.dev>',
+      from: 'AI Developer <proposals@aideveloper.dev>',
       to: data.to,
       subject: `Proposal: ${data.proposalTitle}`,
       html: `
@@ -249,7 +249,7 @@ export const sendSecondPaymentInvoice = createServerFn({ method: 'POST' })
     const alreadyPaid = data.totalAmount - data.secondPaymentAmount
 
     const { data: result, error } = await resend.emails.send({
-      from: 'AI Developer <onboarding@resend.dev>',
+      from: 'AI Developer <proposals@aideveloper.dev>',
       to: data.to,
       subject: `Final Payment Due: ${data.proposalTitle}`,
       html: `
