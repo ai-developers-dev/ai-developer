@@ -49,6 +49,7 @@ import { sendProposalEmail } from '@/lib/resend-server'
 import { PaymentScheduleEditor } from '@/components/proposals/payment-schedule-editor'
 import {
   PRESETS,
+  computeInstallmentAmounts,
   type Installment,
   type InstallmentInput,
 } from '@/lib/installments'
@@ -371,11 +372,33 @@ function ProposalsPage() {
           if (client) {
             await markSent({ id: proposalId })
             try {
-              const finalLineItems = lineItems.map((item) => ({
+              const emailLineItems = lineItems.map((item) => ({
                 description: item.description,
                 quantity: item.quantity,
                 unitPrice: item.unitPrice,
                 total: item.quantity * item.unitPrice,
+              }))
+              // Add discount line item if applicable
+              if (discountAmount > 0) {
+                const discountLabel = discountType === 'percent'
+                  ? `Discount (${discountValue}%)`
+                  : 'Discount'
+                emailLineItems.push({
+                  description: discountLabel,
+                  quantity: 1,
+                  unitPrice: -discountAmount,
+                  total: -discountAmount,
+                })
+              }
+              // Compute installment amounts for email
+              const installmentAmounts = computeInstallmentAmounts(
+                grandTotal,
+                installments.map((i) => i.percent)
+              )
+              const emailInstallments = installments.map((inst, idx) => ({
+                label: inst.label,
+                percent: inst.percent,
+                amount: installmentAmounts[idx],
               }))
               await sendProposalEmail({
                 data: {
@@ -383,12 +406,13 @@ function ProposalsPage() {
                   clientName: client.name,
                   proposalTitle: title,
                   description: description || undefined,
-                  lineItems: finalLineItems,
+                  lineItems: emailLineItems,
                   totalAmount: grandTotal,
                   validUntil: validUntil || undefined,
                   payUrl: `${window.location.origin}/pay/${proposalId}`,
                   signInUrl: `${window.location.origin}/sign-in`,
                   signUpUrl: `${window.location.origin}/sign-up`,
+                  installments: emailInstallments,
                 },
               })
             } catch (emailErr) {
@@ -427,6 +451,20 @@ function ProposalsPage() {
       if (proposal.status === 'draft') {
         await markSent({ id: proposal._id })
       }
+      // Build installments for email if available
+      const existingInstallments: Installment[] | undefined = (proposal as any).installments
+      let emailInstallments: { label: string; percent: number; amount: number }[] | undefined
+      if (existingInstallments && existingInstallments.length > 0) {
+        const amounts = computeInstallmentAmounts(
+          proposal.totalAmount,
+          existingInstallments.map((i) => i.percent)
+        )
+        emailInstallments = existingInstallments.map((inst, idx) => ({
+          label: inst.label,
+          percent: inst.percent,
+          amount: amounts[idx],
+        }))
+      }
       await sendProposalEmail({
         data: {
           to: proposal.client.contactEmail,
@@ -441,6 +479,7 @@ function ProposalsPage() {
           payUrl: `${window.location.origin}/pay/${proposal._id}`,
           signInUrl: `${window.location.origin}/sign-in`,
           signUpUrl: `${window.location.origin}/sign-up`,
+          installments: emailInstallments,
         },
       })
     } catch (err) {

@@ -7,6 +7,12 @@ export interface LineItemInput {
   total: number
 }
 
+export interface InstallmentInput {
+  label: string
+  percent: number
+  amount: number
+}
+
 export interface SendProposalEmailInput {
   to: string
   clientName: string
@@ -18,6 +24,7 @@ export interface SendProposalEmailInput {
   payUrl: string
   signInUrl: string
   signUpUrl: string
+  installments?: InstallmentInput[]
 }
 
 function formatCurrency(amount: number): string {
@@ -25,14 +32,40 @@ function formatCurrency(amount: number): string {
 }
 
 function buildLineItemRows(lineItems: LineItemInput[]): string {
-  return lineItems.map((item) => `
+  return lineItems.map((item) => {
+    const isDiscount = item.total < 0
+    const totalColor = isDiscount ? '#DC2626' : '#333123'
+    const totalPrefix = isDiscount ? '-$' : '$'
+    const displayTotal = isDiscount ? Math.abs(item.total) : item.total
+    const displayUnitPrice = isDiscount ? Math.abs(item.unitPrice) : item.unitPrice
+
+    return `
     <tr>
-      <td style="padding:12px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#374151;">${item.description}</td>
-      <td style="padding:12px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#374151;text-align:center;">${item.quantity}</td>
-      <td style="padding:12px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#374151;text-align:right;">$${formatCurrency(item.unitPrice)}</td>
-      <td style="padding:12px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#333123;text-align:right;font-weight:600;">$${formatCurrency(item.total)}</td>
+      <td style="padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#374151;line-height:1.4;">${item.description}</td>
+      <td style="padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#6B7280;text-align:center;">${item.quantity}</td>
+      <td style="padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#6B7280;text-align:right;">${isDiscount ? '-' : ''}$${formatCurrency(displayUnitPrice)}</td>
+      <td style="padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:${totalColor};text-align:right;font-weight:600;">${totalPrefix}${formatCurrency(displayTotal)}</td>
     </tr>
-  `).join('')
+  `}).join('')
+}
+
+function buildPaymentScheduleRows(installments: InstallmentInput[]): string {
+  if (!installments || installments.length <= 1) return ''
+
+  return `
+    <div style="margin-bottom:28px;">
+      <p style="color:#374151;font-size:14px;font-weight:600;margin:0 0 12px;">Payment Schedule</p>
+      <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0">
+        ${installments.map((inst, i) => `
+          <tr>
+            <td style="padding:10px 16px;background:${i % 2 === 0 ? '#F9FAFB' : '#FFFFFF'};font-size:14px;color:#374151;border-radius:${i === 0 ? '8px 0 0 0' : i === installments.length - 1 ? '0 0 0 8px' : '0'};">${inst.label}</td>
+            <td style="padding:10px 16px;background:${i % 2 === 0 ? '#F9FAFB' : '#FFFFFF'};font-size:14px;color:#6B7280;text-align:center;">${inst.percent}%</td>
+            <td style="padding:10px 16px;background:${i % 2 === 0 ? '#F9FAFB' : '#FFFFFF'};font-size:14px;color:#333123;text-align:right;font-weight:600;border-radius:${i === 0 ? '0 8px 0 0' : i === installments.length - 1 ? '0 0 8px 0' : '0'};">$${formatCurrency(inst.amount)}</td>
+          </tr>
+        `).join('')}
+      </table>
+    </div>
+  `
 }
 
 export const sendProposalEmail = createServerFn({ method: 'POST' })
@@ -118,10 +151,13 @@ export const sendProposalEmail = createServerFn({ method: 'POST' })
                   </table>
 
                   <!-- Total -->
-                  <div style="text-align:right;padding:16px;background:#251917;border-radius:0 0 8px 8px;margin-bottom:28px;">
-                    <span style="color:#6B7280;font-size:13px;text-transform:uppercase;letter-spacing:0.05em;">Total Amount</span>
-                    <p style="color:#d4cebb;font-size:28px;font-weight:800;margin:4px 0 0;">$${formatCurrency(data.totalAmount)}</p>
+                  <div style="text-align:right;padding:20px;background:#251917;border-radius:0 0 8px 8px;margin-bottom:28px;">
+                    <span style="color:rgba(255,255,255,0.6);font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Total Amount</span>
+                    <p style="color:#d4cebb;font-size:32px;font-weight:800;margin:6px 0 0;">$${formatCurrency(data.totalAmount)}</p>
                   </div>
+
+                  <!-- Payment Schedule -->
+                  ${buildPaymentScheduleRows(data.installments || [])}
 
                   ${validUntilFormatted ? `
                   <p style="color:#9CA3AF;font-size:13px;text-align:center;margin:0 0 28px;">
