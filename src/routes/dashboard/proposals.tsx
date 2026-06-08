@@ -131,6 +131,10 @@ function ProposalsPage() {
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...emptyLineItem }])
   const [validUntil, setValidUntil] = useState('')
 
+  // Discount state
+  const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('percent')
+  const [discountValue, setDiscountValue] = useState(0)
+
   // New state
   const [installments, setInstallments] = useState<InstallmentInput[]>(
     PRESETS.full.rows,
@@ -154,6 +158,8 @@ function ProposalsPage() {
     setDescription('')
     setLineItems([{ ...emptyLineItem }])
     setValidUntil('')
+    setDiscountType('percent')
+    setDiscountValue(0)
     setInstallments(PRESETS.full.rows)
     setScheduleLocked(false)
     setEmailToClient(false)
@@ -293,10 +299,16 @@ function ProposalsPage() {
     setLineItems((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const grandTotal = lineItems.reduce(
+  const subtotal = lineItems.reduce(
     (sum, item) => sum + item.quantity * item.unitPrice,
     0
   )
+
+  const discountAmount = discountType === 'percent'
+    ? subtotal * (discountValue / 100)
+    : discountValue
+
+  const grandTotal = Math.max(0, subtotal - discountAmount)
 
   async function handleSave() {
     if (!clientId || !title || lineItems.length === 0) return
@@ -309,6 +321,19 @@ function ProposalsPage() {
         unitPrice: item.unitPrice,
         total: item.quantity * item.unitPrice,
       }))
+
+      // Add discount as a negative line item if applicable
+      if (discountAmount > 0) {
+        const discountLabel = discountType === 'percent'
+          ? `Discount (${discountValue}%)`
+          : 'Discount'
+        finalLineItems.push({
+          description: discountLabel,
+          quantity: 1,
+          unitPrice: -discountAmount,
+          total: -discountAmount,
+        })
+      }
 
       const serviceName = services?.find((s) => s._id === serviceId)?.name
 
@@ -710,12 +735,64 @@ function ProposalsPage() {
                   ))}
                 </div>
 
-                {/* Grand total */}
+                {/* Subtotal */}
                 <div className="flex justify-end border-t pt-2">
-                  <p className="text-sm font-semibold">
-                    Total: ${formatUsd(grandTotal)}
+                  <p className="text-sm text-muted-foreground">
+                    Subtotal: ${formatUsd(subtotal)}
                   </p>
                 </div>
+              </div>
+
+              {/* Discount */}
+              <div className="space-y-2">
+                <Label>Discount</Label>
+                <div className="flex gap-2">
+                  <Select
+                    value={discountType}
+                    onValueChange={(v) => setDiscountType(v as 'percent' | 'fixed')}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="percent">Percentage (%)</SelectItem>
+                      <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="relative flex-1">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                      {discountType === 'percent' ? '%' : '$'}
+                    </span>
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      className="pl-5"
+                      placeholder="0"
+                      value={discountValue || ''}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/[^0-9.]/g, '')
+                        setDiscountValue(parseFloat(v) || 0)
+                      }}
+                    />
+                  </div>
+                </div>
+                {discountValue > 0 && (
+                  <div className="text-right space-y-1">
+                    <p className="text-sm text-red-600">
+                      Discount: -${formatUsd(discountAmount)}
+                    </p>
+                    <p className="text-base font-bold">
+                      Total: ${formatUsd(grandTotal)}
+                    </p>
+                  </div>
+                )}
+                {discountValue === 0 && (
+                  <div className="text-right">
+                    <p className="text-base font-bold">
+                      Total: ${formatUsd(grandTotal)}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Valid Until */}
