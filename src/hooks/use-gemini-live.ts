@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { GoogleGenAI, type LiveServerMessage, Modality } from '@google/genai'
+// Type-only import — erased at build time so the ~hundreds-of-KB Gemini SDK
+// does NOT ship in the initial marketing-page bundle. The runtime SDK is
+// dynamically imported inside start() (see below), only when a visitor
+// actually begins a voice conversation.
+import type { GoogleGenAI, LiveServerMessage } from '@google/genai'
 import { getGeminiKey } from '@/lib/gemini-server.js'
 import { getAvailableSlots, bookCalSlot } from '@/lib/cal-server.js'
 
@@ -266,12 +270,14 @@ export function useGeminiLive() {
       workletNodeRef.current = workletNode
       source.connect(workletNode)
 
-      // 3. Connect to Gemini Live
-      const ai = new GoogleGenAI({ apiKey: key })
+      // 3. Connect to Gemini Live — load the SDK on demand (code-split chunk)
+      // so it stays out of the initial page bundle.
+      const genai = await import('@google/genai')
+      const ai = new genai.GoogleGenAI({ apiKey: key })
       const session = await ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-12-2025',
         config: {
-          responseModalities: [Modality.AUDIO],
+          responseModalities: [genai.Modality.AUDIO],
           systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
           tools: [CAL_TOOLS],
         },

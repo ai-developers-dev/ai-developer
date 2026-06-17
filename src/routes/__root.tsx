@@ -14,7 +14,11 @@ import { convex, queryClient } from '@/router'
 
 import { Navbar } from '@/components/layout/navbar.js'
 import { Footer } from '@/components/layout/footer.js'
-import appCss from '../styles.css?url'
+// Import the compiled CSS as a string and inline it into the SSR <head>.
+// This removes the render-blocking stylesheet request from the critical path,
+// so first paint isn't gated on a second round-trip (no external CSS fetch,
+// no FOUC — the document arrives fully styled).
+import appCss from '../styles.css?inline'
 
 const SITE_URL = 'https://aideveloper.dev'
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/hero-robot.png`
@@ -47,7 +51,6 @@ export const Route = createRootRoute({
       { name: 'twitter:description', content: DEFAULT_DESCRIPTION },
       { name: 'twitter:image', content: DEFAULT_OG_IMAGE },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
   }),
   component: RootLayout,
   shellComponent: RootDocument,
@@ -110,6 +113,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');var d=t==='dark'||!t;if(d)document.documentElement.classList.add('dark')})()` }} />
+        {/* App CSS inlined into the document — no render-blocking stylesheet request */}
+        <style dangerouslySetInnerHTML={{ __html: appCss }} />
         {/* Early connection to font origins (non-blocking) */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
