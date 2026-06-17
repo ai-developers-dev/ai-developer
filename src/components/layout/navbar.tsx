@@ -197,7 +197,12 @@ export function Navbar() {
             <ThemeToggle />
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-nav-text">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-nav-text"
+                  aria-label={open ? 'Close menu' : 'Open menu'}
+                >
                   {open ? (
                     <X className="w-5 h-5" />
                   ) : (

@@ -105,7 +105,10 @@ export function CTASection() {
                     Primary Objective
                   </label>
                   <Select value={service} onValueChange={setService}>
-                    <SelectTrigger className="w-full bg-transparent border-0 border-b-2 border-decoration focus:border-brand-primary focus:ring-0 text-foreground py-3 rounded-none h-auto font-body">
+                    <SelectTrigger
+                      aria-label="Primary Objective"
+                      className="w-full bg-transparent border-0 border-b-2 border-decoration focus:border-brand-primary focus:ring-0 text-foreground py-3 rounded-none h-auto font-body"
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="glass-card border-subtle-border">

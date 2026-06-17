@@ -36,7 +36,7 @@ export function Footer() {
             <div className="font-heading text-lg text-foreground font-bold mb-6">
               AI_DEVELOPER
             </div>
-            <p className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/50 mb-8 max-w-xs leading-relaxed">
+            <p className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/70 mb-8 max-w-xs leading-relaxed">
               Engineering bespoke AI solutions and web experiences for the modern enterprise. Precision-crafted, neural-powered.
             </p>
             <div className="flex items-center gap-4">
@@ -67,15 +67,15 @@ export function Footer() {
           {/* Link Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="font-label text-[10px] tracking-[0.3em] uppercase font-semibold text-nav-text/80 mb-6">
+              <h2 className="font-label text-[10px] tracking-[0.3em] uppercase font-semibold text-nav-text/80 mb-6">
                 {title}
-              </h4>
+              </h2>
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       to={link.href}
-                      className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/50 hover:text-brand-secondary transition-colors duration-300"
+                      className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/70 hover:text-brand-secondary transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -93,7 +93,7 @@ export function Footer() {
           </p>
           <Link
             to="/about"
-            className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/40 hover:text-brand-secondary transition-colors"
+            className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/70 hover:text-brand-secondary transition-colors"
           >
             Founded by Doug Allen
           </Link>

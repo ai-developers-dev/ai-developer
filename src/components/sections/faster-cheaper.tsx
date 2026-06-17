@@ -85,9 +85,9 @@ export function FasterCheaperSection() {
             {/* Rapid scaling — 4 columns */}
             <div className="md:col-span-4 glass-card p-12 flex flex-col justify-between overflow-hidden relative">
               <div className="relative z-10">
-                <h4 className="font-heading text-2xl font-bold text-brand-primary mb-4 uppercase">
+                <h3 className="font-heading text-2xl font-bold text-brand-primary mb-4 uppercase">
                   Up to 90% Lower Cost
-                </h4>
+                </h3>
                 <p className="text-muted-foreground text-sm">
                   By automating repetitive coding, testing, and QA, we pass the savings
                   directly to you.
@@ -99,9 +99,9 @@ export function FasterCheaperSection() {
             {/* Precision engineering — 8 columns */}
             <div className="md:col-span-8 glass-card p-12 flex items-center justify-between">
               <div className="max-w-md">
-                <h4 className="font-heading text-2xl font-bold text-brand-primary mb-4 uppercase">
+                <h3 className="font-heading text-2xl font-bold text-brand-primary mb-4 uppercase">
                   24/7 AI Never Sleeps
-                </h4>
+                </h3>
                 <p className="text-muted-foreground text-sm">
                   Your AI agents and automations work around the clock — no overtime,
                   no burnout, no missed inquiries. Pure architectural efficiency.
