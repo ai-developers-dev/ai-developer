@@ -6,6 +6,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router'
 import { ClerkProvider, useAuth } from '@clerk/tanstack-react-start'
+import { ConvexProvider } from 'convex/react'
 import { ConvexProviderWithClerk } from 'convex/react-clerk'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -73,22 +74,34 @@ const hiddenLayoutPrefixes = ['/dashboard', '/portal', '/sign-in', '/sign-up', '
 
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
-  const hideNavFooter = hiddenLayoutPrefixes.some((prefix) =>
+  const isAppRoute = hiddenLayoutPrefixes.some((prefix) =>
     pathname.startsWith(prefix)
   )
 
-  if (hideNavFooter) {
-    return <Outlet />
+  // App routes (dashboard, portal, sign-in/up, pay, post-login) need Clerk-backed
+  // Convex auth. We mount Clerk ONLY here so the public marketing pages never load
+  // Clerk's third-party cookies or its ~310KB of auth JS — keeping them fast and
+  // free of third-party-cookie violations.
+  if (isAppRoute) {
+    return (
+      <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
+        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+          <Outlet />
+        </ConvexProviderWithClerk>
+      </ClerkProvider>
+    )
   }
 
+  // Public marketing pages: plain (unauthenticated) Convex — the contact form and
+  // other public mutations/queries still work, no Clerk.
   return (
-    <>
+    <ConvexProvider client={convex}>
       <Navbar />
       <main>
         <Outlet />
       </main>
       <Footer />
-    </>
+    </ConvexProvider>
   )
 }
 
@@ -112,15 +125,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="antialiased">
-        <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
-          <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-            <QueryClientProvider client={queryClient}>
-              <TooltipProvider>
-                {children}
-              </TooltipProvider>
-            </QueryClientProvider>
-          </ConvexProviderWithClerk>
-        </ClerkProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
+        </QueryClientProvider>
         <Scripts />
       </body>
     </html>

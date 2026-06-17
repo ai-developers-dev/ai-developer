@@ -1,8 +1,5 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { SignedIn, SignedOut } from '@clerk/tanstack-react-start'
-import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
 import {
   Menu,
   X,
@@ -15,7 +12,6 @@ import {
   Users,
   Search,
   ChevronDown,
-  LayoutDashboard,
   LogIn,
 } from 'lucide-react'
 import { GetStartedDialog } from '@/components/get-started-dialog'
@@ -80,21 +76,6 @@ const services = [
     description: 'Local & global search + content',
   },
 ]
-
-function AuthDashboardLink() {
-  const currentUser = useQuery(api.users.getCurrent)
-  const dashboardPath = currentUser?.role === 'admin' ? '/dashboard' : '/portal'
-  const label = currentUser?.role === 'admin' ? 'Dashboard' : 'Portal'
-
-  return (
-    <Button asChild variant="ghost" size="sm" className="text-nav-text hover:text-nav-text-hover">
-      <Link to={dashboardPath} className="flex items-center gap-1.5">
-        <LayoutDashboard className="w-4 h-4" />
-        {label}
-      </Link>
-    </Button>
-  )
-}
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
@@ -173,17 +154,12 @@ export function Navbar() {
           {/* Desktop CTA + Auth */}
           <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
-            <SignedIn>
-              <AuthDashboardLink />
-            </SignedIn>
-            <SignedOut>
-              <Button asChild variant="ghost" size="sm" className="text-nav-text/60 hover:text-nav-text-hover">
-                <Link to="/sign-in/$" className="flex items-center gap-1.5">
-                  <LogIn className="w-4 h-4" />
-                  <span className="font-label uppercase tracking-[0.2em] text-xs">Sign In</span>
-                </Link>
-              </Button>
-            </SignedOut>
+            <Button asChild variant="ghost" size="sm" className="text-nav-text/60 hover:text-nav-text-hover">
+              <Link to="/sign-in/$" className="flex items-center gap-1.5">
+                <LogIn className="w-4 h-4" />
+                <span className="font-label uppercase tracking-[0.2em] text-xs">Sign In</span>
+              </Link>
+            </Button>
             <button
               className="gradient-btn font-label text-xs tracking-[0.2em] font-bold py-2 px-6 rounded-sm transition-all uppercase"
               onClick={() => setDialogOpen(true)}
@@ -258,19 +234,14 @@ export function Navbar() {
                     Contact
                   </Link>
 
-                  <SignedIn>
-                    <AuthDashboardLink />
-                  </SignedIn>
-                  <SignedOut>
-                    <Link
-                      to="/sign-in/$"
-                      className="flex items-center gap-2 font-label uppercase tracking-[0.2em] text-xs text-nav-text hover:text-brand-tertiary transition-colors px-2 py-2"
-                      onClick={() => setOpen(false)}
-                    >
-                      <LogIn className="w-4 h-4" />
-                      Sign In
-                    </Link>
-                  </SignedOut>
+                  <Link
+                    to="/sign-in/$"
+                    className="flex items-center gap-2 font-label uppercase tracking-[0.2em] text-xs text-nav-text hover:text-brand-tertiary transition-colors px-2 py-2"
+                    onClick={() => setOpen(false)}
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Sign In
+                  </Link>
 
                   <button
                     className="mt-4 gradient-btn font-label text-xs tracking-[0.2em] font-bold py-3 px-6 rounded-sm uppercase w-full"
