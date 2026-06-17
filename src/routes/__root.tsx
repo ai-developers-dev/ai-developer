@@ -21,6 +21,8 @@ const DEFAULT_TITLE =
   'AI Developer — Custom AI Software & CRMs Built Faster'
 const DEFAULT_DESCRIPTION =
   'AI Developer builds custom websites, web apps, voice AI agents, and home service CRMs — owned forever, no monthly SaaS fees.'
+const FONT_HREF =
+  'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -44,19 +46,7 @@ export const Route = createRootRoute({
       { name: 'twitter:description', content: DEFAULT_DESCRIPTION },
       { name: 'twitter:image', content: DEFAULT_OG_IMAGE },
     ],
-    links: [
-      { rel: 'stylesheet', href: appCss },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossOrigin: 'anonymous',
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap',
-      },
-    ],
+    links: [{ rel: 'stylesheet', href: appCss }],
   }),
   component: RootLayout,
   shellComponent: RootDocument,
@@ -107,6 +97,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');var d=t==='dark'||!t;if(d)document.documentElement.classList.add('dark')})()` }} />
+        {/* Early connection to font origins (non-blocking) */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Load font CSS without blocking first paint: attach as media="print", flip to "all" once loaded. display=swap keeps text visible in the fallback meanwhile. */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(FONT_HREF)};l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l);})()` }} />
+        <noscript>
+          <link rel="stylesheet" href={FONT_HREF} />
+        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_SCHEMA) }}
