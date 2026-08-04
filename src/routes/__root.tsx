@@ -10,6 +10,7 @@ import { ConvexProvider } from 'convex/react'
 import { ConvexProviderWithClerk } from 'convex/react-clerk'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from 'sonner'
 import { convex, queryClient } from '@/router'
 
 import { Navbar } from '@/components/layout/navbar.js'
@@ -90,6 +91,8 @@ function RootLayout() {
       <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
           <Outlet />
+          {/* App-wide toast notifications (e.g. proposal email sent/failed) */}
+          <Toaster position="top-center" richColors closeButton theme="dark" />
         </ConvexProviderWithClerk>
       </ClerkProvider>
     )

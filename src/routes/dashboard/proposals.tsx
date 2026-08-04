@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/select'
 import { Plus, Trash2, Pencil, FileText, Mail, Eye, ExternalLink } from 'lucide-react'
 import { sendProposalEmail } from '@/lib/resend-server'
+import { toast } from 'sonner'
 import { PaymentScheduleEditor } from '@/components/proposals/payment-schedule-editor'
 import {
   PRESETS,
@@ -415,9 +416,17 @@ function ProposalsPage() {
                   installments: emailInstallments,
                 },
               })
+              toast.success('Proposal email sent', {
+                description: `Delivered to ${client.contactEmail}`,
+              })
             } catch (emailErr) {
               console.error('Email send failed (proposal still saved):', emailErr)
-              alert('Proposal saved but email failed to send. Check console for details.')
+              toast.error('Proposal saved, but the email failed to send', {
+                description:
+                  emailErr instanceof Error
+                    ? emailErr.message
+                    : 'Try again from the list using the email button.',
+              })
             }
           }
         }
@@ -486,9 +495,17 @@ function ProposalsPage() {
           installments: emailInstallments,
         },
       })
+      // Resend accepted the message (the server fn throws if Resend returns an error)
+      toast.success('Proposal email sent', {
+        description: `Delivered to ${proposal.client.contactEmail}`,
+      })
     } catch (err) {
       console.error('Email send failed:', err)
-      alert('Failed to send email. Check console for details.')
+      // Surface the actual Resend/API failure reason
+      toast.error('Failed to send email', {
+        description:
+          err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+      })
     } finally {
       setSendingEmailId(null)
     }
