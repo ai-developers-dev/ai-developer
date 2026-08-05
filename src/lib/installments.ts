@@ -94,7 +94,7 @@ export const STAGE_OPTIONS: { value: Stage; label: string }[] = [
   { value: 'completed', label: 'Completed' },
 ]
 
-export type Preset = 'full' | 'split-50' | 'thirds' | 'front-loaded' | 'custom'
+export type Preset = 'full' | 'split-50' | 'thirds' | 'front-loaded' | 'quarters' | 'custom'
 
 export const PRESETS: Record<
   Exclude<Preset, 'custom'>,
@@ -135,6 +135,23 @@ export const PRESETS: Record<
         trigger: { type: 'net_days_after_previous', days: 30 },
       },
       { label: 'Final', percent: 40, trigger: { type: 'on_completion' } },
+    ],
+  },
+  quarters: {
+    label: '25 / 25 / 25 / 25',
+    rows: [
+      { label: 'Deposit', percent: 25, trigger: { type: 'on_acceptance' } },
+      {
+        label: 'Milestone 1',
+        percent: 25,
+        trigger: { type: 'net_days_after_previous', days: 30 },
+      },
+      {
+        label: 'Milestone 2',
+        percent: 25,
+        trigger: { type: 'net_days_after_previous', days: 30 },
+      },
+      { label: 'Final', percent: 25, trigger: { type: 'on_completion' } },
     ],
   },
 }
