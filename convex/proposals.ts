@@ -447,12 +447,16 @@ export const replaceSchedule = mutation({
     if (!proposal) throw new Error("Proposal not found");
 
     if (proposal.installments) {
-      const hasLockedRow = proposal.installments.some(
-        (r) => r.status !== "pending"
+      // Only a real payment locks the schedule. Merely "invoiced" (unpaid) rows
+      // stay editable, since no money has been collected. buildInstallments below
+      // rebuilds every row as pending, so replacing the schedule clears a prior
+      // "invoiced" deposit — fine, because nothing has been paid.
+      const hasPaidRow = proposal.installments.some(
+        (r) => r.status === "paid"
       );
-      if (hasLockedRow) {
+      if (hasPaidRow) {
         throw new Error(
-          "Schedule is locked once any installment has been invoiced or paid."
+          "Schedule is locked once an installment has been paid."
         );
       }
       // Cancel any orphaned scheduled jobs (shouldn't exist on pending rows but be safe)

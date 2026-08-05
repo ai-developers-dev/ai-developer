@@ -127,8 +127,7 @@ export function PaymentScheduleEditor({
 
       {locked && (
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
-          Schedule is locked — at least one installment has already been
-          invoiced or paid.
+          Schedule is locked — an installment has already been paid.
         </p>
       )}
 

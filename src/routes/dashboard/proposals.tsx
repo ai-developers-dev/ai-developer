@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
@@ -121,6 +121,7 @@ function ProposalsPage() {
   const updateProposal = useMutation(api.proposals.update)
   const removeProposal = useMutation(api.proposals.remove)
   const markSent = useMutation(api.proposals.markSent)
+  const replaceSchedule = useMutation(api.proposals.replaceSchedule)
 
   const projects = useQuery(api.projects.list, {})
 
@@ -143,6 +144,9 @@ function ProposalsPage() {
     PRESETS.full.rows,
   )
   const [scheduleLocked, setScheduleLocked] = useState(false)
+  // Snapshot of the schedule as loaded when opening the edit dialog, so we can
+  // detect whether the user actually changed it before persisting.
+  const loadedScheduleRef = useRef<InstallmentInput[] | null>(null)
   const [emailToClient, setEmailToClient] = useState(false)
   const [sending, setSending] = useState(false)
   const [editingProposalId, setEditingProposalId] = useState<Id<'proposals'> | null>(null)
@@ -166,6 +170,7 @@ function ProposalsPage() {
     setDiscountValue(0)
     setInstallments(PRESETS.full.rows)
     setScheduleLocked(false)
+    loadedScheduleRef.current = null
     setEmailToClient(false)
     setEditingProposalId(null)
   }
@@ -197,21 +202,24 @@ function ProposalsPage() {
     const existingInstallments: Installment[] | undefined = (proposal as any)
       .installments
     if (existingInstallments && existingInstallments.length > 0) {
-      setInstallments(
-        existingInstallments
-          .slice()
-          .sort((a, b) => a.order - b.order)
-          .map((r) => ({
-            label: r.label,
-            percent: r.percent,
-            trigger: r.trigger,
-          })),
-      )
+      const loaded = existingInstallments
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((r) => ({
+          label: r.label,
+          percent: r.percent,
+          trigger: r.trigger,
+        }))
+      setInstallments(loaded)
+      loadedScheduleRef.current = loaded
+      // Only an actual payment locks the schedule. A merely "invoiced" (unpaid)
+      // installment stays editable — no money has been collected yet.
       setScheduleLocked(
-        existingInstallments.some((r) => r.status !== 'pending'),
+        existingInstallments.some((r) => r.status === 'paid'),
       )
     } else {
       setInstallments(PRESETS.full.rows)
+      loadedScheduleRef.current = PRESETS.full.rows
       setScheduleLocked(false)
     }
     setEmailToClient(false)
@@ -353,6 +361,16 @@ function ProposalsPage() {
           totalAmount: grandTotal,
           validUntil: validUntil ? new Date(validUntil).getTime() : undefined,
         })
+        // update() doesn't persist installments — save schedule edits separately.
+        // Skip when locked (a paid installment; replaceSchedule would reject it)
+        // or when unchanged (so a title-only edit doesn't reset a sent proposal).
+        if (
+          !scheduleLocked &&
+          JSON.stringify(installments) !==
+            JSON.stringify(loadedScheduleRef.current)
+        ) {
+          await replaceSchedule({ id: editingProposalId, installments })
+        }
       } else {
         // Create new proposal
         const proposalId = await createProposal({
@@ -436,6 +454,12 @@ function ProposalsPage() {
       setDialogOpen(false)
     } catch (err) {
       console.error('Failed to save proposal:', err)
+      toast.error('Couldn’t save the proposal', {
+        description:
+          err instanceof Error
+            ? err.message
+            : 'Something went wrong. Please try again.',
+      })
     } finally {
       setSending(false)
     }
@@ -877,8 +901,8 @@ function ProposalsPage() {
               />
               {scheduleLocked && (
                 <p className="text-xs text-muted-foreground">
-                  The schedule can&apos;t be changed because at least one
-                  installment is already invoiced or paid.
+                  The schedule can&apos;t be changed because an installment has
+                  already been paid.
                 </p>
               )}
 
