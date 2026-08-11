@@ -12,6 +12,7 @@ import type * as clients from "../clients.js";
 import type * as contactSubmissions from "../contactSubmissions.js";
 import type * as crmStarterMapper from "../crmStarterMapper.js";
 import type * as discoverySubmissions from "../discoverySubmissions.js";
+import type * as earlyAccess from "../earlyAccess.js";
 import type * as http from "../http.js";
 import type * as pricingSettings from "../pricingSettings.js";
 import type * as projects from "../projects.js";
@@ -19,6 +20,7 @@ import type * as proposalGenerator from "../proposalGenerator.js";
 import type * as proposals from "../proposals.js";
 import type * as serviceCatalog from "../serviceCatalog.js";
 import type * as services from "../services.js";
+import type * as stripeCatalogSync from "../stripeCatalogSync.js";
 import type * as timeEntries from "../timeEntries.js";
 import type * as users from "../users.js";
 
@@ -33,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   contactSubmissions: typeof contactSubmissions;
   crmStarterMapper: typeof crmStarterMapper;
   discoverySubmissions: typeof discoverySubmissions;
+  earlyAccess: typeof earlyAccess;
   http: typeof http;
   pricingSettings: typeof pricingSettings;
   projects: typeof projects;
@@ -40,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   proposals: typeof proposals;
   serviceCatalog: typeof serviceCatalog;
   services: typeof services;
+  stripeCatalogSync: typeof stripeCatalogSync;
   timeEntries: typeof timeEntries;
   users: typeof users;
 }>;

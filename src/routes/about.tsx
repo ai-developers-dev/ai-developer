@@ -77,7 +77,7 @@ function AboutPage() {
             <FadeInView className="lg:col-span-5">
               <div className="relative">
                 <div className="absolute -inset-2 bg-gradient-to-br from-brand-primary/30 to-brand-tertiary/20 rounded-2xl blur-2xl opacity-60" />
-                <div className="relative rounded-2xl shadow-xl w-full max-w-md aspect-[4/5] bg-gradient-to-br from-[#1c1110] to-[#2a1f1d] overflow-hidden flex items-center justify-center">
+                <div className="relative rounded-2xl shadow-xl w-full max-w-md aspect-[4/5] bg-gradient-to-br from-[#000000] to-[#2a1f1d] overflow-hidden flex items-center justify-center">
                   <img
                     src="/images/doug-allen.png"
                     alt="Doug Allen — Founder & CEO of AI Developer"

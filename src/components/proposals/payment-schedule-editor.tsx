@@ -126,7 +126,7 @@ export function PaymentScheduleEditor({
       </div>
 
       {locked && (
-        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+        <p className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-none px-2 py-1">
           Schedule is locked — an installment has already been paid.
         </p>
       )}
@@ -247,7 +247,7 @@ export function PaymentScheduleEditor({
                     type="button"
                     onClick={() => removeRow(i)}
                     aria-label="Remove row"
-                    className="p-1 rounded hover:bg-destructive/10"
+                    className="p-1 rounded-none hover:bg-destructive/10"
                   >
                     <Trash2 className="w-3.5 h-3.5 text-destructive" />
                   </button>
@@ -275,8 +275,8 @@ export function PaymentScheduleEditor({
         <span
           className={
             validity.ok
-              ? 'text-green-700'
-              : 'text-red-600'
+              ? 'text-green-300'
+              : 'text-red-400'
           }
         >
           Σ = {sum.toFixed(2)}%{' '}

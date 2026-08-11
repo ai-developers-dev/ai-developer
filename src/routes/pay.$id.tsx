@@ -36,7 +36,7 @@ function formatCurrency(amount: number): string {
 function ProposalDescription({ text }: { text: string }) {
   const blocks = text.split(/\n{2,}/)
   return (
-    <div className="space-y-4 text-[15px] text-[#d0c5af] leading-relaxed">
+    <div className="space-y-4 text-[15px] text-[rgba(255,255,255,0.6)] leading-relaxed">
       {blocks.map((block, i) => {
         const lines = block.split('\n')
         const isList = lines.every(
@@ -62,7 +62,7 @@ function renderInline(s: string): React.ReactNode {
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
-        <strong key={i} className="font-semibold text-[#f4dddb]">
+        <strong key={i} className="font-semibold text-[#FFFFFF]">
           {part.slice(2, -2)}
         </strong>
       )
@@ -98,16 +98,16 @@ function PublicPayPage() {
 
   if (proposal === undefined) {
     return (
-      <div className="min-h-screen bg-[#1c1110] flex items-center justify-center">
-        <p className="text-sm text-[#d0c5af]">Loading…</p>
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+        <p className="text-sm text-[rgba(255,255,255,0.6)]">Loading…</p>
       </div>
     )
   }
 
   if (proposal === null) {
     return (
-      <div className="min-h-screen bg-[#1c1110] flex items-center justify-center">
-        <p className="text-sm text-[#d0c5af]">Proposal not found.</p>
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+        <p className="text-sm text-[rgba(255,255,255,0.6)]">Proposal not found.</p>
       </div>
     )
   }
@@ -193,18 +193,18 @@ function PublicPayPage() {
       : null
 
   return (
-    <div className="min-h-screen bg-[#1c1110] py-10 px-4">
+    <div className="min-h-screen bg-[#000000] py-10 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Brand header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#d4cebb] to-[#b8b3a0] text-[#333123] flex items-center justify-center font-bold text-lg font-['Space_Grotesk']">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#EF6A00] to-[#FF8A2B] text-[#000000] flex items-center justify-center font-bold text-lg font-['Inter']">
             A
           </div>
           <div>
-            <p className="text-base font-semibold text-[#f4dddb] font-['Space_Grotesk']">
+            <p className="text-base font-semibold text-[#FFFFFF] font-['Inter']">
               AI Developer
             </p>
-            <p className="text-xs text-[#d0c5af]">
+            <p className="text-xs text-[rgba(255,255,255,0.6)]">
               Websites, Apps & AI Solutions Built Faster
             </p>
           </div>
@@ -240,28 +240,28 @@ function PublicPayPage() {
         )}
 
         {/* Proposal card */}
-        <div className="bg-[#251917] rounded-2xl border border-[rgba(208,197,175,0.15)] overflow-hidden">
+        <div className="bg-[#0B0B0B] rounded-2xl border border-[rgba(255,255,255,0.1)] overflow-hidden">
           {/* Header */}
-          <div className="px-8 py-6 border-b border-[rgba(208,197,175,0.1)] flex items-start justify-between gap-4">
+          <div className="px-8 py-6 border-b border-[rgba(255,255,255,0.1)] flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#d0c5af] mb-1.5">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[rgba(255,255,255,0.6)] mb-1.5">
                 Proposal for {proposal.clientName}
               </p>
-              <h1 className="text-2xl font-bold text-[#f4dddb] leading-tight font-['Space_Grotesk']">
+              <h1 className="text-2xl font-bold text-[#FFFFFF] leading-tight font-['Inter']">
                 {proposal.title}
               </h1>
             </div>
             <div className="text-right shrink-0">
               {positionLabel && (
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#d0c5af] mb-1">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[rgba(255,255,255,0.6)] mb-1">
                   {positionLabel}
                 </p>
               )}
-              <p className="text-3xl font-bold text-[#d4cebb] tabular-nums font-['Space_Grotesk']">
+              <p className="text-3xl font-bold text-[#EF6A00] tabular-nums font-['Inter']">
                 ${formatCurrency(active ? activeAmount : proposal.totalAmount)}
               </p>
               {active && installments.length > 1 && (
-                <p className="text-xs text-[#d0c5af] mt-1">
+                <p className="text-xs text-[rgba(255,255,255,0.6)] mt-1">
                   of ${formatCurrency(proposal.totalAmount)} total
                 </p>
               )}
@@ -270,18 +270,18 @@ function PublicPayPage() {
 
           {/* Description */}
           {proposal.description && (
-            <div className="px-8 py-6 border-b border-[rgba(208,197,175,0.1)]">
+            <div className="px-8 py-6 border-b border-[rgba(255,255,255,0.1)]">
               <ProposalDescription text={proposal.description} />
             </div>
           )}
 
           {/* Line items */}
-          <div className="px-8 py-6 border-b border-[rgba(208,197,175,0.1)]">
-            <h2 className="text-[11px] uppercase tracking-[0.18em] text-[#d4cebb] mb-4 font-semibold">
+          <div className="px-8 py-6 border-b border-[rgba(255,255,255,0.1)]">
+            <h2 className="text-[11px] uppercase tracking-[0.18em] text-[#EF6A00] mb-4 font-semibold">
               Services
             </h2>
             <div className="space-y-1.5">
-              <div className="grid grid-cols-12 gap-3 text-[11px] uppercase tracking-wider text-[#d0c5af]/70 pb-2 border-b border-[rgba(208,197,175,0.1)]">
+              <div className="grid grid-cols-12 gap-3 text-[11px] uppercase tracking-wider text-[rgba(255,255,255,0.6)]/70 pb-2 border-b border-[rgba(255,255,255,0.1)]">
                 <div className="col-span-7">Description</div>
                 <div className="col-span-1 text-center">Qty</div>
                 <div className="col-span-2 text-right">Price</div>
@@ -294,14 +294,14 @@ function PublicPayPage() {
                     key={i}
                     className="grid grid-cols-12 gap-3 py-3 text-sm border-b border-[rgba(208,197,175,0.05)] last:border-b-0"
                   >
-                    <div className="col-span-7 text-[#f4dddb]">{item.description}</div>
-                    <div className="col-span-1 text-center text-[#d0c5af]">
+                    <div className="col-span-7 text-[#FFFFFF]">{item.description}</div>
+                    <div className="col-span-1 text-center text-[rgba(255,255,255,0.6)]">
                       {item.quantity}
                     </div>
-                    <div className="col-span-2 text-right text-[#d0c5af] tabular-nums">
+                    <div className="col-span-2 text-right text-[rgba(255,255,255,0.6)] tabular-nums">
                       {isDiscount ? '-' : ''}${formatCurrency(Math.abs(item.unitPrice))}
                     </div>
-                    <div className={`col-span-2 text-right font-semibold tabular-nums ${isDiscount ? 'text-red-400' : 'text-[#f4dddb]'}`}>
+                    <div className={`col-span-2 text-right font-semibold tabular-nums ${isDiscount ? 'text-red-400' : 'text-[#FFFFFF]'}`}>
                       {isDiscount ? '-' : ''}${formatCurrency(Math.abs(item.total))}
                     </div>
                   </div>
@@ -312,12 +312,12 @@ function PublicPayPage() {
 
           {/* Payment schedule */}
           {installments.length > 0 && (
-            <div className="px-8 py-6 border-b border-[rgba(208,197,175,0.1)] bg-[#291d1b]">
+            <div className="px-8 py-6 border-b border-[rgba(255,255,255,0.1)] bg-[#0B0B0B]">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[11px] uppercase tracking-[0.18em] text-[#d4cebb] font-semibold">
+                <h2 className="text-[11px] uppercase tracking-[0.18em] text-[#EF6A00] font-semibold">
                   Payment Schedule
                 </h2>
-                <p className="text-sm font-semibold text-[#f4dddb] tabular-nums">
+                <p className="text-sm font-semibold text-[#FFFFFF] tabular-nums">
                   Total: ${formatCurrency(proposal.totalAmount)}
                 </p>
               </div>
@@ -330,22 +330,22 @@ function PublicPayPage() {
                       key={row.id}
                       className={`flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm transition-all ${
                         isActive
-                          ? 'bg-[#251917] border-2 border-[#d4cebb]/40 shadow-lg shadow-[#d4cebb]/5'
-                          : 'bg-[#251917]/50 border border-[rgba(208,197,175,0.1)]'
+                          ? 'bg-[#0B0B0B] border-2 border-[#EF6A00]/40 shadow-lg shadow-[#EF6A00]/5'
+                          : 'bg-[#0B0B0B]/50 border border-[rgba(255,255,255,0.1)]'
                       }`}
                     >
                       <div className="min-w-0">
                         <p
                           className={`font-medium ${
                             isPaid
-                              ? 'text-[#d0c5af]/60 line-through'
+                              ? 'text-[rgba(255,255,255,0.6)]/60 line-through'
                               : isActive
-                                ? 'text-[#f4dddb]'
-                                : 'text-[#d0c5af]'
+                                ? 'text-[#FFFFFF]'
+                                : 'text-[rgba(255,255,255,0.6)]'
                           }`}
                         >
                           {row.label}{' '}
-                          <span className="text-[#d0c5af]/60 font-normal">
+                          <span className="text-[rgba(255,255,255,0.6)]/60 font-normal">
                             ({describeTrigger(row.trigger)})
                           </span>
                         </p>
@@ -360,10 +360,10 @@ function PublicPayPage() {
                         <p
                           className={`tabular-nums font-semibold ${
                             isPaid
-                              ? 'text-[#d0c5af]/40 line-through'
+                              ? 'text-[rgba(255,255,255,0.6)]/40 line-through'
                               : isActive
-                                ? 'text-[#d4cebb]'
-                                : 'text-[#d0c5af]'
+                                ? 'text-[#EF6A00]'
+                                : 'text-[rgba(255,255,255,0.6)]'
                           }`}
                         >
                           ${formatCurrency(amounts[i])}
@@ -385,7 +385,7 @@ function PublicPayPage() {
 
           {/* Embedded checkout OR CTA */}
           {showCheckout && clientSecret ? (
-            <div className="px-8 py-6 bg-white rounded-b-2xl">
+            <div className="px-8 py-6 bg-[#0B0B0B] rounded-b-2xl">
               <EmbeddedCheckoutProvider
                 stripe={stripePromise}
                 options={{ clientSecret }}
@@ -398,12 +398,12 @@ function PublicPayPage() {
               <button
                 onClick={handlePay}
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#d4cebb] to-[#b8b3a0] hover:from-[#e0d9c8] hover:to-[#c4bfac] text-[#333123] font-bold text-base px-6 py-4 rounded-xl transition-all disabled:opacity-60 font-['Space_Grotesk'] shadow-lg shadow-[#d4cebb]/20"
+                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#EF6A00] to-[#FF8A2B] hover:from-[#e0d9c8] hover:to-[#c4bfac] text-[#000000] font-bold text-base px-6 py-4 rounded-xl transition-all disabled:opacity-60 font-['Inter'] shadow-lg shadow-[#EF6A00]/20"
               >
                 <Lock className="w-4 h-4" />
                 {loading ? 'Loading…' : `Pay ${active.label} — $${formatCurrency(activeAmount)}`}
               </button>
-              <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-[#d0c5af]">
+              <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-[rgba(255,255,255,0.6)]">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Secure payment powered by Stripe
               </div>
@@ -412,7 +412,7 @@ function PublicPayPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-[#d0c5af]/60 mt-8">
+        <p className="text-center text-xs text-[rgba(255,255,255,0.6)]/60 mt-8">
           AI Developer · Websites, Apps & AI Solutions Built Faster
         </p>
       </div>
@@ -444,8 +444,8 @@ function MockCheckoutOverlay({
   onClose: () => void
 }) {
   return (
-    <div className="fixed inset-0 z-50 bg-[#1c1110]/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="relative bg-[#251917] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-[rgba(208,197,175,0.15)]">
+    <div className="fixed inset-0 z-50 bg-[#000000]/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="relative bg-[#0B0B0B] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-[rgba(255,255,255,0.1)]">
         {/* Preview ribbon */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 bg-amber-900/50 border border-amber-600/50 text-amber-200 text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full">
           Preview — not a real checkout
@@ -454,41 +454,41 @@ function MockCheckoutOverlay({
         <button
           onClick={onClose}
           aria-label="Close preview"
-          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-[#291d1b] hover:bg-[#342726] flex items-center justify-center text-[#d0c5af] border border-[rgba(208,197,175,0.15)]"
+          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-[#0B0B0B] hover:bg-[#141414] flex items-center justify-center text-[rgba(255,255,255,0.6)] border border-[rgba(255,255,255,0.1)]"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[rgba(208,197,175,0.1)] overflow-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[rgba(255,255,255,0.1)] overflow-auto">
           {/* Left — order summary */}
-          <div className="p-8 bg-[#291d1b]">
+          <div className="p-8 bg-[#0B0B0B]">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#d4cebb] to-[#b8b3a0] text-[#333123] flex items-center justify-center text-sm font-bold font-['Space_Grotesk']">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#EF6A00] to-[#FF8A2B] text-[#000000] flex items-center justify-center text-sm font-bold font-['Inter']">
                 A
               </div>
-              <p className="text-sm font-semibold text-[#f4dddb] font-['Space_Grotesk']">
+              <p className="text-sm font-semibold text-[#FFFFFF] font-['Inter']">
                 AI Developer
               </p>
             </div>
-            <p className="text-sm text-[#d0c5af] mb-1">Pay AI Developer</p>
-            <p className="text-4xl font-bold text-[#d4cebb] tabular-nums mb-6 font-['Space_Grotesk']">
+            <p className="text-sm text-[rgba(255,255,255,0.6)] mb-1">Pay AI Developer</p>
+            <p className="text-4xl font-bold text-[#EF6A00] tabular-nums mb-6 font-['Inter']">
               ${formatCurrency(amount)}
             </p>
             <div className="space-y-3 text-sm">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="text-[#f4dddb] font-medium truncate">
+                  <p className="text-[#FFFFFF] font-medium truncate">
                     {proposalTitle}
                   </p>
-                  <p className="text-xs text-[#d0c5af] mt-0.5">{label}</p>
+                  <p className="text-xs text-[rgba(255,255,255,0.6)] mt-0.5">{label}</p>
                 </div>
-                <p className="text-[#f4dddb] font-medium tabular-nums shrink-0">
+                <p className="text-[#FFFFFF] font-medium tabular-nums shrink-0">
                   ${formatCurrency(amount)}
                 </p>
               </div>
-              <div className="pt-3 border-t border-[rgba(208,197,175,0.1)] flex items-center justify-between">
-                <p className="text-[#d0c5af] font-medium">Total due</p>
-                <p className="text-[#d4cebb] font-bold tabular-nums">
+              <div className="pt-3 border-t border-[rgba(255,255,255,0.1)] flex items-center justify-between">
+                <p className="text-[rgba(255,255,255,0.6)] font-medium">Total due</p>
+                <p className="text-[#EF6A00] font-bold tabular-nums">
                   ${formatCurrency(amount)}
                 </p>
               </div>
@@ -496,79 +496,79 @@ function MockCheckoutOverlay({
           </div>
 
           {/* Right — payment form (mock) */}
-          <div className="p-8 bg-[#251917]">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#d4cebb] mb-4 font-semibold">
+          <div className="p-8 bg-[#0B0B0B]">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#EF6A00] mb-4 font-semibold">
               Contact information
             </p>
             <div className="mb-5">
-              <label className="block text-xs font-medium text-[#d0c5af] mb-1">
+              <label className="block text-xs font-medium text-[rgba(255,255,255,0.6)] mb-1">
                 Email
               </label>
-              <div className="px-3 py-2.5 rounded-lg border border-[rgba(208,197,175,0.15)] bg-[#291d1b] text-sm text-[#f4dddb]">
+              <div className="px-3 py-2.5 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0B0B0B] text-sm text-[#FFFFFF]">
                 {clientEmail}
               </div>
             </div>
 
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#d4cebb] mb-4 mt-6 font-semibold">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#EF6A00] mb-4 mt-6 font-semibold">
               Payment method
             </p>
             <div className="flex items-center gap-2 mb-4">
-              <div className="px-3 py-1.5 rounded-md border-2 border-[#d4cebb] text-xs font-semibold text-[#d4cebb]">
+              <div className="px-3 py-1.5 rounded-md border-2 border-[#EF6A00] text-xs font-semibold text-[#EF6A00]">
                 Card
               </div>
-              <div className="px-3 py-1.5 rounded-md border border-[rgba(208,197,175,0.2)] text-xs font-medium text-[#d0c5af]/60">
+              <div className="px-3 py-1.5 rounded-md border border-[rgba(208,197,175,0.2)] text-xs font-medium text-[rgba(255,255,255,0.6)]/60">
                 Cash App Pay
               </div>
-              <div className="px-3 py-1.5 rounded-md border border-[rgba(208,197,175,0.2)] text-xs font-medium text-[#d0c5af]/60">
+              <div className="px-3 py-1.5 rounded-md border border-[rgba(208,197,175,0.2)] text-xs font-medium text-[rgba(255,255,255,0.6)]/60">
                 Link
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-[#d0c5af] mb-1">
+                <label className="block text-xs font-medium text-[rgba(255,255,255,0.6)] mb-1">
                   Card number
                 </label>
-                <div className="px-3 py-2.5 rounded-lg border border-[rgba(208,197,175,0.15)] bg-[#291d1b] text-sm text-[#d0c5af]/50 flex items-center justify-between">
+                <div className="px-3 py-2.5 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0B0B0B] text-sm text-[rgba(255,255,255,0.6)]/50 flex items-center justify-between">
                   <span>1234 1234 1234 1234</span>
                   <div className="flex items-center gap-1">
-                    <div className="w-7 h-5 rounded bg-gradient-to-br from-blue-600 to-blue-800" />
-                    <div className="w-7 h-5 rounded bg-gradient-to-br from-red-500 to-orange-500" />
-                    <div className="w-7 h-5 rounded bg-gradient-to-br from-blue-500 to-cyan-500" />
+                    <div className="w-7 h-5 rounded-none bg-gradient-to-br from-blue-600 to-blue-800" />
+                    <div className="w-7 h-5 rounded-none bg-gradient-to-br from-red-500 to-orange-500" />
+                    <div className="w-7 h-5 rounded-none bg-gradient-to-br from-blue-500 to-cyan-500" />
                   </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#d0c5af] mb-1">
+                  <label className="block text-xs font-medium text-[rgba(255,255,255,0.6)] mb-1">
                     Expiration
                   </label>
-                  <div className="px-3 py-2.5 rounded-lg border border-[rgba(208,197,175,0.15)] bg-[#291d1b] text-sm text-[#d0c5af]/50">
+                  <div className="px-3 py-2.5 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0B0B0B] text-sm text-[rgba(255,255,255,0.6)]/50">
                     MM / YY
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#d0c5af] mb-1">
+                  <label className="block text-xs font-medium text-[rgba(255,255,255,0.6)] mb-1">
                     CVC
                   </label>
-                  <div className="px-3 py-2.5 rounded-lg border border-[rgba(208,197,175,0.15)] bg-[#291d1b] text-sm text-[#d0c5af]/50">
+                  <div className="px-3 py-2.5 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0B0B0B] text-sm text-[rgba(255,255,255,0.6)]/50">
                     CVC
                   </div>
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#d0c5af] mb-1">
+                <label className="block text-xs font-medium text-[rgba(255,255,255,0.6)] mb-1">
                   Cardholder name
                 </label>
-                <div className="px-3 py-2.5 rounded-lg border border-[rgba(208,197,175,0.15)] bg-[#291d1b] text-sm text-[#d0c5af]/50">
+                <div className="px-3 py-2.5 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0B0B0B] text-sm text-[rgba(255,255,255,0.6)]/50">
                   Full name on card
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#d0c5af] mb-1">
+                <label className="block text-xs font-medium text-[rgba(255,255,255,0.6)] mb-1">
                   Country
                 </label>
-                <div className="px-3 py-2.5 rounded-lg border border-[rgba(208,197,175,0.15)] bg-[#291d1b] text-sm text-[#f4dddb]">
+                <div className="px-3 py-2.5 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0B0B0B] text-sm text-[#FFFFFF]">
                   United States
                 </div>
               </div>
@@ -576,13 +576,13 @@ function MockCheckoutOverlay({
 
             <button
               disabled
-              className="w-full mt-6 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#d4cebb] to-[#b8b3a0] text-[#333123] font-bold text-sm px-6 py-3.5 rounded-xl opacity-90 cursor-not-allowed font-['Space_Grotesk']"
+              className="w-full mt-6 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#EF6A00] to-[#FF8A2B] text-[#000000] font-bold text-sm px-6 py-3.5 rounded-xl opacity-90 cursor-not-allowed font-['Inter']"
             >
               <Lock className="w-3.5 h-3.5" />
               Pay ${formatCurrency(amount)}
             </button>
 
-            <div className="flex items-center justify-center gap-1.5 mt-3 text-[11px] text-[#d0c5af]/60">
+            <div className="flex items-center justify-center gap-1.5 mt-3 text-[11px] text-[rgba(255,255,255,0.6)]/60">
               <ShieldCheck className="w-3 h-3" />
               Powered by Stripe
             </div>

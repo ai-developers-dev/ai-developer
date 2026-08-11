@@ -247,7 +247,7 @@ function TimeTrackingPage() {
                     onChange={(e) =>
                       setNewEntry({ ...newEntry, billable: e.target.checked })
                     }
-                    className="rounded"
+                    className="rounded-none"
                   />
                   Billable
                 </label>
@@ -406,7 +406,7 @@ function TimeTrackingPage() {
                       <span className="text-sm font-medium">{entry.hours}h</span>
                       <button
                         onClick={() => removeEntry({ id: entry._id })}
-                        className="p-1 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-600"
+                        className="p-1 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-400"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

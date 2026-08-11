@@ -4,14 +4,35 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ═══════════════════════════════════════════
+   basis33 — bitmap mono used for pixel words,
+   eyebrows and micro-labels. Self-hosted (one
+   7.8KB woff2) instead of the third-party CDN
+   in the handoff, so first paint never waits on
+   another origin's DNS + TLS.
+
+   Font: basis33 via onlinewebfonts.com — CC BY 4.0.
+   Attribution required: https://www.onlinewebfonts.com/fonts
+   ═══════════════════════════════════════════ */
+@font-face {
+  font-family: 'basis33';
+  src: url('/fonts/basis33.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  /* Sharp corners throughout — the design has no border radius.
+     (The logo mark's 8px rect is drawn in SVG, not CSS.) */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -44,145 +65,100 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Neural Architect brand colors — variable-driven for light/dark */
+  /* Brand */
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: var(--brand-secondary);
   --color-brand-tertiary: var(--brand-tertiary);
   --color-brand-dark: var(--brand-dark);
 
-  /* Surface tiers — variable-driven for light/dark */
+  /* Surface tiers */
   --color-surface-lowest: var(--surface-lowest);
   --color-surface-low: var(--surface-low);
   --color-surface: var(--surface);
   --color-surface-high: var(--surface-high);
   --color-surface-highest: var(--surface-highest);
 
-  /* Navigation & utility colors — variable-driven */
+  /* Navigation & utility colors */
   --color-nav-text: var(--nav-text);
   --color-nav-text-hover: var(--nav-text-hover);
   --color-subtle-border: var(--subtle-border);
   --color-decoration: var(--decoration);
 
-  /* Font families */
-  --font-heading: 'Space Grotesk', sans-serif;
+  /* Font families — Inter for everything, basis33 for pixel/label type */
+  --font-heading: 'Inter', sans-serif;
   --font-body: 'Inter', sans-serif;
-  --font-label: 'Manrope', sans-serif;
+  --font-label: 'basis33', 'Courier New', monospace;
+  --font-pixel: 'basis33', 'Courier New', monospace;
 }
 
 /* ═══════════════════════════════════════════
-   LIGHT THEME — Obsidian Amber rosy-sand palette
-   Warm pinkish foundation from Material "Obsidian Amber"
-   Primary #F0EAD6, Secondary #8B7355, Tertiary #FFBF00
+   THEME — single dark palette (no light mode).
+   Tokens live on :root so they apply whether or
+   not `.dark` is present; `.dark` stays on <html>
+   purely so existing `dark:` variants keep working.
    ═══════════════════════════════════════════ */
-:root {
-  --radius: 0.125rem;
-  /* Obsidian Amber — soft blush pink foundation (#FCE4EC) */
-  --background: #FCE4EC;
-  --foreground: #1A0F0E;
-  --card: #FDF0F4;
-  --card-foreground: #1A0F0E;
-  --popover: #FDF0F4;
-  --popover-foreground: #1A0F0E;
-  --primary: #6B5240;
-  --primary-foreground: #FCE4EC;
-  --secondary: #F3D2DA;
-  --secondary-foreground: #1A0F0E;
-  --muted: #F3D2DA;
-  --muted-foreground: #6B5D50;
-  --accent: #F3D2DA;
-  --accent-foreground: #1A0F0E;
-  --destructive: #B91C1C;
-  --border: rgba(26, 15, 14, 0.08);
-  --input: rgba(26, 15, 14, 0.08);
-  --ring: #8B7355;
-  --chart-1: #8B7355;
-  --chart-2: #6B5240;
-  --chart-3: #DAA520;
-  --chart-4: #6B5D50;
-  --chart-5: #1A0F0E;
-  --sidebar: #F6D9E1;
-  --sidebar-foreground: #1A0F0E;
-  --sidebar-primary: #6B5240;
-  --sidebar-primary-foreground: #FCE4EC;
-  --sidebar-accent: #F3D2DA;
-  --sidebar-accent-foreground: #1A0F0E;
-  --sidebar-border: rgba(26, 15, 14, 0.06);
-  --sidebar-ring: #8B7355;
-
-  /* Brand — Obsidian Amber palette */
-  --brand-primary: #6B5240;
-  --brand-secondary: #8B7355;
-  --brand-tertiary: #DAA520;
-  --brand-dark: #1A0F0E;
-
-  /* Surface tiers — blush pink graduation from #FCE4EC */
-  --surface-lowest: #FCE4EC;
-  --surface-low: #F6D9E1;
-  --surface: #F3D2DA;
-  --surface-high: #EAC4CD;
-  --surface-highest: #DFB3BD;
-
-  /* Navigation */
-  --nav-text: #6B5D50;
-  --nav-text-hover: #1A0F0E;
-  --subtle-border: rgba(26, 15, 14, 0.08);
-  --decoration: rgba(26, 15, 14, 0.12);
-}
-
-/* ═══════════════════════════════════════════
-   DARK THEME (.dark class on <html>)
-   ═══════════════════════════════════════════ */
+:root,
 .dark {
-  --background: #1c1110;
-  --foreground: #f4dddb;
-  --card: #251917;
-  --card-foreground: #f4dddb;
-  --popover: #291d1b;
-  --popover-foreground: #f4dddb;
-  --primary: #d4cebb;
-  --primary-foreground: #333123;
-  --secondary: #342726;
-  --secondary-foreground: #f4dddb;
-  --muted: #291d1b;
-  --muted-foreground: #d0c5af;
-  --accent: #342726;
-  --accent-foreground: #f4dddb;
-  --destructive: #ffb4ab;
-  --border: rgba(208, 197, 175, 0.15);
-  --input: rgba(208, 197, 175, 0.15);
-  --ring: #d4cebb;
-  --chart-1: #d4cebb;
-  --chart-2: #dfc29f;
-  --chart-3: #ffc640;
-  --chart-4: #b8b3a0;
-  --chart-5: #f4dddb;
-  --sidebar: #251917;
-  --sidebar-foreground: #f4dddb;
-  --sidebar-primary: #d4cebb;
-  --sidebar-primary-foreground: #333123;
-  --sidebar-accent: #342726;
-  --sidebar-accent-foreground: #f4dddb;
-  --sidebar-border: rgba(208, 197, 175, 0.1);
-  --sidebar-ring: #d4cebb;
+  --radius: 0px;
+
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --card: #0B0B0B;
+  --card-foreground: #FFFFFF;
+  --popover: #0B0B0B;
+  --popover-foreground: #FFFFFF;
+
+  /* Accent orange is the primary action colour; black text sits on it */
+  --primary: #EF6A00;
+  --primary-foreground: #000000;
+
+  --secondary: #0B0B0B;
+  --secondary-foreground: #FFFFFF;
+  --muted: #0B0B0B;
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --accent: #141414;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF5C5C;
+
+  /* Card borders 0.1, inputs 0.2 — matches the handoff's two border tiers */
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.2);
+  --ring: #EF6A00;
+
+  --chart-1: #EF6A00;
+  --chart-2: #FF8A2B;
+  --chart-3: #FFFFFF;
+  --chart-4: rgba(255, 255, 255, 0.6);
+  --chart-5: rgba(255, 255, 255, 0.3);
+
+  --sidebar: #0B0B0B;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #EF6A00;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #141414;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #EF6A00;
 
   /* Brand */
-  --brand-primary: #d4cebb;
-  --brand-secondary: #dfc29f;
-  --brand-tertiary: #ffc640;
-  --brand-dark: #1c1110;
+  --brand-primary: #EF6A00;
+  --brand-secondary: #FF8A2B;
+  --brand-tertiary: #EF6A00;
+  --brand-dark: #000000;
 
-  /* Surface tiers */
-  --surface-lowest: #160b0a;
-  --surface-low: #251917;
-  --surface: #291d1b;
-  --surface-high: #342726;
-  --surface-highest: #3f3130;
+  /* Surface tiers — black base, #0B0B0B panels, lifting for hover states */
+  --surface-lowest: #000000;
+  --surface-low: #0B0B0B;
+  --surface: #0B0B0B;
+  --surface-high: #141414;
+  --surface-highest: #1C1C1C;
 
-  /* Navigation */
-  --nav-text: #d0c5af;
-  --nav-text-hover: #f4dddb;
-  --subtle-border: rgba(208, 197, 175, 0.15);
-  --decoration: rgba(77, 70, 53, 0.3);
+  /* Navigation — pure white so Tailwind alpha modifiers (/50 /60 /70 /80)
+     land exactly on the handoff's muted text tiers */
+  --nav-text: #FFFFFF;
+  --nav-text-hover: #FFFFFF;
+  --subtle-border: rgba(255, 255, 255, 0.1);
+  --decoration: rgba(255, 255, 255, 0.1);
 }
 
 @keyframes marquee {
@@ -194,60 +170,138 @@
   }
 }
 
+/* Hero subject: slow breathing zoom, 24s, bottom-anchored */
+@keyframes hero-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+/* Mobile menu overlay + staggered links */
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes link-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ═══════════════════════════════════════════
-   UTILITY CLASSES — mode-aware
+   TYPE UTILITIES
    ═══════════════════════════════════════════ */
 
-/* Architectural outline text */
+/* A word set in basis33 inside an Inter headline. Renders at 1.25em with
+   line-height 1 so the bitmap face optically matches the surrounding caps. */
+.pixel-word {
+  font-family: var(--font-pixel);
+  font-size: 1.25em;
+  font-weight: 400;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: baseline;
+}
+
+/* Section eyebrow — "01 / Services" */
+.eyebrow {
+  font-family: var(--font-label);
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+.eyebrow-accent {
+  color: #EF6A00;
+}
+
+/* Display headings — uppercase, tight leading, light weight */
+.display-h1 {
+  font-size: clamp(26px, min(4.1vw, 8.4vh), 64px);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  font-weight: 400;
+  line-height: 0.72;
+  margin: 0;
+}
+.display-h2 {
+  font-size: clamp(30px, 3.4vw, 54px);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  font-weight: 400;
+  line-height: 0.85;
+  margin: 0;
+}
+
+/* Shared section rhythm from the handoff */
+.section-pad {
+  padding: clamp(80px, 9vw, 140px) clamp(20px, 3.6vw, 56px);
+}
+.side-pad {
+  padding-left: clamp(20px, 3.6vw, 56px);
+  padding-right: clamp(20px, 3.6vw, 56px);
+}
+
+/* ═══════════════════════════════════════════
+   COMPONENT UTILITIES
+   ═══════════════════════════════════════════ */
+
+/* Outline text — white stroke on black */
 .architectural-outline {
-  -webkit-text-stroke: 1.5px rgba(26, 15, 14, 0.25);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
   color: transparent;
 }
-.dark .architectural-outline {
-  -webkit-text-stroke: 1px rgba(208, 197, 175, 0.3);
-}
 
-/* Glass card — blush pink glassmorphism (light) */
+/* Panel surface — flat #0B0B0B with a hairline border, orange on hover */
 .glass-card {
-  background: rgba(253, 240, 244, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(26, 15, 14, 0.05);
-  transition: all 0.5s ease;
+  background: #0B0B0B;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 200ms;
 }
 .glass-card:hover {
-  background: rgba(253, 240, 244, 0.98);
-  border: 1px solid rgba(26, 15, 14, 0.12);
-}
-/* Glass card — dark obsidian glassmorphism */
-.dark .glass-card {
-  background: rgba(32, 20, 18, 0.97);
-  border: 1px solid rgba(208, 197, 175, 0.15);
-}
-.dark .glass-card:hover {
-  background: rgba(32, 20, 18, 0.99);
-  border: 1px solid rgba(208, 197, 175, 0.4);
+  border-color: #EF6A00;
 }
 
-/* Gradient button — dark bronze metallic (light) */
+/* Primary action — flat orange, black label (no gradients in this design) */
 .gradient-btn {
-  background: linear-gradient(135deg, #6B5240 0%, #523D30 100%);
-  color: #FCE4EC;
+  background: #EF6A00;
+  color: #000000;
+  transition: background-color 200ms;
 }
 .gradient-btn:hover {
-  box-shadow: 0 0 40px rgba(107, 82, 64, 0.25);
+  background: #FF8A2B;
+  color: #000000;
 }
-/* Gradient button — champagne metallic (dark) */
-.dark .gradient-btn {
-  background: linear-gradient(135deg, #d4cebb 0%, #b8b3a0 100%);
-  color: #333123;
+
+/* Bordered secondary action */
+.outline-btn {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+  transition: background-color 200ms;
 }
-.dark .gradient-btn:hover {
-  box-shadow: 0 0 40px rgba(212, 206, 187, 0.3);
+.outline-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  html {
+    background: #000000;
   }
   body {
     @apply bg-background text-foreground;
@@ -256,14 +310,10 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body ::selection {
-    background: #DAA520;
-    color: #FCE4EC;
-  }
-  .dark body ::selection {
-    background: #ffc640;
-    color: #1c1110;
+    background: #EF6A00;
+    color: #000000;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 }

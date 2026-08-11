@@ -29,11 +29,11 @@ const statusBadge = (status: string) => {
     case 'draft':
       return <Badge variant="secondary">Draft</Badge>
     case 'sent':
-      return <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">Sent</Badge>
+      return <Badge className="bg-blue-500/10 text-blue-300 hover:bg-blue-500/10 border-blue-500/30">Sent</Badge>
     case 'viewed':
-      return <Badge className="bg-amber-50 text-amber-700 hover:bg-amber-50 border-amber-200">Viewed</Badge>
+      return <Badge className="bg-amber-500/10 text-amber-300 hover:bg-amber-500/10 border-amber-500/30">Viewed</Badge>
     case 'accepted':
-      return <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Accepted</Badge>
+      return <Badge className="bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30">Accepted</Badge>
     default:
       return <Badge variant="secondary">{status}</Badge>
   }
@@ -67,13 +67,13 @@ function ProposalDetailPage() {
     switch (status) {
       case 'paid':
         return (
-          <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">
+          <Badge className="bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30">
             Paid
           </Badge>
         )
       case 'invoiced':
         return (
-          <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">
+          <Badge className="bg-blue-500/10 text-blue-300 hover:bg-blue-500/10 border-blue-500/30">
             Invoiced
           </Badge>
         )
@@ -280,7 +280,7 @@ function ProposalDetailPage() {
             {proposal.acceptedAt && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Accepted</span>
-                <span className="text-green-600 font-medium">
+                <span className="text-green-400 font-medium">
                   {new Date(proposal.acceptedAt).toLocaleDateString()}
                 </span>
               </div>
@@ -288,7 +288,7 @@ function ProposalDetailPage() {
             {proposal.paidAt && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Paid</span>
-                <span className="text-green-600 font-medium">
+                <span className="text-green-400 font-medium">
                   {new Date(proposal.paidAt).toLocaleDateString()}
                 </span>
               </div>
@@ -372,7 +372,7 @@ function ProvisionCrmCard({ businessName, config }: ProvisionCrmCardProps) {
           <Button variant="outline" onClick={copyCmd}>
             {copied ? (
               <>
-                <Check className="w-4 h-4 mr-1.5 text-green-600" />
+                <Check className="w-4 h-4 mr-1.5 text-green-400" />
                 Copied
               </>
             ) : (

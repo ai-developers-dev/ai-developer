@@ -163,6 +163,24 @@ export default defineSchema({
     notes: v.optional(v.string()),
   }).index("by_status", ["status"]),
 
+  // Waitlist for the paid courses product (see /early-access + /courses).
+  // Public no-auth insert; reads are admin-gated in earlyAccess.ts.
+  earlyAccessSignups: defineTable({
+    name: v.string(),
+    email: v.string(), // stored lowercased+trimmed so by_email dedupe works
+    // Which page the signup came from ("early-access", "courses", ...)
+    source: v.optional(v.string()),
+    status: v.union(
+      v.literal("new"),
+      v.literal("invited"),
+      v.literal("converted"),
+      v.literal("archived")
+    ),
+    notes: v.optional(v.string()),
+  })
+    .index("by_status", ["status"])
+    .index("by_email", ["email"]),
+
   clients: defineTable({
     name: v.string(),
     contactEmail: v.string(),

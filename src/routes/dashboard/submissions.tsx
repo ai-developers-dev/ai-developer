@@ -44,19 +44,19 @@ const statusBadge = (status: string) => {
   switch (status) {
     case 'new':
       return (
-        <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">
+        <Badge className="bg-blue-500/10 text-blue-300 hover:bg-blue-500/10 border-blue-500/30">
           New
         </Badge>
       )
     case 'contacted':
       return (
-        <Badge className="bg-amber-50 text-amber-700 hover:bg-amber-50 border-amber-200">
+        <Badge className="bg-amber-500/10 text-amber-300 hover:bg-amber-500/10 border-amber-500/30">
           Contacted
         </Badge>
       )
     case 'converted':
       return (
-        <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">
+        <Badge className="bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30">
           Converted
         </Badge>
       )

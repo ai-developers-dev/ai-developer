@@ -806,7 +806,7 @@ export function DiscoveryForm({ source }: DiscoveryFormProps) {
           )}
 
           {error && (
-            <div className="rounded-md bg-red-50 border border-red-200 text-red-700 text-sm p-3">
+            <div className="rounded-md bg-red-500/10 border border-red-500/30 text-red-300 text-sm p-3">
               {error}
             </div>
           )}

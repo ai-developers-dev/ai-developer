@@ -494,7 +494,7 @@ function SettingsPage() {
                         variant="secondary"
                         className={
                           user.role === 'admin'
-                            ? 'bg-blue-50 text-blue-700 border-blue-200 mt-1'
+                            ? 'bg-blue-500/10 text-blue-300 border-blue-500/30 mt-1'
                             : 'mt-1'
                         }
                       >
@@ -505,7 +505,7 @@ function SettingsPage() {
                       variant={user.isActive ? 'default' : 'secondary'}
                       className={
                         user.isActive
-                          ? 'bg-green-50 text-green-700 hover:bg-green-50 border-green-200'
+                          ? 'bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30'
                           : ''
                       }
                     >

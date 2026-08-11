@@ -13,3 +13,7 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+
+# Local tooling config and scratch artifacts (contains .env files — never commit)
+.codex/
+artifacts/

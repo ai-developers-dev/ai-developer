@@ -19,13 +19,13 @@ const statusBadge = (status: string) => {
     case 'draft':
       return <Badge variant="secondary">Draft</Badge>
     case 'sent':
-      return <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">Sent</Badge>
+      return <Badge className="bg-blue-500/10 text-blue-300 hover:bg-blue-500/10 border-blue-500/30">Sent</Badge>
     case 'viewed':
-      return <Badge className="bg-amber-50 text-amber-700 hover:bg-amber-50 border-amber-200">Viewed</Badge>
+      return <Badge className="bg-amber-500/10 text-amber-300 hover:bg-amber-500/10 border-amber-500/30">Viewed</Badge>
     case 'accepted':
-      return <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Accepted</Badge>
+      return <Badge className="bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30">Accepted</Badge>
     case 'rejected':
-      return <Badge className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">Rejected</Badge>
+      return <Badge className="bg-red-500/10 text-red-300 hover:bg-red-500/10 border-red-500/30">Rejected</Badge>
     case 'expired':
       return <Badge variant="outline">Expired</Badge>
     default:

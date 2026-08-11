@@ -185,8 +185,8 @@ export function NeuralNetworkBg() {
     function getColors() {
       const isDark = document.documentElement.classList.contains('dark')
       const s = getComputedStyle(document.documentElement)
-      const primary = s.getPropertyValue('--brand-primary').trim() || '#d4cebb'
-      const tertiary = s.getPropertyValue('--brand-tertiary').trim() || '#ffc640'
+      const primary = s.getPropertyValue('--brand-primary').trim() || '#EF6A00'
+      const tertiary = s.getPropertyValue('--brand-tertiary').trim() || '#EF6A00'
       // Light mode needs stronger opacity — dark colors on light bg have less contrast
       const boost = isDark ? 1 : 2.5
       return { primary: hexToRgb(primary), tertiary: hexToRgb(tertiary), boost }
