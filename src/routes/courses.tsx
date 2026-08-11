@@ -23,7 +23,16 @@ const DESCRIPTION =
 
 export const Route = createFileRoute('/courses')({
   component: CoursesPage,
-  head: () => pageSeo({ title: TITLE, description: DESCRIPTION, path: PATH }),
+  head: () => {
+    const seo = pageSeo({ title: TITLE, description: DESCRIPTION, path: PATH })
+    return {
+      ...seo,
+      // Unlisted while the prices below are placeholders: keep this page out
+      // of search results so a made-up price can't get indexed or cached.
+      // Delete this meta entry (and relist in nav/footer/sitemap) at launch.
+      meta: [...seo.meta, { name: 'robots', content: 'noindex, nofollow' }],
+    }
+  },
 })
 
 // ── Edit these to change what the page sells ────────────────────────────────

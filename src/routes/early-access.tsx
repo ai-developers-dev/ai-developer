@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '@/components/layout/page-header.js'
 import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { Card, CardContent } from '@/components/ui/card'
 import { EarlyAccessForm } from '@/components/early-access-form'
-import { ArrowRight, BadgeCheck, Clock, Lock } from 'lucide-react'
+import { BadgeCheck, Clock, Lock } from 'lucide-react'
 import { pageSeo } from '@/lib/seo'
 
 const PATH = '/early-access'
@@ -60,25 +60,9 @@ function EarlyAccessPage() {
                 </Card>
               </FadeInView>
 
-              <FadeInView delay={0.15}>
-                <div className="mt-6 rounded-2xl border border-brand-primary/30 bg-brand-primary/5 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Want to see what's coming?
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      The full course lineup and pricing are on the courses page.
-                    </p>
-                  </div>
-                  <Link
-                    to="/courses"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-primary hover:text-brand-primary/80 transition-colors whitespace-nowrap"
-                  >
-                    View the courses
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </FadeInView>
+              {/* The "View the courses" cross-link is removed while /courses
+                  is unlisted — it would walk visitors straight into the
+                  placeholder pricing. Restore it when prices are real. */}
             </div>
 
             {/* Perks */}

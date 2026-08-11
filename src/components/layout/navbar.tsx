@@ -15,8 +15,10 @@ const services = [
   { label: 'SEO', href: '/services/seo' },
 ]
 
+// NOTE: /courses is deliberately unlisted until its real prices are set —
+// the page still exists at its URL. Re-add { label: 'COURSES', to: '/courses',
+// delay: 100 } here (and the desktop link + footer entry) to relist it.
 const mobileLinks = [
-  { label: 'COURSES', to: '/courses', delay: 100 },
   { label: 'ABOUT', to: '/about', delay: 160 },
   { label: 'CONTACT', to: '/contact', delay: 220 },
   { label: 'SIGN IN', to: '/sign-in/$', delay: 280 },
@@ -101,12 +103,6 @@ export function Navbar() {
               )}
             </div>
 
-            <Link
-              to="/courses"
-              className="text-white hover:opacity-70 transition-opacity duration-200"
-            >
-              Courses
-            </Link>
             <Link
               to="/about"
               className="text-white hover:opacity-70 transition-opacity duration-200"

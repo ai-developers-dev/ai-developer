@@ -21,7 +21,7 @@ const footerLinks = {
     { label: 'Privacy Policy', href: '/privacy' },
   ],
   Resources: [
-    { label: 'Courses', href: '/courses' },
+    // { label: 'Courses', href: '/courses' } — unlisted until real prices are set
     { label: 'Early Access', href: '/early-access' },
     { label: 'Blog', href: '/blog' },
     { label: 'Case Studies', href: '/case-studies' },

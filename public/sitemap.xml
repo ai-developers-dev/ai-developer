@@ -111,11 +111,6 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://aideveloper.dev/courses</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://aideveloper.dev/early-access</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
