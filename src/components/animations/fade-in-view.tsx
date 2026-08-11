@@ -32,6 +32,10 @@ export function FadeInView({
     const el = ref.current
     if (!el) return
 
+    // Reduced motion: leave the content as-is, visible. Bail before hiding it —
+    // otherwise the opacity:0 below sticks and the content never appears.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
     // Set hidden state imperatively (no inline styles in SSR)
     el.style.opacity = '0'
     el.style.transform = `translateX(${offset.x}px) translateY(${offset.y}px)`

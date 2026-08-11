@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { FadeInView } from '@/components/animations/fade-in-view.js'
 import { pageSeo } from '@/lib/seo'
 
 export const Route = createFileRoute('/')({
@@ -212,26 +213,34 @@ function Services() {
   return (
     <section id="services" className="section-pad border-t border-white/10">
       <div className="mx-auto max-w-[1320px]">
-        <div className="eyebrow">01 / Services</div>
-        <h2 className="display-h2 mt-5 max-w-[820px]">
-          START WITH WHAT'S <span className="pixel-word">COSTING</span> YOU MONEY
-        </h2>
+        <FadeInView>
+          <div className="eyebrow">01 / Services</div>
+          <h2 className="display-h2 mt-5 max-w-[820px]">
+            START WITH WHAT'S <span className="pixel-word">COSTING</span> YOU MONEY
+          </h2>
+        </FadeInView>
         <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {serviceCards.map((card) => (
-            <Link
-              key={card.href}
-              to={card.href}
-              className="flex flex-col gap-3.5 border border-white/10 bg-[#0B0B0B] p-7 transition-colors duration-200 hover:border-[#EF6A00]"
-            >
-              <div
-                className={`eyebrow text-[13px] ${card.accent ? 'eyebrow-accent' : ''}`}
+          {serviceCards.map((card, i) => (
+            <FadeInView key={card.href} delay={0.06 * i} className="h-full">
+              <Link
+                to={card.href}
+                className="group flex h-full flex-col gap-3.5 border border-white/10 bg-[#0B0B0B] p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#EF6A00]"
               >
-                {card.eyebrow}
-              </div>
-              <div className="text-[22px] font-bold tracking-[0.01em]">{card.title}</div>
-              <p className="m-0 flex-1 text-sm leading-[1.6] text-white/60">{card.body}</p>
-              <div className="text-[13px] text-white/80">View specification →</div>
-            </Link>
+                <div
+                  className={`eyebrow text-[13px] ${card.accent ? 'eyebrow-accent' : ''}`}
+                >
+                  {card.eyebrow}
+                </div>
+                <div className="text-[22px] font-bold tracking-[0.01em]">{card.title}</div>
+                <p className="m-0 flex-1 text-sm leading-[1.6] text-white/60">{card.body}</p>
+                <div className="text-[13px] text-white/80">
+                  View specification{' '}
+                  <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">
+                    →
+                  </span>
+                </div>
+              </Link>
+            </FadeInView>
           ))}
         </div>
       </div>
@@ -260,7 +269,7 @@ function Crm() {
   return (
     <section id="crm" className="section-pad border-t border-white/10">
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-[clamp(32px,4vw,72px)] md:grid-cols-[1.1fr_0.9fr]">
-        <div>
+        <FadeInView>
           <div className="eyebrow">02 / Own it forever</div>
           <h2 className="display-h2 mt-5">
             A CRM YOU <span className="pixel-word">OWN</span>,
@@ -277,24 +286,23 @@ function Crm() {
               <Link
                 key={trade.href}
                 to={trade.href}
-                className="border border-white/30 px-5 py-[11px] text-[13px] tracking-[0.05em] transition-colors duration-200 hover:bg-white/10"
+                className="border border-white/30 px-5 py-[11px] text-[13px] tracking-[0.05em] transition-colors duration-200 hover:border-[#EF6A00] hover:bg-white/10"
               >
                 {trade.label}
               </Link>
             ))}
           </div>
-        </div>
+        </FadeInView>
         <div className="grid gap-3">
           {crmRows.map((row, i) => (
-            <div
-              key={row}
-              className="flex items-baseline justify-between gap-4 border border-white/10 bg-[#0B0B0B] px-6 py-5"
-            >
-              <span className="text-[15px] text-white/80">{row}</span>
-              <span className="font-label text-sm text-[#EF6A00]">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-            </div>
+            <FadeInView key={row} delay={0.08 * i} direction="left">
+              <div className="flex items-baseline justify-between gap-4 border border-white/10 bg-[#0B0B0B] px-6 py-5 transition-colors duration-200 hover:border-white/25">
+                <span className="text-[15px] text-white/80">{row}</span>
+                <span className="font-label text-sm text-[#EF6A00]">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+            </FadeInView>
           ))}
         </div>
       </div>
@@ -355,22 +363,22 @@ function Agents() {
   return (
     <section id="agents" className="section-pad border-t border-white/10">
       <div className="mx-auto max-w-[1320px]">
-        <div className="eyebrow">03 / Voice &amp; chat</div>
-        <h2 className="display-h2 mt-5 max-w-[900px]">
-          THE CALL YOU <span className="pixel-word">MISS</span> IS THE JOB YOU LOSE
-        </h2>
-        <p className="mt-6 max-w-[620px] text-base leading-[1.65] text-white/60">
-          Most trades lose more work to a ringing phone than to price. An agent that
-          answers every call and every late-night message turns the leads you already
-          paid for into booked jobs — without putting anyone else on payroll.
-        </p>
+        <FadeInView>
+          <div className="eyebrow">03 / Voice &amp; chat</div>
+          <h2 className="display-h2 mt-5 max-w-[900px]">
+            THE CALL YOU <span className="pixel-word">MISS</span> IS THE JOB YOU LOSE
+          </h2>
+          <p className="mt-6 max-w-[620px] text-base leading-[1.65] text-white/60">
+            Most trades lose more work to a ringing phone than to price. An agent that
+            answers every call and every late-night message turns the leads you already
+            paid for into booked jobs — without putting anyone else on payroll.
+          </p>
+        </FadeInView>
 
         <div className="mt-14 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {agents.map((agent) => (
-            <div
-              key={agent.href}
-              className="flex flex-col gap-5 border border-white/10 bg-[#0B0B0B] p-7"
-            >
+          {agents.map((agent, i) => (
+            <FadeInView key={agent.href} delay={0.1 * i} className="h-full">
+              <div className="group flex h-full flex-col gap-5 border border-white/10 bg-[#0B0B0B] p-7 transition-colors duration-200 hover:border-[#EF6A00]/50">
               <div>
                 <div className="eyebrow eyebrow-accent text-[13px]">{agent.eyebrow}</div>
                 <div className="mt-3 text-[22px] font-bold tracking-[0.01em]">
@@ -403,11 +411,15 @@ function Agents() {
 
               <Link
                 to={agent.href}
-                className="mt-auto text-[13px] text-white/80 transition-colors duration-200 hover:text-white"
+                className="group/link mt-auto text-[13px] text-white/80 transition-colors duration-200 hover:text-white"
               >
-                View specification →
+                View specification{' '}
+                <span className="inline-block transition-transform duration-200 group-hover/link:translate-x-1">
+                  →
+                </span>
               </Link>
-            </div>
+              </div>
+            </FadeInView>
           ))}
         </div>
       </div>
@@ -444,29 +456,32 @@ function Process() {
   return (
     <section id="process" className="section-pad border-t border-white/10">
       <div className="mx-auto max-w-[1320px]">
-        <div className="eyebrow">04 / Process</div>
-        <h2 className="display-h2 mt-5">
-          WORKING SOFTWARE IN <span className="pixel-word">WEEK ONE</span>
-        </h2>
+        <FadeInView>
+          <div className="eyebrow">04 / Process</div>
+          <h2 className="display-h2 mt-5">
+            WORKING SOFTWARE IN <span className="pixel-word">WEEK ONE</span>
+          </h2>
+        </FadeInView>
         <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {steps.map((step) => (
-            <div
-              key={step.step}
-              className="pt-6"
-              style={{
-                borderTop: `2px solid ${step.active ? '#EF6A00' : 'rgba(255,255,255,0.2)'}`,
-              }}
-            >
+          {steps.map((step, i) => (
+            <FadeInView key={step.step} delay={0.1 * i} className="h-full">
               <div
-                className={`font-label text-sm tracking-[0.1em] ${
-                  step.active ? 'text-[#EF6A00]' : 'text-white/50'
-                }`}
+                className="h-full pt-6"
+                style={{
+                  borderTop: `2px solid ${step.active ? '#EF6A00' : 'rgba(255,255,255,0.2)'}`,
+                }}
               >
-                {step.step}
+                <div
+                  className={`font-label text-sm tracking-[0.1em] ${
+                    step.active ? 'text-[#EF6A00]' : 'text-white/50'
+                  }`}
+                >
+                  {step.step}
+                </div>
+                <div className="mt-3 text-xl font-bold">{step.title}</div>
+                <p className="mt-2.5 text-sm leading-[1.6] text-white/60">{step.body}</p>
               </div>
-              <div className="mt-3 text-xl font-bold">{step.title}</div>
-              <p className="mt-2.5 text-sm leading-[1.6] text-white/60">{step.body}</p>
-            </div>
+            </FadeInView>
           ))}
         </div>
       </div>
@@ -532,7 +547,7 @@ function Talk() {
   return (
     <section id="talk" className="section-pad border-t border-white/10">
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-[clamp(32px,4vw,72px)] md:grid-cols-[1.1fr_0.9fr]">
-        <div>
+        <FadeInView>
           <div className="eyebrow">05 / Talk</div>
           <h2 className="display-h2 mt-5">
             TELL ME WHAT'S <span className="pixel-word">SLOWING</span> YOU DOWN
@@ -558,8 +573,9 @@ function Talk() {
               doug@aideveloper.dev
             </a>
           </div>
-        </div>
+        </FadeInView>
 
+        <FadeInView delay={0.12}>
         {sent ? (
           <div className="flex flex-col justify-center gap-3 border border-[#EF6A00]/50 bg-[#EF6A00]/[0.06] p-10">
             <div className="text-2xl font-bold">Got it — thanks.</div>
@@ -626,6 +642,7 @@ function Talk() {
             </button>
           </form>
         )}
+        </FadeInView>
       </div>
     </section>
   )
