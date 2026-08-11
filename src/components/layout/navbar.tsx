@@ -250,8 +250,10 @@ export function Navbar() {
           onMouseLeave={closeExpertise}
         >
           {/* Deliberately see-through — you should be able to read the hero
-              through it. */}
-          <div className="w-[600px] max-w-[calc(100vw-2rem)] border border-white/[0.14] bg-[#0B0B0B]/60 backdrop-blur-3xl">
+              through it. The alpha can sit this low only because the 64px blur
+              is doing the legibility work; drop the blur and this becomes
+              unreadable long before the alpha does. */}
+          <div className="w-[600px] max-w-[calc(100vw-2rem)] border border-white/[0.14] bg-[#0B0B0B]/30 backdrop-blur-3xl">
             <div className="grid grid-cols-2 gap-1 p-3">
               {services.map((service) => (
                 <Link
