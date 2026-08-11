@@ -93,10 +93,29 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Where to pin the dropdown. It renders OUTSIDE <nav> (see the panel's own
+  // comment), so it needs the trigger's viewport position rather than CSS
+  // `absolute` positioning.
+  const [panelPos, setPanelPos] = useState({ left: 0, top: 0 })
+  const measurePanel = () => {
+    const el = expertiseRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    const width = Math.min(600, window.innerWidth - 32)
+    const half = width / 2
+    // Clamp the centre so a 600px panel can't hang off either edge.
+    const centre = Math.min(
+      Math.max(r.left + r.width / 2, 16 + half),
+      window.innerWidth - 16 - half,
+    )
+    setPanelPos({ left: centre, top: r.bottom })
+  }
+
   // Expertise opens on hover. The close is delayed so travelling from the
   // trigger down to the panel doesn't snap it shut mid-move.
   const openExpertise = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
+    measurePanel()
     setExpertiseOpen(true)
   }
   const closeExpertise = () => {
@@ -175,56 +194,6 @@ export function Navbar() {
                   }`}
                 />
               </button>
-              {expertiseOpen && (
-                // The outer wrapper's pt-2 is a transparent bridge across the
-                // gap below the trigger, so the pointer never leaves the
-                // hoverable area on its way to the panel. Centred on the
-                // trigger and width-clamped so a 600px panel can't run off
-                // either edge at the 840px breakpoint.
-                <div className="absolute top-full left-1/2 z-[60] -translate-x-1/2 pt-2">
-                  {/* More opaque than the nav bar itself: this panel can sit
-                      over dense headline text, and at 80% the copy behind it
-                      bled through and competed with the menu items. */}
-                  <div className="w-[600px] max-w-[calc(100vw-2rem)] border border-white/[0.14] bg-[#0B0B0B]/[0.93] backdrop-blur-xl">
-                    <div className="grid grid-cols-2 gap-1 p-3">
-                      {services.map((service) => (
-                        <Link
-                          key={service.href}
-                          to={service.href}
-                          onClick={() => setExpertiseOpen(false)}
-                          className="group flex items-center gap-3 p-3 transition-colors duration-200 hover:bg-white/[0.05]"
-                        >
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/10 bg-white/[0.03] transition-colors duration-200 group-hover:border-[#EF6A00]/60 group-hover:bg-[#EF6A00]/10">
-                            <service.icon
-                              className="h-4 w-4 text-[#EF6A00]"
-                              strokeWidth={1.5}
-                            />
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block text-sm text-white/90 group-hover:text-white">
-                              {service.label}
-                            </span>
-                            <span className="block truncate text-xs text-white/45">
-                              {service.desc}
-                            </span>
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between border-t border-white/10 px-6 py-3">
-                      <span className="eyebrow text-[11px]">All expertise</span>
-                      <Link
-                        to="/about"
-                        onClick={() => setExpertiseOpen(false)}
-                        className="inline-flex items-center gap-1.5 text-xs text-[#EF6A00] transition-colors duration-200 hover:text-[#FF8A2B]"
-                      >
-                        How we work
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             <Link
@@ -265,6 +234,60 @@ export function Navbar() {
           </button>
         </div>
       </nav>
+
+      {/* Expertise panel — deliberately rendered OUTSIDE <nav>.
+          Once scrolled, the nav carries its own backdrop-filter, which makes it
+          a backdrop root: a descendant's backdrop-filter can then only sample
+          what's painted inside the nav, so the panel's blur silently did
+          nothing and the page showed through unblurred. As a sibling it samples
+          the page directly. Cost: it can't use CSS `absolute` off the trigger,
+          hence the measured fixed position. */}
+      {expertiseOpen && (
+        <div
+          className="fixed z-[60] -translate-x-1/2 pt-2"
+          style={{ left: panelPos.left, top: panelPos.top }}
+          onMouseEnter={openExpertise}
+          onMouseLeave={closeExpertise}
+        >
+          {/* Deliberately see-through — you should be able to read the hero
+              through it. */}
+          <div className="w-[600px] max-w-[calc(100vw-2rem)] border border-white/[0.14] bg-[#0B0B0B]/60 backdrop-blur-3xl">
+            <div className="grid grid-cols-2 gap-1 p-3">
+              {services.map((service) => (
+                <Link
+                  key={service.href}
+                  to={service.href}
+                  onClick={() => setExpertiseOpen(false)}
+                  className="group flex items-center gap-3 p-3 transition-colors duration-200 hover:bg-white/[0.05]"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/10 bg-white/[0.03] transition-colors duration-200 group-hover:border-[#EF6A00]/60 group-hover:bg-[#EF6A00]/10">
+                    <service.icon className="h-4 w-4 text-[#EF6A00]" strokeWidth={1.5} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm text-white/90 group-hover:text-white">
+                      {service.label}
+                    </span>
+                    <span className="block truncate text-xs text-white/45">
+                      {service.desc}
+                    </span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="flex items-center justify-between border-t border-white/10 px-6 py-3">
+              <span className="eyebrow text-[11px]">All expertise</span>
+              <Link
+                to="/about"
+                onClick={() => setExpertiseOpen(false)}
+                className="inline-flex items-center gap-1.5 text-xs text-[#EF6A00] transition-colors duration-200 hover:text-[#FF8A2B]"
+              >
+                How we work
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile fullscreen overlay */}
       {menuOpen && (

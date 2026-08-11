@@ -93,10 +93,12 @@ function Hero() {
 
       {/* Content — sits under the fixed navbar */}
       <div className="relative z-10 flex h-full flex-col side-pad pt-[78px] pb-4">
-        <h2 className="m-0 text-[clamp(16px,1.3vw,20px)] font-normal leading-[1.15] tracking-[0.025em]">
-          <span className="block">SOFTWARE &amp;</span>
+        {/* Flex-wrap rather than stacked blocks: stays on one line wherever it
+            fits (desktop and tablet) and only breaks when it genuinely can't. */}
+        <h2 className="m-0 flex flex-wrap items-baseline gap-x-3 text-[clamp(16px,1.3vw,20px)] font-normal leading-[1.15] tracking-[0.025em]">
+          <span>SOFTWARE &amp;</span>
           <span
-            className="block font-label"
+            className="font-label"
             style={{ fontSize: 'clamp(22px, min(2.1vw, 3.4vh), 30px)' }}
           >
             AI SYSTEMS
