@@ -21,6 +21,7 @@ function HomePage() {
       <Hero />
       <Services />
       <Crm />
+      <Agents />
       <Process />
       <Talk />
     </>
@@ -300,7 +301,120 @@ function Crm() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   03 / PROCESS
+   03 / VOICE & CHAT AGENTS
+   ══════════════════════════════════════════════════════════ */
+
+/** One line of a sample exchange, set in the pixel face like a call log. */
+function ExchangeLine({ who, accent, text }: { who: string; accent?: boolean; text: string }) {
+  return (
+    <div className="flex gap-3">
+      <span
+        className={`font-label shrink-0 text-[13px] leading-[1.5] ${
+          accent ? 'text-[#EF6A00]' : 'text-white/40'
+        }`}
+      >
+        {who}
+      </span>
+      <span className="text-[13px] leading-[1.5] text-white/70">{text}</span>
+    </div>
+  )
+}
+
+const agents = [
+  {
+    href: '/services/voice-ai',
+    eyebrow: 'Answers on the second ring',
+    title: 'Voice agents',
+    body: "It picks up when you're under a sink or on a roof — day, night, Sunday. It qualifies the job, books it against your real calendar, and texts you the summary before you've wiped your hands.",
+    log: [
+      { who: '21:14', text: 'Inbound — unknown number' },
+      { who: 'CALLER', text: '“Water heater’s leaking all over the garage.”' },
+      { who: 'AGENT', accent: true, text: '“I can get someone to you tonight. What’s the address?”' },
+      { who: '21:16', text: 'Booked · 22:30 · Ross sent · you were texted' },
+    ],
+    points: ['Books straight into your calendar', 'Escalates true emergencies to your mobile', 'Speaks your pricing, not a script'],
+  },
+  {
+    href: '/services/chat-ai',
+    eyebrow: 'On your site around the clock',
+    title: 'Chat agents',
+    body: 'The visitor comparing three contractors at 11pm gets an answer instead of a contact form. It reads your own pricing and service area, qualifies the lead, and hands you someone worth calling back.',
+    log: [
+      { who: '23:41', text: 'Visitor on /services/custom-crm' },
+      { who: 'VISITOR', text: '“Do you cover Naperville?”' },
+      { who: 'AGENT', accent: true, text: '“We do — panel upgrades start at $2,400. Want Thursday?”' },
+      { who: '23:43', text: 'Lead captured · routed to your inbox' },
+    ],
+    points: ['Trained on your docs, not the open web', 'Hands off to a human on request', 'Every conversation lands in your CRM'],
+  },
+]
+
+function Agents() {
+  return (
+    <section id="agents" className="section-pad border-t border-white/10">
+      <div className="mx-auto max-w-[1320px]">
+        <div className="eyebrow">03 / Voice &amp; chat</div>
+        <h2 className="display-h2 mt-5 max-w-[900px]">
+          THE CALL YOU <span className="pixel-word">MISS</span> IS THE JOB YOU LOSE
+        </h2>
+        <p className="mt-6 max-w-[620px] text-base leading-[1.65] text-white/60">
+          Most trades lose more work to a ringing phone than to price. An agent that
+          answers every call and every late-night message turns the leads you already
+          paid for into booked jobs — without putting anyone else on payroll.
+        </p>
+
+        <div className="mt-14 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {agents.map((agent) => (
+            <div
+              key={agent.href}
+              className="flex flex-col gap-5 border border-white/10 bg-[#0B0B0B] p-7"
+            >
+              <div>
+                <div className="eyebrow eyebrow-accent text-[13px]">{agent.eyebrow}</div>
+                <div className="mt-3 text-[22px] font-bold tracking-[0.01em]">
+                  {agent.title}
+                </div>
+              </div>
+
+              <p className="m-0 text-sm leading-[1.6] text-white/60">{agent.body}</p>
+
+              {/* Sample exchange, styled like a call log */}
+              <div className="grid gap-2 border border-white/10 bg-black p-4">
+                {agent.log.map((line) => (
+                  <ExchangeLine
+                    key={line.who + line.text}
+                    who={line.who}
+                    accent={line.accent}
+                    text={line.text}
+                  />
+                ))}
+              </div>
+
+              <div className="grid gap-2.5">
+                {agent.points.map((point) => (
+                  <div key={point} className="flex gap-3 text-sm text-white/80">
+                    <span className="text-[#EF6A00]">→</span>
+                    {point}
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                to={agent.href}
+                className="mt-auto text-[13px] text-white/80 transition-colors duration-200 hover:text-white"
+              >
+                View specification →
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════
+   04 / PROCESS
    ══════════════════════════════════════════════════════════ */
 
 const steps = [
@@ -328,7 +442,7 @@ function Process() {
   return (
     <section id="process" className="section-pad border-t border-white/10">
       <div className="mx-auto max-w-[1320px]">
-        <div className="eyebrow">03 / Process</div>
+        <div className="eyebrow">04 / Process</div>
         <h2 className="display-h2 mt-5">
           WORKING SOFTWARE IN <span className="pixel-word">WEEK ONE</span>
         </h2>
@@ -359,7 +473,7 @@ function Process() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   04 / TALK — wired to the existing contactSubmissions handler
+   05 / TALK — wired to the existing contactSubmissions handler
    ══════════════════════════════════════════════════════════ */
 
 const needOptions = [
@@ -417,7 +531,7 @@ function Talk() {
     <section id="talk" className="section-pad border-t border-white/10">
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-[clamp(32px,4vw,72px)] md:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <div className="eyebrow">04 / Talk</div>
+          <div className="eyebrow">05 / Talk</div>
           <h2 className="display-h2 mt-5">
             TELL ME WHAT'S <span className="pixel-word">SLOWING</span> YOU DOWN
           </h2>

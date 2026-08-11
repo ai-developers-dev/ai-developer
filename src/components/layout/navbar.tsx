@@ -1,18 +1,71 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ChevronDown, Menu, X } from 'lucide-react'
+import {
+  ArrowRight,
+  Bot,
+  ChevronDown,
+  Code2,
+  Globe,
+  Menu,
+  MessageSquare,
+  Radar,
+  Users,
+  Waypoints,
+  X,
+  Zap,
+} from 'lucide-react'
 import { GetStartedDialog } from '@/components/get-started-dialog'
 import { Logo, LogoMark } from '@/components/layout/logo'
 
 const services = [
-  { label: 'Custom CRM', href: '/services/custom-crm' },
-  { label: 'Custom Websites', href: '/services/websites' },
-  { label: 'Web Applications', href: '/services/web-apps' },
-  { label: 'Voice AI Agents', href: '/services/voice-ai' },
-  { label: 'Chat AI Agents', href: '/services/chat-ai' },
-  { label: 'AI Assistants', href: '/services/ai-assistants' },
-  { label: 'AI Automations', href: '/services/ai-automations' },
-  { label: 'SEO', href: '/services/seo' },
+  {
+    label: 'Custom CRM',
+    href: '/services/custom-crm',
+    desc: 'Built for how your trade runs',
+    icon: Users,
+  },
+  {
+    label: 'Custom Websites',
+    href: '/services/websites',
+    desc: 'Fast sites that convert',
+    icon: Globe,
+  },
+  {
+    label: 'Web Applications',
+    href: '/services/web-apps',
+    desc: 'Full-stack builds you own',
+    icon: Code2,
+  },
+  {
+    label: 'Voice AI Agents',
+    href: '/services/voice-ai',
+    desc: 'Answers calls 24/7',
+    icon: Waypoints,
+  },
+  {
+    label: 'Chat AI Agents',
+    href: '/services/chat-ai',
+    desc: 'Qualifies leads on your site',
+    icon: MessageSquare,
+  },
+  {
+    label: 'AI Assistants',
+    href: '/services/ai-assistants',
+    desc: 'Works alongside your team',
+    icon: Bot,
+  },
+  {
+    label: 'AI Automations',
+    href: '/services/ai-automations',
+    desc: 'Kills the busywork',
+    icon: Zap,
+  },
+  {
+    label: 'SEO',
+    href: '/services/seo',
+    desc: 'Local + national search',
+    icon: Radar,
+  },
 ]
 
 // NOTE: /courses is deliberately unlisted until its real prices are set —
@@ -125,19 +178,50 @@ export function Navbar() {
               {expertiseOpen && (
                 // The outer wrapper's pt-2 is a transparent bridge across the
                 // gap below the trigger, so the pointer never leaves the
-                // hoverable area on its way to the panel.
-                <div className="absolute top-full -left-4 z-[60] pt-2">
-                  <div className="flex min-w-[230px] flex-col border border-white/[0.14] bg-[#0B0B0B]/80 py-2 backdrop-blur-xl">
-                    {services.map((service) => (
+                // hoverable area on its way to the panel. Centred on the
+                // trigger and width-clamped so a 600px panel can't run off
+                // either edge at the 840px breakpoint.
+                <div className="absolute top-full left-1/2 z-[60] -translate-x-1/2 pt-2">
+                  {/* More opaque than the nav bar itself: this panel can sit
+                      over dense headline text, and at 80% the copy behind it
+                      bled through and competed with the menu items. */}
+                  <div className="w-[600px] max-w-[calc(100vw-2rem)] border border-white/[0.14] bg-[#0B0B0B]/[0.93] backdrop-blur-xl">
+                    <div className="grid grid-cols-2 gap-1 p-3">
+                      {services.map((service) => (
+                        <Link
+                          key={service.href}
+                          to={service.href}
+                          onClick={() => setExpertiseOpen(false)}
+                          className="group flex items-center gap-3 p-3 transition-colors duration-200 hover:bg-white/[0.05]"
+                        >
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/10 bg-white/[0.03] transition-colors duration-200 group-hover:border-[#EF6A00]/60 group-hover:bg-[#EF6A00]/10">
+                            <service.icon
+                              className="h-4 w-4 text-[#EF6A00]"
+                              strokeWidth={1.5}
+                            />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-sm text-white/90 group-hover:text-white">
+                              {service.label}
+                            </span>
+                            <span className="block truncate text-xs text-white/45">
+                              {service.desc}
+                            </span>
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between border-t border-white/10 px-6 py-3">
+                      <span className="eyebrow text-[11px]">All expertise</span>
                       <Link
-                        key={service.href}
-                        to={service.href}
+                        to="/about"
                         onClick={() => setExpertiseOpen(false)}
-                        className="px-[18px] py-2.5 text-sm text-white/85 hover:bg-white/[0.07] hover:text-white transition-colors duration-200"
+                        className="inline-flex items-center gap-1.5 text-xs text-[#EF6A00] transition-colors duration-200 hover:text-[#FF8A2B]"
                       >
-                        {service.label}
+                        How we work
+                        <ArrowRight className="h-3.5 w-3.5" />
                       </Link>
-                    ))}
+                    </div>
                   </div>
                 </div>
               )}
