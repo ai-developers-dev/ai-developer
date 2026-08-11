@@ -17,12 +17,12 @@ export const Route = createFileRoute('/portal/')({
 })
 
 const stageColors: Record<string, string> = {
-  lead: 'bg-blue-50 text-blue-700 border-blue-200',
-  proposal: 'bg-amber-50 text-amber-700 border-amber-200',
-  contracted: 'bg-violet-50 text-violet-700 border-violet-200',
-  in_progress: 'bg-orange-50 text-orange-700 border-orange-200',
-  review: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-  completed: 'bg-green-50 text-green-700 border-green-200',
+  lead: 'bg-blue-500/10 text-blue-300 border-blue-500/30',
+  proposal: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+  contracted: 'bg-violet-500/10 text-violet-300 border-violet-500/30',
+  in_progress: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
+  review: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+  completed: 'bg-green-500/10 text-green-300 border-green-500/30',
 }
 
 function PortalDashboard() {

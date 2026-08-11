@@ -227,7 +227,7 @@ function ContactPage() {
                           type="submit"
                           size="lg"
                           disabled={submitting}
-                          className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white h-12 text-base font-semibold"
+                          className="w-full bg-brand-primary hover:bg-brand-secondary text-black h-12 text-base font-semibold"
                         >
                           {submitting ? 'Sending...' : 'Send Message'}
                           {!submitting && <ArrowRight className="w-4 h-4 ml-1" />}

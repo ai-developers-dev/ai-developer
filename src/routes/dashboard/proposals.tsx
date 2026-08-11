@@ -82,13 +82,13 @@ const statusBadge = (status: string) => {
     case 'draft':
       return <Badge variant="secondary">Draft</Badge>
     case 'sent':
-      return <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">Sent</Badge>
+      return <Badge className="bg-blue-500/10 text-blue-300 hover:bg-blue-500/10 border-blue-500/30">Sent</Badge>
     case 'viewed':
-      return <Badge className="bg-amber-50 text-amber-700 hover:bg-amber-50 border-amber-200">Viewed</Badge>
+      return <Badge className="bg-amber-500/10 text-amber-300 hover:bg-amber-500/10 border-amber-500/30">Viewed</Badge>
     case 'accepted':
-      return <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Accepted</Badge>
+      return <Badge className="bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30">Accepted</Badge>
     case 'rejected':
-      return <Badge className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">Rejected</Badge>
+      return <Badge className="bg-red-500/10 text-red-300 hover:bg-red-500/10 border-red-500/30">Rejected</Badge>
     case 'expired':
       return <Badge variant="outline">Expired</Badge>
     default:
@@ -865,7 +865,7 @@ function ProposalsPage() {
                 </div>
                 {discountValue > 0 && (
                   <div className="text-right space-y-1">
-                    <p className="text-sm text-red-600">
+                    <p className="text-sm text-red-400">
                       Discount: -${formatUsd(discountAmount)}
                     </p>
                     <p className="text-base font-bold">
@@ -1098,28 +1098,28 @@ function ProposalsPage() {
             <div id="proposal-pdf-content" className="bg-surface p-8 rounded-lg border">
               {/* Company Header */}
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-primary text-white text-2xl font-bold mb-3">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-primary text-black text-2xl font-bold mb-3">
                   A
                 </div>
                 <h2 className="text-2xl font-bold text-foreground">AI Developer</h2>
-                <p className="text-sm text-gray-500">Websites, Apps & AI Solutions Built Faster</p>
+                <p className="text-sm text-white/50">Websites, Apps & AI Solutions Built Faster</p>
               </div>
 
-              <hr className="border-gray-200 mb-6" />
+              <hr className="border-white/10 mb-6" />
 
               {/* Client & Proposal Info */}
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Prepared For</p>
+                  <p className="text-xs text-white/40 uppercase tracking-wide mb-1">Prepared For</p>
                   <p className="font-medium">{pdfProposal.client?.businessName || pdfProposal.client?.name || 'Unknown'}</p>
-                  <p className="text-sm text-gray-600">{pdfProposal.client?.contactEmail}</p>
+                  <p className="text-sm text-white/60">{pdfProposal.client?.contactEmail}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Date</p>
+                  <p className="text-xs text-white/40 uppercase tracking-wide mb-1">Date</p>
                   <p className="text-sm">{new Date(pdfProposal._creationTime).toLocaleDateString()}</p>
                   {pdfProposal.validUntil && (
                     <>
-                      <p className="text-xs text-gray-400 uppercase tracking-wide mb-1 mt-3">Valid Until</p>
+                      <p className="text-xs text-white/40 uppercase tracking-wide mb-1 mt-3">Valid Until</p>
                       <p className="text-sm">{new Date(pdfProposal.validUntil).toLocaleDateString()}</p>
                     </>
                   )}
@@ -1129,22 +1129,22 @@ function ProposalsPage() {
               {/* Proposal Title & Description */}
               <h3 className="text-xl font-bold mb-2">{pdfProposal.title}</h3>
               {pdfProposal.description && (
-                <p className="text-gray-600 text-sm leading-relaxed mb-6">{pdfProposal.description}</p>
+                <p className="text-white/60 text-sm leading-relaxed mb-6">{pdfProposal.description}</p>
               )}
 
               {/* Line Items Table */}
               <table className="w-full mb-4">
                 <thead>
-                  <tr className="bg-gray-50">
-                    <th className="py-2 px-3 text-left text-xs font-semibold text-gray-500 uppercase">Description</th>
-                    <th className="py-2 px-3 text-right text-xs font-semibold text-gray-500 uppercase">Qty</th>
-                    <th className="py-2 px-3 text-right text-xs font-semibold text-gray-500 uppercase">Unit Price</th>
-                    <th className="py-2 px-3 text-right text-xs font-semibold text-gray-500 uppercase">Total</th>
+                  <tr className="bg-white/5">
+                    <th className="py-2 px-3 text-left text-xs font-semibold text-white/50 uppercase">Description</th>
+                    <th className="py-2 px-3 text-right text-xs font-semibold text-white/50 uppercase">Qty</th>
+                    <th className="py-2 px-3 text-right text-xs font-semibold text-white/50 uppercase">Unit Price</th>
+                    <th className="py-2 px-3 text-right text-xs font-semibold text-white/50 uppercase">Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pdfProposal.lineItems.map((item, i) => (
-                    <tr key={i} className="border-b border-gray-100">
+                    <tr key={i} className="border-b border-white/10">
                       <td className="py-2 px-3 text-sm">{item.description}</td>
                       <td className="py-2 px-3 text-sm text-right">{item.quantity}</td>
                       <td className="py-2 px-3 text-sm text-right">${formatUsd(item.unitPrice)}</td>
@@ -1155,16 +1155,16 @@ function ProposalsPage() {
               </table>
 
               {/* Total */}
-              <div className="flex justify-end border-t-2 border-gray-200 pt-3">
+              <div className="flex justify-end border-t-2 border-white/10 pt-3">
                 <div className="text-right">
-                  <p className="text-xs text-gray-400 uppercase">Total Amount</p>
+                  <p className="text-xs text-white/40 uppercase">Total Amount</p>
                   <p className="text-2xl font-bold text-brand-primary">${formatUsd(pdfProposal.totalAmount)}</p>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="mt-8 pt-4 border-t border-gray-100 text-center">
-                <p className="text-xs text-gray-400">AI Developer &mdash; Websites, Apps & AI Solutions Built Faster</p>
+              <div className="mt-8 pt-4 border-t border-white/10 text-center">
+                <p className="text-xs text-white/40">AI Developer &mdash; Websites, Apps & AI Solutions Built Faster</p>
               </div>
             </div>
           )}

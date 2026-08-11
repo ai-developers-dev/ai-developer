@@ -37,7 +37,7 @@ function PostLoginPage() {
   }, [currentUser, navigate])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8F7FF]">
+    <div className="min-h-screen flex items-center justify-center bg-[#000000]">
       <div className="text-sm text-muted-foreground">Signing you in…</div>
     </div>
   )

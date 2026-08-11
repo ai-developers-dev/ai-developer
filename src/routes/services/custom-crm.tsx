@@ -267,7 +267,7 @@ function CustomCrmPage() {
               <Link
                 to="/discover"
                 search={{ source: 'custom-crm' }}
-                className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-3 rounded-lg font-semibold text-base transition-colors"
+                className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-secondary text-black px-8 py-3 rounded-lg font-semibold text-base transition-colors"
               >
                 Get a Custom Quote
                 <ArrowRight className="w-4 h-4" />

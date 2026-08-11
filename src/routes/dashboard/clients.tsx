@@ -393,7 +393,7 @@ function ClientsPage() {
                       variant={client.isActive ? 'default' : 'secondary'}
                       className={
                         client.isActive
-                          ? 'bg-green-50 text-green-700 hover:bg-green-50 border-green-200'
+                          ? 'bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30'
                           : ''
                       }
                     >

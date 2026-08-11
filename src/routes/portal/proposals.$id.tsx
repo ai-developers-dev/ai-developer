@@ -33,10 +33,10 @@ export const Route = createFileRoute('/portal/proposals/$id')({
 const statusBadge = (status: string) => {
   switch (status) {
     case 'accepted':
-      return <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Accepted</Badge>
+      return <Badge className="bg-green-500/10 text-green-300 hover:bg-green-500/10 border-green-500/30">Accepted</Badge>
     case 'sent':
     case 'viewed':
-      return <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">{status}</Badge>
+      return <Badge className="bg-blue-500/10 text-blue-300 hover:bg-blue-500/10 border-blue-500/30">{status}</Badge>
     default:
       return <Badge variant="secondary">{status}</Badge>
   }
@@ -142,11 +142,11 @@ function PortalProposalDetailPage() {
       </Button>
 
       {isFullyPaid && (
-        <div className="p-4 rounded-lg bg-green-50 border border-green-200 flex items-center gap-3">
-          <CheckCircle2 className="w-6 h-6 text-green-600" />
+        <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center gap-3">
+          <CheckCircle2 className="w-6 h-6 text-green-400" />
           <div>
-            <p className="font-medium text-green-800">Paid in Full</p>
-            <p className="text-sm text-green-700">
+            <p className="font-medium text-green-300">Paid in Full</p>
+            <p className="text-sm text-green-300">
               Thank you! Your payment was processed successfully.
             </p>
           </div>
@@ -154,11 +154,11 @@ function PortalProposalDetailPage() {
       )}
 
       {isAwaitingNext && (
-        <div className="p-4 rounded-lg bg-blue-50 border border-blue-200 flex items-center gap-3">
-          <Clock className="w-6 h-6 text-blue-600" />
+        <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center gap-3">
+          <Clock className="w-6 h-6 text-blue-400" />
           <div>
-            <p className="font-medium text-blue-800">Awaiting next milestone</p>
-            <p className="text-sm text-blue-700">
+            <p className="font-medium text-blue-300">Awaiting next milestone</p>
+            <p className="text-sm text-blue-300">
               Your next installment will become available based on the schedule.
             </p>
           </div>
@@ -254,7 +254,7 @@ function PortalProposalDetailPage() {
                         <span
                           className={
                             row.status === 'paid'
-                              ? 'text-green-600 font-medium'
+                              ? 'text-green-400 font-medium'
                               : isActive
                                 ? 'font-medium'
                                 : ''

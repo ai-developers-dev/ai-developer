@@ -7,36 +7,46 @@ interface PageHeaderProps {
   description: string
 }
 
-export function PageHeader({ badge, title, highlightWord, description }: PageHeaderProps) {
-  const parts = title.split(highlightWord)
+export function PageHeader({
+  badge,
+  title,
+  highlightWord,
+  description,
+}: PageHeaderProps) {
+  // Split on the FIRST occurrence only and keep the remainder, so a highlight
+  // word that also appears later in the title doesn't truncate the headline.
+  const at = title.indexOf(highlightWord)
+  const before = at === -1 ? title : title.slice(0, at)
+  const after = at === -1 ? '' : title.slice(at + highlightWord.length)
 
   return (
-    <section className="relative pt-28 pb-16 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-brand-tertiary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-brand-secondary/5 rounded-full blur-3xl" />
+    <section className="relative overflow-hidden pt-32 pb-16 side-pad">
+      {/* Ambient orange glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div
+          className="absolute left-1/2 top-0 h-[420px] w-[620px] max-w-full -translate-x-1/2 rounded-full"
+          style={{
+            background:
+              'radial-gradient(circle, rgba(239,106,0,0.12) 0%, rgba(239,106,0,0) 70%)',
+          }}
+        />
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="mx-auto max-w-[1320px]">
         <FadeInView>
-          <span className="font-label text-brand-tertiary tracking-[0.3em] uppercase text-xs mb-6 inline-block">
-            {badge}
-          </span>
+          <div className="eyebrow">{badge}</div>
         </FadeInView>
 
         <FadeInView delay={0.1}>
-          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-            {parts[0]}
-            <span className="bg-gradient-to-r from-brand-primary to-brand-tertiary bg-clip-text text-transparent">
-              {highlightWord}
-            </span>
-            {parts[1]}
+          <h1 className="display-h2 mt-5 max-w-[900px]">
+            {before}
+            {at !== -1 && <span className="pixel-word">{highlightWord}</span>}
+            {after}
           </h1>
         </FadeInView>
 
         <FadeInView delay={0.2}>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-6 max-w-[620px] text-base leading-[1.65] text-white/60">
             {description}
           </p>
         </FadeInView>

@@ -104,7 +104,7 @@ export function VoiceOrb({ status, onClick }: VoiceOrbProps) {
         className="absolute inset-8 sm:inset-10 rounded-full flex items-center justify-center"
         style={{
           background:
-            'radial-gradient(circle at 35% 35%, #dfc29f, #d4cebb 50%, #b8b3a0 100%)',
+            'radial-gradient(circle at 35% 35%, #FF8A2B, #EF6A00 50%, #FF8A2B 100%)',
           boxShadow: isActive
             ? '0 0 40px rgba(255,198,64,0.5), inset 0 0 20px rgba(255,255,255,0.1)'
             : '0 0 20px rgba(212,206,187,0.3), inset 0 0 15px rgba(255,255,255,0.1)',

@@ -12,6 +12,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from 'sonner'
 import { convex, queryClient } from '@/router'
+import { clerkAppearance } from '@/lib/clerk-appearance'
 
 import { Navbar } from '@/components/layout/navbar.js'
 import { Footer } from '@/components/layout/footer.js'
@@ -27,15 +28,17 @@ const DEFAULT_TITLE =
   'AI Developer — Custom AI Software & CRMs Built Faster'
 const DEFAULT_DESCRIPTION =
   'AI Developer builds custom websites, web apps, voice AI agents, and home service CRMs — owned forever, no monthly SaaS fees.'
+// Inter only — the design uses it for everything except the basis33 pixel
+// words, and basis33 is self-hosted from /fonts.
 const FONT_HREF =
-  'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap'
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { name: 'theme-color', content: '#1c1110' },
+      { name: 'theme-color', content: '#000000' },
       { title: DEFAULT_TITLE },
       { name: 'description', content: DEFAULT_DESCRIPTION },
       { name: 'robots', content: 'index, follow' },
@@ -88,7 +91,10 @@ function RootLayout() {
   // free of third-party-cookie violations.
   if (isAppRoute) {
     return (
-      <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
+      <ClerkProvider
+        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+        appearance={clerkAppearance}
+      >
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
           <Outlet />
           {/* App-wide toast notifications (e.g. proposal email sent/failed) */}
@@ -113,11 +119,21 @@ function RootLayout() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    /* Single dark theme — `dark` is static so existing `dark:` variants keep
+       resolving; there is no light mode and no theme toggle. */
+    <html lang="en" className="dark">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');var d=t==='dark'||!t;if(d)document.documentElement.classList.add('dark')})()` }} />
         {/* App CSS inlined into the document — no render-blocking stylesheet request */}
         <style dangerouslySetInnerHTML={{ __html: appCss }} />
+        {/* basis33 (pixel type) is self-hosted and tiny — preload so headline
+            words don't swap in late. */}
+        <link
+          rel="preload"
+          href="/fonts/basis33.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         {/* Early connection to font origins (non-blocking) */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

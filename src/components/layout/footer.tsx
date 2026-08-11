@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Github, Twitter, Linkedin } from 'lucide-react'
+import { Logo } from '@/components/layout/logo'
 
 const footerLinks = {
   Services: [
@@ -21,83 +21,93 @@ const footerLinks = {
     { label: 'Privacy Policy', href: '/privacy' },
   ],
   Resources: [
+    { label: 'Courses', href: '/courses' },
+    { label: 'Early Access', href: '/early-access' },
     { label: 'Blog', href: '/blog' },
     { label: 'Case Studies', href: '/case-studies' },
   ],
 }
 
+const socials = [
+  {
+    label: 'Facebook',
+    path: 'M13.5 21v-7.5h2.5l.5-3h-3V8.6c0-.9.3-1.6 1.7-1.6H16.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.4H8v3h2.5V21h3z',
+    size: 15,
+  },
+  {
+    label: 'X',
+    path: 'M17.8 3h3.1l-6.8 7.8L22 21h-6.3l-4.9-6.4L5.2 21H2.1l7.3-8.3L2 3h6.4l4.4 5.9L17.8 3zm-1.1 16.2h1.7L7.5 4.7H5.7l11 14.5z',
+    size: 14,
+  },
+  {
+    label: 'LinkedIn',
+    path: 'M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3V9zm6.5 0H13.3v1.7h.05c.53-1 1.83-2.05 3.77-2.05C21.2 8.65 22 11.1 22 14.3V21h-4v-5.9c0-1.4-.03-3.2-2-3.2s-2.3 1.5-2.3 3.1V21h-4.2V9z',
+    size: 15,
+  },
+]
+
 export function Footer() {
   return (
-    <footer className="bg-surface-low w-full py-16 px-6 md:px-12 mt-20">
-      <div className="max-w-screen-2xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand Column */}
-          <div className="lg:col-span-1">
-            <div className="font-heading text-lg text-foreground font-bold mb-6">
-              AI_DEVELOPER
-            </div>
-            <p className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/70 mb-8 max-w-xs leading-relaxed">
-              Engineering bespoke AI solutions and web experiences for the modern enterprise. Precision-crafted, neural-powered.
-            </p>
-            <div className="flex items-center gap-4">
+    <footer className="border-t border-white/10 pt-16 side-pad">
+      <div className="mx-auto max-w-[1320px] grid grid-cols-1 md:grid-cols-[1.3fr_1fr_0.8fr_0.8fr] gap-8 md:gap-[clamp(32px,4vw,64px)]">
+        {/* Brand */}
+        <div>
+          <Logo size={24} />
+          <p className="mt-[18px] max-w-[300px] text-sm leading-[1.65] text-white/60">
+            Engineering bespoke AI solutions and web experiences for the modern
+            enterprise. Precision-crafted, neural-powered.
+          </p>
+          <div className="mt-5 flex gap-3.5">
+            {socials.map((social) => (
               <a
+                key={social.label}
                 href="#"
-                className="text-nav-text/40 hover:text-brand-secondary transition-colors duration-300"
-                aria-label="GitHub"
+                aria-label={social.label}
+                className="flex h-[34px] w-[34px] items-center justify-center border border-white/20 text-white/70 hover:border-white hover:text-white transition-colors duration-200"
               >
-                <Github className="w-4 h-4" />
+                <svg
+                  width={social.size}
+                  height={social.size}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d={social.path} />
+                </svg>
               </a>
-              <a
-                href="#"
-                className="text-nav-text/40 hover:text-brand-secondary transition-colors duration-300"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="text-nav-text/40 hover:text-brand-secondary transition-colors duration-300"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Link columns */}
+        {Object.entries(footerLinks).map(([title, links]) => (
+          <div key={title}>
+            <div className="eyebrow mb-4 text-[13px]">{title}</div>
+            <div className="grid gap-2.5 text-sm">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-white/70 hover:text-white transition-colors duration-200"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* Link Columns */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h2 className="font-label text-[10px] tracking-[0.3em] uppercase font-semibold text-nav-text/80 mb-6">
-                {title}
-              </h2>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      to={link.href}
-                      className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/70 hover:text-brand-secondary transition-colors duration-300"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+      <div className="mx-auto mt-12 flex max-w-[1320px] flex-wrap items-center justify-between gap-3 border-t border-white/10 py-6 text-xs text-white/50">
+        <div className="tracking-[0.08em]">
+          © {new Date().getFullYear()} AI DEVELOPER. ENGINEERED FOR PRECISION.
         </div>
-
-        {/* Bottom Bar */}
-        <div className="mt-16 pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-          <p className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-brand-tertiary/80 hover:text-brand-tertiary transition-opacity">
-            &copy; {new Date().getFullYear()} AI DEVELOPER. ENGINEERED FOR PRECISION.
-          </p>
-          <Link
-            to="/about"
-            className="font-label text-[10px] tracking-[0.2em] uppercase font-light text-nav-text/70 hover:text-brand-secondary transition-colors"
-          >
-            Founded by Doug Allen
-          </Link>
-        </div>
+        <Link
+          to="/about"
+          className="text-white/50 hover:text-white transition-colors duration-200"
+        >
+          Founded by Doug Allen
+        </Link>
       </div>
     </footer>
   )

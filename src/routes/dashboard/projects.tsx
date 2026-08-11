@@ -154,7 +154,7 @@ function ProjectsPage() {
                         })
                       }}
                       aria-label="Delete project"
-                      className="absolute top-2 right-2 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-destructive/10 transition-opacity"
+                      className="absolute top-2 right-2 p-1 rounded-none opacity-0 group-hover:opacity-100 hover:bg-destructive/10 transition-opacity"
                     >
                       <Trash2 className="w-3.5 h-3.5 text-destructive" />
                     </button>

@@ -258,7 +258,7 @@ function NewProposalPage() {
                 <div className="col-span-1">
                   <button
                     onClick={() => removeLineItem(i)}
-                    className="p-1 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-600"
+                    className="p-1 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-400"
                     disabled={lineItems.length === 1}
                   >
                     <Trash2 className="w-4 h-4" />
