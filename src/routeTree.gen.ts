@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PostLoginRouteImport } from './routes/post-login'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as EarlyAccessRouteImport } from './routes/early-access'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CaseStudiesRouteImport } from './routes/case-studies'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -26,6 +28,7 @@ import { Route as SignInSplatRouteImport } from './routes/sign-in.$'
 import { Route as ServicesWebsitesRouteImport } from './routes/services/websites'
 import { Route as ServicesWebAppsRouteImport } from './routes/services/web-apps'
 import { Route as ServicesVoiceAiRouteImport } from './routes/services/voice-ai'
+import { Route as ServicesSeoRouteImport } from './routes/services/seo'
 import { Route as ServicesCustomCrmRouteImport } from './routes/services/custom-crm'
 import { Route as ServicesChatAiRouteImport } from './routes/services/chat-ai'
 import { Route as ServicesAiAutomationsRouteImport } from './routes/services/ai-automations'
@@ -39,7 +42,7 @@ import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settin
 import { Route as DashboardServicesRouteImport } from './routes/dashboard/services'
 import { Route as DashboardProposalsRouteImport } from './routes/dashboard/proposals'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
-import { Route as DashboardPricingRouteImport } from './routes/dashboard/pricing'
+import { Route as DashboardEarlyAccessRouteImport } from './routes/dashboard/early-access'
 import { Route as DashboardDiscoveriesRouteImport } from './routes/dashboard/discoveries'
 import { Route as DashboardClientsRouteImport } from './routes/dashboard/clients'
 import { Route as BlogStopPayingMonthlyFieldServiceSoftwareRouteImport } from './routes/blog.stop-paying-monthly-field-service-software'
@@ -70,6 +73,11 @@ const PortalRoute = PortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EarlyAccessRoute = EarlyAccessRouteImport.update({
+  id: '/early-access',
+  path: '/early-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
@@ -78,6 +86,11 @@ const DiscoverRoute = DiscoverRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesRoute = CoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -138,6 +151,11 @@ const ServicesWebAppsRoute = ServicesWebAppsRouteImport.update({
 const ServicesVoiceAiRoute = ServicesVoiceAiRouteImport.update({
   id: '/services/voice-ai',
   path: '/services/voice-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesSeoRoute = ServicesSeoRouteImport.update({
+  id: '/services/seo',
+  path: '/services/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesCustomCrmRoute = ServicesCustomCrmRouteImport.update({
@@ -205,9 +223,9 @@ const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardPricingRoute = DashboardPricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
+const DashboardEarlyAccessRoute = DashboardEarlyAccessRouteImport.update({
+  id: '/early-access',
+  path: '/early-access',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardDiscoveriesRoute = DashboardDiscoveriesRouteImport.update({
@@ -294,8 +312,10 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
+  '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/discover': typeof DiscoverRoute
+  '/early-access': typeof EarlyAccessRoute
   '/portal': typeof PortalRouteWithChildren
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
@@ -306,7 +326,7 @@ export interface FileRoutesByFullPath {
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
-  '/dashboard/pricing': typeof DashboardPricingRoute
+  '/dashboard/early-access': typeof DashboardEarlyAccessRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/services': typeof DashboardServicesRoute
@@ -320,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
   '/services/custom-crm': typeof ServicesCustomCrmRouteWithChildren
+  '/services/seo': typeof ServicesSeoRoute
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -341,7 +362,9 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRouteWithChildren
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
+  '/courses': typeof CoursesRoute
   '/discover': typeof DiscoverRoute
+  '/early-access': typeof EarlyAccessRoute
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
   '/blog/build-vs-buy-field-service-software': typeof BlogBuildVsBuyFieldServiceSoftwareRoute
@@ -351,7 +374,7 @@ export interface FileRoutesByTo {
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
-  '/dashboard/pricing': typeof DashboardPricingRoute
+  '/dashboard/early-access': typeof DashboardEarlyAccessRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/services': typeof DashboardServicesRoute
@@ -365,6 +388,7 @@ export interface FileRoutesByTo {
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
   '/services/custom-crm': typeof ServicesCustomCrmRouteWithChildren
+  '/services/seo': typeof ServicesSeoRoute
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -387,8 +411,10 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/case-studies': typeof CaseStudiesRoute
   '/contact': typeof ContactRoute
+  '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/discover': typeof DiscoverRoute
+  '/early-access': typeof EarlyAccessRoute
   '/portal': typeof PortalRouteWithChildren
   '/post-login': typeof PostLoginRoute
   '/privacy': typeof PrivacyRoute
@@ -399,7 +425,7 @@ export interface FileRoutesById {
   '/blog/stop-paying-monthly-field-service-software': typeof BlogStopPayingMonthlyFieldServiceSoftwareRoute
   '/dashboard/clients': typeof DashboardClientsRoute
   '/dashboard/discoveries': typeof DashboardDiscoveriesRoute
-  '/dashboard/pricing': typeof DashboardPricingRoute
+  '/dashboard/early-access': typeof DashboardEarlyAccessRoute
   '/dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/dashboard/proposals': typeof DashboardProposalsRouteWithChildren
   '/dashboard/services': typeof DashboardServicesRoute
@@ -413,6 +439,7 @@ export interface FileRoutesById {
   '/services/ai-automations': typeof ServicesAiAutomationsRoute
   '/services/chat-ai': typeof ServicesChatAiRoute
   '/services/custom-crm': typeof ServicesCustomCrmRouteWithChildren
+  '/services/seo': typeof ServicesSeoRoute
   '/services/voice-ai': typeof ServicesVoiceAiRoute
   '/services/web-apps': typeof ServicesWebAppsRoute
   '/services/websites': typeof ServicesWebsitesRoute
@@ -436,8 +463,10 @@ export interface FileRouteTypes {
     | '/blog'
     | '/case-studies'
     | '/contact'
+    | '/courses'
     | '/dashboard'
     | '/discover'
+    | '/early-access'
     | '/portal'
     | '/post-login'
     | '/privacy'
@@ -448,7 +477,7 @@ export interface FileRouteTypes {
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/discoveries'
-    | '/dashboard/pricing'
+    | '/dashboard/early-access'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/services'
@@ -462,6 +491,7 @@ export interface FileRouteTypes {
     | '/services/ai-automations'
     | '/services/chat-ai'
     | '/services/custom-crm'
+    | '/services/seo'
     | '/services/voice-ai'
     | '/services/web-apps'
     | '/services/websites'
@@ -483,7 +513,9 @@ export interface FileRouteTypes {
     | '/blog'
     | '/case-studies'
     | '/contact'
+    | '/courses'
     | '/discover'
+    | '/early-access'
     | '/post-login'
     | '/privacy'
     | '/blog/build-vs-buy-field-service-software'
@@ -493,7 +525,7 @@ export interface FileRouteTypes {
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/discoveries'
-    | '/dashboard/pricing'
+    | '/dashboard/early-access'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/services'
@@ -507,6 +539,7 @@ export interface FileRouteTypes {
     | '/services/ai-automations'
     | '/services/chat-ai'
     | '/services/custom-crm'
+    | '/services/seo'
     | '/services/voice-ai'
     | '/services/web-apps'
     | '/services/websites'
@@ -528,8 +561,10 @@ export interface FileRouteTypes {
     | '/blog'
     | '/case-studies'
     | '/contact'
+    | '/courses'
     | '/dashboard'
     | '/discover'
+    | '/early-access'
     | '/portal'
     | '/post-login'
     | '/privacy'
@@ -540,7 +575,7 @@ export interface FileRouteTypes {
     | '/blog/stop-paying-monthly-field-service-software'
     | '/dashboard/clients'
     | '/dashboard/discoveries'
-    | '/dashboard/pricing'
+    | '/dashboard/early-access'
     | '/dashboard/projects'
     | '/dashboard/proposals'
     | '/dashboard/services'
@@ -554,6 +589,7 @@ export interface FileRouteTypes {
     | '/services/ai-automations'
     | '/services/chat-ai'
     | '/services/custom-crm'
+    | '/services/seo'
     | '/services/voice-ai'
     | '/services/web-apps'
     | '/services/websites'
@@ -576,8 +612,10 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   CaseStudiesRoute: typeof CaseStudiesRoute
   ContactRoute: typeof ContactRoute
+  CoursesRoute: typeof CoursesRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DiscoverRoute: typeof DiscoverRoute
+  EarlyAccessRoute: typeof EarlyAccessRoute
   PortalRoute: typeof PortalRouteWithChildren
   PostLoginRoute: typeof PostLoginRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -586,6 +624,7 @@ export interface RootRouteChildren {
   ServicesAiAutomationsRoute: typeof ServicesAiAutomationsRoute
   ServicesChatAiRoute: typeof ServicesChatAiRoute
   ServicesCustomCrmRoute: typeof ServicesCustomCrmRouteWithChildren
+  ServicesSeoRoute: typeof ServicesSeoRoute
   ServicesVoiceAiRoute: typeof ServicesVoiceAiRoute
   ServicesWebAppsRoute: typeof ServicesWebAppsRoute
   ServicesWebsitesRoute: typeof ServicesWebsitesRoute
@@ -616,6 +655,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/early-access': {
+      id: '/early-access'
+      path: '/early-access'
+      fullPath: '/early-access'
+      preLoaderRoute: typeof EarlyAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/discover': {
       id: '/discover'
       path: '/discover'
@@ -628,6 +674,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses': {
+      id: '/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof CoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -712,6 +765,13 @@ declare module '@tanstack/react-router' {
       path: '/services/voice-ai'
       fullPath: '/services/voice-ai'
       preLoaderRoute: typeof ServicesVoiceAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/seo': {
+      id: '/services/seo'
+      path: '/services/seo'
+      fullPath: '/services/seo'
+      preLoaderRoute: typeof ServicesSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/custom-crm': {
@@ -805,11 +865,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/pricing': {
-      id: '/dashboard/pricing'
-      path: '/pricing'
-      fullPath: '/dashboard/pricing'
-      preLoaderRoute: typeof DashboardPricingRouteImport
+    '/dashboard/early-access': {
+      id: '/dashboard/early-access'
+      path: '/early-access'
+      fullPath: '/dashboard/early-access'
+      preLoaderRoute: typeof DashboardEarlyAccessRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/discoveries': {
@@ -963,7 +1023,7 @@ const DashboardProposalsRouteWithChildren =
 interface DashboardRouteChildren {
   DashboardClientsRoute: typeof DashboardClientsRoute
   DashboardDiscoveriesRoute: typeof DashboardDiscoveriesRoute
-  DashboardPricingRoute: typeof DashboardPricingRoute
+  DashboardEarlyAccessRoute: typeof DashboardEarlyAccessRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
   DashboardProposalsRoute: typeof DashboardProposalsRouteWithChildren
   DashboardServicesRoute: typeof DashboardServicesRoute
@@ -976,7 +1036,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardClientsRoute: DashboardClientsRoute,
   DashboardDiscoveriesRoute: DashboardDiscoveriesRoute,
-  DashboardPricingRoute: DashboardPricingRoute,
+  DashboardEarlyAccessRoute: DashboardEarlyAccessRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
   DashboardProposalsRoute: DashboardProposalsRouteWithChildren,
   DashboardServicesRoute: DashboardServicesRoute,
@@ -1038,8 +1098,10 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   CaseStudiesRoute: CaseStudiesRoute,
   ContactRoute: ContactRoute,
+  CoursesRoute: CoursesRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DiscoverRoute: DiscoverRoute,
+  EarlyAccessRoute: EarlyAccessRoute,
   PortalRoute: PortalRouteWithChildren,
   PostLoginRoute: PostLoginRoute,
   PrivacyRoute: PrivacyRoute,
@@ -1048,6 +1110,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesAiAutomationsRoute: ServicesAiAutomationsRoute,
   ServicesChatAiRoute: ServicesChatAiRoute,
   ServicesCustomCrmRoute: ServicesCustomCrmRouteWithChildren,
+  ServicesSeoRoute: ServicesSeoRoute,
   ServicesVoiceAiRoute: ServicesVoiceAiRoute,
   ServicesWebAppsRoute: ServicesWebAppsRoute,
   ServicesWebsitesRoute: ServicesWebsitesRoute,
