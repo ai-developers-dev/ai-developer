@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- "The Arch" mark. The logo's 1.4px outline rect would alias away at 16px,
+       so the favicon fills that same silhouette solid black and scales the
+       arch + crossbar up 1.45x about the centre to stay legible in a tab. -->
+  <rect width="32" height="32" rx="6" fill="#000000"/>
+  <g transform="translate(16 16) scale(1.45) translate(-16 -16)"
+     fill="none" stroke-linecap="round">
+    <path d="M8.5 24V15.5a7.5 7.5 0 0 1 15 0V24" stroke="#EF6A00" stroke-width="3"/>
+    <path d="M8.5 19.5h15" stroke="#FFFFFF" stroke-width="3"/>
+  </g>
+</svg>

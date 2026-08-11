@@ -215,6 +215,55 @@
   vertical-align: baseline;
 }
 
+/* A warm highlight that sweeps across a pixel word. Used on "SOFTWARE" in the
+   hero headline. The word stays solid white and only the travelling band picks
+   up the accent, so it reads as a sheen rather than a colour change.
+   Falls back to plain white text if background-clip:text is unavailable. */
+.pixel-shimmer {
+  color: #FFFFFF;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .pixel-shimmer {
+    background-image: linear-gradient(
+      100deg,
+      #FFFFFF 0%,
+      #FFFFFF 38%,
+      #EF6A00 46%,
+      #FF8A2B 50%,
+      #EF6A00 54%,
+      #FFFFFF 62%,
+      #FFFFFF 100%
+    );
+    /* Tile in em (so it scales with the headline) and REPEAT. With
+       background-clip:text, any part of the box the image doesn't cover paints
+       nothing — with no-repeat the leading letters vanish as the gradient
+       slides off. The gradient starts and ends white, so tiling is seamless,
+       and travelling exactly one tile width makes the loop seamless too. */
+    background-size: 14em 100%;
+    background-repeat: repeat-x;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: pixel-shimmer 6s linear infinite;
+  }
+}
+@keyframes pixel-shimmer {
+  from {
+    background-position: 14em 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+/* Respect reduced-motion: hold the plain white state, no sweep. */
+@media (prefers-reduced-motion: reduce) {
+  .pixel-shimmer {
+    animation: none;
+    background-image: none;
+    color: #FFFFFF;
+  }
+}
+
 /* Section eyebrow — "01 / Services" */
 .eyebrow {
   font-family: var(--font-label);
@@ -227,9 +276,13 @@
   color: #EF6A00;
 }
 
-/* Display headings — uppercase, tight leading, light weight */
+/* Display headings — uppercase, tight leading, light weight.
+   The hero headline is three lines, so it can run larger than the original
+   four-line spec without breaking the locked viewport. */
 .display-h1 {
-  font-size: clamp(26px, min(4.1vw, 8.4vh), 64px);
+  /* 4.8vw is the largest that keeps "BUSINESS OWNS —" on one line in the
+     hero's 1.1fr column; above it the em dash orphans onto its own line. */
+  font-size: clamp(30px, min(4.8vw, 10.4vh), 76px);
   letter-spacing: 0.025em;
   text-transform: uppercase;
   font-weight: 400;

@@ -30,8 +30,9 @@ export function Navbar() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const expertiseRef = useRef<HTMLDivElement>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Transparent over the hero, solid black once the page moves under it.
+  // Transparent over the hero, translucent black once the page moves under it.
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
     onScroll()
@@ -39,14 +40,28 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Click-outside closes the Expertise dropdown
+  // Expertise opens on hover. The close is delayed so travelling from the
+  // trigger down to the panel doesn't snap it shut mid-move.
+  const openExpertise = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setExpertiseOpen(true)
+  }
+  const closeExpertise = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    closeTimer.current = setTimeout(() => setExpertiseOpen(false), 160)
+  }
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }, [])
+
+  // Escape closes it (hover menus still need a keyboard way out)
   useEffect(() => {
     if (!expertiseOpen) return
-    const onDown = (e: MouseEvent) => {
-      if (!expertiseRef.current?.contains(e.target as Node)) setExpertiseOpen(false)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExpertiseOpen(false)
     }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
   }, [expertiseOpen])
 
   // Lock body scroll while the mobile overlay is open
@@ -63,7 +78,9 @@ export function Navbar() {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 side-pad transition-colors duration-200 ${
-          scrolled ? 'bg-black border-b border-white/10' : 'bg-transparent'
+          scrolled
+            ? 'bg-black/80 backdrop-blur-xl border-b border-white/10'
+            : 'bg-transparent'
         }`}
       >
         <div className="flex items-center justify-between pt-6 pb-5">
@@ -72,12 +89,30 @@ export function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-8 text-sm tracking-[0.025em]">
-            <div className="relative" ref={expertiseRef}>
+          {/* Desktop nav survives down to ~768px, but the logo and links start
+              crowding below 840px (28px gap at 840, 10px at 800, touching at
+              768). 840 is the last comfortable width — keep both this and the
+              hamburger's min-[840px]:hidden in sync if you retune it. */}
+          <div className="hidden min-[840px]:flex items-center gap-8 text-sm tracking-[0.025em]">
+            <div
+              className="relative"
+              ref={expertiseRef}
+              onMouseEnter={openExpertise}
+              onMouseLeave={closeExpertise}
+              onFocus={openExpertise}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setExpertiseOpen(false)
+                }
+              }}
+            >
               <button
                 type="button"
+                // Hover drives this on desktop; the click toggle stays so touch
+                // and keyboard users can still open it.
                 onClick={() => setExpertiseOpen((o) => !o)}
                 aria-expanded={expertiseOpen}
+                aria-haspopup="true"
                 className="flex items-center gap-1.5 text-white hover:opacity-70 transition-opacity duration-200"
               >
                 Expertise
@@ -88,17 +123,22 @@ export function Navbar() {
                 />
               </button>
               {expertiseOpen && (
-                <div className="absolute top-8 -left-4 z-[60] min-w-[230px] bg-[#0B0B0B] border border-white/[0.14] py-2 flex flex-col">
-                  {services.map((service) => (
-                    <Link
-                      key={service.href}
-                      to={service.href}
-                      onClick={() => setExpertiseOpen(false)}
-                      className="px-[18px] py-2.5 text-sm text-white/85 hover:bg-white/[0.07] hover:text-white transition-colors duration-200"
-                    >
-                      {service.label}
-                    </Link>
-                  ))}
+                // The outer wrapper's pt-2 is a transparent bridge across the
+                // gap below the trigger, so the pointer never leaves the
+                // hoverable area on its way to the panel.
+                <div className="absolute top-full -left-4 z-[60] pt-2">
+                  <div className="flex min-w-[230px] flex-col border border-white/[0.14] bg-[#0B0B0B]/80 py-2 backdrop-blur-xl">
+                    {services.map((service) => (
+                      <Link
+                        key={service.href}
+                        to={service.href}
+                        onClick={() => setExpertiseOpen(false)}
+                        className="px-[18px] py-2.5 text-sm text-white/85 hover:bg-white/[0.07] hover:text-white transition-colors duration-200"
+                      >
+                        {service.label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -135,7 +175,7 @@ export function Navbar() {
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className="lg:hidden p-2 text-white hover:opacity-70 transition-opacity duration-200"
+            className="min-[840px]:hidden p-2 text-white hover:opacity-70 transition-opacity duration-200"
           >
             <Menu className="w-6 h-6" />
           </button>

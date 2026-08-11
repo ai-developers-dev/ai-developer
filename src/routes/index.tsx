@@ -107,11 +107,20 @@ function Hero() {
         <div className="pb-4">
           <div className="grid grid-cols-1 items-center gap-[clamp(16px,1.4vw,24px)] md:grid-cols-[1.1fr_0.9fr]">
             <h1 className="display-h1">
-              I BUILD THE
+              {/* "SOFTWARE" runs at 1.5em (vs 1.25em for other pixel words) so
+                  it carries the line now that "I BUILD THE" is gone. Inline —
+                  .pixel-word is unlayered CSS and would beat a Tailwind size
+                  utility in the cascade. */}
+              <span
+                className="pixel-word pixel-shimmer"
+                style={{ fontSize: '1.5em' }}
+              >
+                SOFTWARE
+              </span>{' '}
+              YOUR
               <br />
-              <span className="pixel-word">SOFTWARE</span> YOUR
-              <br />
-              BUSINESS OWNS —
+              {/* nbsp so the em dash can never orphan onto its own line */}
+              BUSINESS OWNS{' —'}
               <br />
               <span className="pixel-word">NOT RENTS</span>
             </h1>
