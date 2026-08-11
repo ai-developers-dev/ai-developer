@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { FadeInView } from '@/components/animations/fade-in-view.js'
+import { AnimatedHeading } from '@/components/animations/animated-heading'
 import { pageSeo } from '@/lib/seo'
 
 export const Route = createFileRoute('/')({
@@ -215,9 +216,10 @@ function Services() {
       <div className="mx-auto max-w-[1320px]">
         <FadeInView>
           <div className="eyebrow">01 / Services</div>
-          <h2 className="display-h2 mt-5 max-w-[820px]">
-            START WITH WHAT'S <span className="pixel-word">COSTING</span> YOU MONEY
-          </h2>
+          <AnimatedHeading
+            className="display-h2 mt-5 max-w-[820px]"
+            segments={["START WITH WHAT'S", { text: 'COSTING', pixel: true }, 'YOU MONEY']}
+          />
         </FadeInView>
         <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {serviceCards.map((card, i) => (
@@ -271,11 +273,15 @@ function Crm() {
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-[clamp(32px,4vw,72px)] md:grid-cols-[1.1fr_0.9fr]">
         <FadeInView>
           <div className="eyebrow">02 / Own it forever</div>
-          <h2 className="display-h2 mt-5">
-            A CRM YOU <span className="pixel-word">OWN</span>,
-            <br />
-            NOT SUBSCRIBE TO
-          </h2>
+          <AnimatedHeading
+            className="display-h2 mt-5"
+            segments={[
+              'A CRM YOU',
+              { text: 'OWN', pixel: true, after: ',' },
+              '\n',
+              'NOT SUBSCRIBE TO',
+            ]}
+          />
           <p className="mt-6 max-w-[520px] text-base leading-[1.65] text-white/60">
             A typical 8-person shop pays $640/mo for field-service SaaS and $300/mo for
             an answering service — forever. One fixed-price build replaces both, and
@@ -365,9 +371,10 @@ function Agents() {
       <div className="mx-auto max-w-[1320px]">
         <FadeInView>
           <div className="eyebrow">03 / Voice &amp; chat</div>
-          <h2 className="display-h2 mt-5 max-w-[900px]">
-            THE CALL YOU <span className="pixel-word">MISS</span> IS THE JOB YOU LOSE
-          </h2>
+          <AnimatedHeading
+            className="display-h2 mt-5 max-w-[900px]"
+            segments={['THE CALL YOU', { text: 'MISS', pixel: true }, 'IS THE JOB YOU LOSE']}
+          />
           <p className="mt-6 max-w-[620px] text-base leading-[1.65] text-white/60">
             Most trades lose more work to a ringing phone than to price. An agent that
             answers every call and every late-night message turns the leads you already
@@ -458,9 +465,10 @@ function Process() {
       <div className="mx-auto max-w-[1320px]">
         <FadeInView>
           <div className="eyebrow">04 / Process</div>
-          <h2 className="display-h2 mt-5">
-            WORKING SOFTWARE IN <span className="pixel-word">WEEK ONE</span>
-          </h2>
+          <AnimatedHeading
+            className="display-h2 mt-5"
+            segments={['WORKING SOFTWARE IN', { text: 'WEEK ONE', pixel: true }]}
+          />
         </FadeInView>
         <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
           {steps.map((step, i) => (
@@ -549,9 +557,10 @@ function Talk() {
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-[clamp(32px,4vw,72px)] md:grid-cols-[1.1fr_0.9fr]">
         <FadeInView>
           <div className="eyebrow">05 / Talk</div>
-          <h2 className="display-h2 mt-5">
-            TELL ME WHAT'S <span className="pixel-word">SLOWING</span> YOU DOWN
-          </h2>
+          <AnimatedHeading
+            className="display-h2 mt-5"
+            segments={["TELL ME WHAT'S", { text: 'SLOWING', pixel: true }, 'YOU DOWN']}
+          />
           <p className="mt-6 max-w-[480px] text-base leading-[1.65] text-white/60">
             A 20-minute call — no deck, no sales team. You'll leave knowing roughly what
             it costs and how long it takes, whether or not you hire me.
