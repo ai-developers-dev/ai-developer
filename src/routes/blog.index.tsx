@@ -8,7 +8,7 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, Calendar } from 'lucide-react'
 import { pageSeo } from '@/lib/seo'
 
-export const Route = createFileRoute('/blog')({
+export const Route = createFileRoute('/blog/')({
   component: BlogPage,
   head: () =>
     pageSeo({
