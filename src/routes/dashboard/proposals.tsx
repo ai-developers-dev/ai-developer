@@ -100,16 +100,24 @@ interface LineItem {
   description: string
   quantity: number
   unitPrice: number
+  /** Regular per-unit price shown crossed out — display-only, never charged. */
+  compareAtUnitPrice?: number
+}
+
+/** Only a regular price above the real one reads as a markdown. */
+function markdownOf(item: LineItem): number | undefined {
+  return item.compareAtUnitPrice !== undefined &&
+    item.compareAtUnitPrice > item.unitPrice
+    ? item.compareAtUnitPrice
+    : undefined
 }
 
 const emptyLineItem: LineItem = { description: '', quantity: 1, unitPrice: 0 }
 
 /**
- * Line items for one catalog service. A marked-down service (regular price
- * above its actual price) becomes TWO lines — the regular price, then a
- * negative discount line — so the client sees the deal on the proposal, pay
- * page and email, which all render negative lines as discounts. The lines
- * still net to the actual price, so nothing extra is ever charged.
+ * The line item for one catalog service. A marked-down service is still ONE
+ * line at its real price; the regular price rides along as
+ * compareAtUnitPrice and is shown crossed out wherever the line renders.
  */
 function catalogLineItems(item: {
   name: string
@@ -117,18 +125,16 @@ function catalogLineItems(item: {
   defaultPrice?: number
   compareAtPrice?: number
 }): LineItem[] {
-  const description = item.name + (item.description ? ` - ${item.description}` : '')
   const price = item.defaultPrice ?? 0
-  const regular = item.compareAtPrice
-  if (regular === undefined || regular <= price) {
-    return [{ description, quantity: 1, unitPrice: price }]
-  }
   return [
-    { description, quantity: 1, unitPrice: regular },
     {
-      description: `${item.name} — discount`,
+      description: item.name + (item.description ? ` - ${item.description}` : ''),
       quantity: 1,
-      unitPrice: -(Math.round((regular - price) * 100) / 100),
+      unitPrice: price,
+      compareAtUnitPrice:
+        item.compareAtPrice !== undefined && item.compareAtPrice > price
+          ? item.compareAtPrice
+          : undefined,
     },
   ]
 }
@@ -221,6 +227,7 @@ function ProposalsPage() {
         description: li.description,
         quantity: li.quantity,
         unitPrice: li.unitPrice,
+        compareAtUnitPrice: li.compareAtUnitPrice,
       }))
     )
     setValidUntil(
@@ -349,11 +356,18 @@ function ProposalsPage() {
 
     setSending(true)
     try {
-      const finalLineItems = lineItems.map((item) => ({
+      const finalLineItems: Array<{
+        description: string
+        quantity: number
+        unitPrice: number
+        total: number
+        compareAtUnitPrice?: number
+      }> = lineItems.map((item) => ({
         description: item.description,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         total: item.quantity * item.unitPrice,
+        compareAtUnitPrice: markdownOf(item),
       }))
 
       // Add discount as a negative line item if applicable
@@ -412,11 +426,18 @@ function ProposalsPage() {
           if (client) {
             await markSent({ id: proposalId })
             try {
-              const emailLineItems = lineItems.map((item) => ({
+              const emailLineItems: Array<{
+                description: string
+                quantity: number
+                unitPrice: number
+                total: number
+                compareAtUnitPrice?: number
+              }> = lineItems.map((item) => ({
                 description: item.description,
                 quantity: item.quantity,
                 unitPrice: item.unitPrice,
                 total: item.quantity * item.unitPrice,
+                compareAtUnitPrice: markdownOf(item),
               }))
               // Add discount line item if applicable
               if (discountAmount > 0) {
@@ -829,9 +850,16 @@ function ProposalsPage() {
                           }}
                         />
                       </div>
-                      <p className="text-sm font-medium text-right pr-1">
-                        ${formatUsd(item.quantity * item.unitPrice)}
-                      </p>
+                      <div className="text-right pr-1 leading-tight">
+                        {markdownOf(item) !== undefined && (
+                          <p className="text-xs text-muted-foreground line-through">
+                            ${formatUsd(item.quantity * markdownOf(item)!)}
+                          </p>
+                        )}
+                        <p className="text-sm font-medium">
+                          ${formatUsd(item.quantity * item.unitPrice)}
+                        </p>
+                      </div>
                       <Button
                         type="button"
                         variant="ghost"
@@ -1171,7 +1199,12 @@ function ProposalsPage() {
                     <tr key={i} className="border-b border-white/10">
                       <td className="py-2 px-3 text-sm">{item.description}</td>
                       <td className="py-2 px-3 text-sm text-right">{item.quantity}</td>
-                      <td className="py-2 px-3 text-sm text-right">${formatUsd(item.unitPrice)}</td>
+                      <td className="py-2 px-3 text-sm text-right">
+                        {item.compareAtUnitPrice !== undefined && item.compareAtUnitPrice > item.unitPrice && (
+                          <span className="text-white/40 line-through mr-1.5">${formatUsd(item.compareAtUnitPrice)}</span>
+                        )}
+                        ${formatUsd(item.unitPrice)}
+                      </td>
                       <td className="py-2 px-3 text-sm text-right font-medium">${formatUsd(item.total)}</td>
                     </tr>
                   ))}

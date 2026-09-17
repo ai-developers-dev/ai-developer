@@ -299,6 +299,11 @@ function PublicPayPage() {
                       {item.quantity}
                     </div>
                     <div className="col-span-2 text-right text-[rgba(255,255,255,0.6)] tabular-nums">
+                      {!isDiscount && item.compareAtUnitPrice !== undefined && item.compareAtUnitPrice > item.unitPrice && (
+                        <span className="block text-xs text-[rgba(255,255,255,0.4)] line-through">
+                          ${formatCurrency(item.compareAtUnitPrice)}
+                        </span>
+                      )}
                       {isDiscount ? '-' : ''}${formatCurrency(Math.abs(item.unitPrice))}
                     </div>
                     <div className={`col-span-2 text-right font-semibold tabular-nums ${isDiscount ? 'text-red-400' : 'text-[#FFFFFF]'}`}>

@@ -28,6 +28,7 @@ const lineItemValidator = v.object({
   quantity: v.number(),
   unitPrice: v.number(),
   total: v.number(),
+  compareAtUnitPrice: v.optional(v.number()),
 });
 
 const stageLiteral = v.union(

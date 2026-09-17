@@ -5,6 +5,7 @@ export interface LineItemInput {
   quantity: number
   unitPrice: number
   total: number
+  compareAtUnitPrice?: number
 }
 
 export interface InstallmentInput {
@@ -38,12 +39,17 @@ function buildLineItemRows(lineItems: LineItemInput[]): string {
     const textColor = isDiscount ? '#ef4444' : '#f4dddb'
     const displayTotal = Math.abs(item.total)
     const displayUnitPrice = Math.abs(item.unitPrice)
+    // Marked-down line: regular price struck through above the real one.
+    const regularHtml =
+      !isDiscount && item.compareAtUnitPrice !== undefined && item.compareAtUnitPrice > item.unitPrice
+        ? `<div style="font-size:12px;color:#8a8a8a;text-decoration:line-through;">$${formatCurrency(item.compareAtUnitPrice)}</div>`
+        : ''
 
     return `
     <tr>
       <td style="padding:16px 20px;border-bottom:${isLast ? 'none' : '1px solid rgba(208,197,175,0.1)'};font-size:14px;color:#f4dddb;line-height:1.5;">${item.description}</td>
       <td style="padding:16px 12px;border-bottom:${isLast ? 'none' : '1px solid rgba(208,197,175,0.1)'};font-size:14px;color:#d0c5af;text-align:center;">${item.quantity}</td>
-      <td style="padding:16px 12px;border-bottom:${isLast ? 'none' : '1px solid rgba(208,197,175,0.1)'};font-size:14px;color:#d0c5af;text-align:right;">${isDiscount ? '-' : ''}$${formatCurrency(displayUnitPrice)}</td>
+      <td style="padding:16px 12px;border-bottom:${isLast ? 'none' : '1px solid rgba(208,197,175,0.1)'};font-size:14px;color:#d0c5af;text-align:right;">${regularHtml}${isDiscount ? '-' : ''}$${formatCurrency(displayUnitPrice)}</td>
       <td style="padding:16px 20px;border-bottom:${isLast ? 'none' : '1px solid rgba(208,197,175,0.1)'};font-size:14px;color:${textColor};text-align:right;font-weight:600;">${isDiscount ? '-' : ''}$${formatCurrency(displayTotal)}</td>
     </tr>
   `}).join('')

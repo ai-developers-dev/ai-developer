@@ -240,6 +240,10 @@ export default defineSchema({
         quantity: v.number(),
         unitPrice: v.number(),
         total: v.number(),
+        // Regular per-unit price shown crossed out beside unitPrice — carried
+        // over from a marked-down catalog service. Display-only: total is
+        // always quantity × unitPrice.
+        compareAtUnitPrice: v.optional(v.number()),
       })
     ),
     totalAmount: v.number(),
