@@ -97,6 +97,7 @@ export const listItemsForProposals = query({
           name: i.name,
           description: i.description,
           defaultPrice: i.defaultPrice,
+          billingInterval: i.billingInterval ?? "one_time",
           categoryId: i.categoryId,
           categoryName: cat?.name ?? "Other",
           categoryOrder: cat?.displayOrder ?? 999,
@@ -225,6 +226,7 @@ export const removeCategory = mutation({
           {
             stripeProductId: item.stripeProductId,
             stripePriceId: item.stripePriceId,
+            stripePaymentLinkId: item.stripePaymentLinkId,
           },
         );
       }
@@ -242,6 +244,9 @@ export const addItem = mutation({
     name: v.string(),
     description: v.optional(v.string()),
     defaultPrice: v.number(),
+    billingInterval: v.optional(
+      v.union(v.literal("one_time"), v.literal("month"))
+    ),
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
@@ -258,6 +263,7 @@ export const addItem = mutation({
       name: args.name,
       description: args.description,
       defaultPrice: args.defaultPrice,
+      billingInterval: args.billingInterval,
       isActive: true,
       displayOrder: maxOrder + 1,
     });
@@ -274,6 +280,9 @@ export const updateItem = mutation({
     name: v.optional(v.string()),
     description: v.optional(v.string()),
     defaultPrice: v.optional(v.number()),
+    billingInterval: v.optional(
+      v.union(v.literal("one_time"), v.literal("month"))
+    ),
     isActive: v.optional(v.boolean()),
   },
   handler: async (ctx, { id, ...rest }) => {
@@ -301,6 +310,7 @@ export const removeItem = mutation({
         {
           stripeProductId: item.stripeProductId,
           stripePriceId: item.stripePriceId,
+          stripePaymentLinkId: item.stripePaymentLinkId,
         },
       );
     }

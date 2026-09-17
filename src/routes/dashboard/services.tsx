@@ -33,7 +33,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Pencil, Plus, Trash2, RefreshCw } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Check, Copy, Pencil, Plus, Trash2, RefreshCw } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/services')({
   component: ServicesPage,
@@ -53,8 +61,10 @@ type CategoryWithItems = {
     name: string
     description?: string
     defaultPrice: number
+    billingInterval?: 'one_time' | 'month'
     isActive: boolean
     displayOrder: number
+    stripePaymentLinkUrl?: string
   }>
 }
 
@@ -291,33 +301,65 @@ function ServiceItemRow({
   const removeItem = useMutation(api.serviceCatalog.removeItem)
   const [editing, setEditing] = useState(false)
   const [localPrice, setLocalPrice] = useState(item.defaultPrice.toString())
+  const [copied, setCopied] = useState(false)
+  const isMonthly = item.billingInterval === 'month'
 
   useEffect(() => {
     setLocalPrice(item.defaultPrice.toString())
   }, [item.defaultPrice])
 
+  async function copySubscribeLink() {
+    if (!item.stripePaymentLinkUrl) return
+    await navigator.clipboard.writeText(item.stripePaymentLinkUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <div className="flex items-center gap-3 rounded-md border bg-card px-3 py-2">
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{item.name}</p>
+        <div className="flex items-center gap-2 min-w-0">
+          <p className="text-sm font-medium truncate">{item.name}</p>
+          {isMonthly && (
+            <Badge className="bg-amber-500/10 text-amber-300 hover:bg-amber-500/10 border-amber-500/30 shrink-0 text-[10px] px-1.5 py-0">
+              Monthly
+            </Badge>
+          )}
+        </div>
         {item.description && (
           <p className="text-xs text-muted-foreground truncate">
             {item.description}
           </p>
         )}
       </div>
-      <div className="relative w-32 shrink-0">
+      {isMonthly && item.stripePaymentLinkUrl && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 shrink-0"
+          onClick={copySubscribeLink}
+          title="Copy the Stripe subscribe link — send it to the client to start the monthly billing"
+        >
+          {copied ? (
+            <Check className="w-3.5 h-3.5 mr-1.5" />
+          ) : (
+            <Copy className="w-3.5 h-3.5 mr-1.5" />
+          )}
+          {copied ? 'Copied' : 'Subscribe link'}
+        </Button>
+      )}
+      <div className="relative w-36 shrink-0">
         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
           $
         </span>
         <Input
           type="number"
           min={0}
-          step={100}
+          step={isMonthly ? 1 : 100}
           value={localPrice}
           onChange={(e) => setLocalPrice(e.target.value)}
           onBlur={() => {
-            const n = parseInt(localPrice, 10)
+            const n = parseFloat(localPrice)
             if (!Number.isFinite(n)) {
               setLocalPrice(item.defaultPrice.toString())
               return
@@ -325,8 +367,13 @@ function ServiceItemRow({
             if (n !== item.defaultPrice)
               updateItem({ id: item._id, defaultPrice: n })
           }}
-          className="pl-6 h-8 text-sm text-right"
+          className={`pl-6 h-8 text-sm text-right ${isMonthly ? 'pr-10' : ''}`}
         />
+        {isMonthly && (
+          <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+            /mo
+          </span>
+        )}
       </div>
       <Button
         variant="ghost"
@@ -396,6 +443,7 @@ function AddItemRow({
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
+  const [billing, setBilling] = useState<'one_time' | 'month'>('one_time')
 
   if (!open) {
     return (
@@ -412,23 +460,25 @@ function AddItemRow({
   }
 
   async function handleAdd() {
-    const n = parseInt(price, 10)
+    const n = parseFloat(price)
     if (!name.trim() || !Number.isFinite(n)) return
     await addItem({
       categoryId,
       name: name.trim(),
       description: description.trim() || undefined,
       defaultPrice: n,
+      billingInterval: billing,
     })
     setName('')
     setPrice('')
     setDescription('')
+    setBilling('one_time')
     setOpen(false)
   }
 
   return (
     <div className="grid grid-cols-12 gap-2 items-start rounded-md border-2 border-dashed border-brand-primary/30 p-3 mt-1">
-      <div className="col-span-5">
+      <div className="col-span-4">
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -437,13 +487,27 @@ function AddItemRow({
           className="h-8 text-sm"
         />
       </div>
-      <div className="col-span-4">
+      <div className="col-span-3">
         <Input
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description (optional)"
           className="h-8 text-sm"
         />
+      </div>
+      <div className="col-span-2">
+        <Select
+          value={billing}
+          onValueChange={(v) => setBilling(v as 'one_time' | 'month')}
+        >
+          <SelectTrigger className="h-8 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="one_time">One-time</SelectItem>
+            <SelectItem value="month">Monthly retainer</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className="col-span-2">
         <div className="relative">
@@ -453,12 +517,17 @@ function AddItemRow({
           <Input
             type="number"
             min={0}
-            step={100}
+            step={billing === 'month' ? 1 : 100}
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             placeholder="0"
-            className="pl-6 h-8 text-sm text-right"
+            className={`pl-6 h-8 text-sm text-right ${billing === 'month' ? 'pr-9' : ''}`}
           />
+          {billing === 'month' && (
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+              /mo
+            </span>
+          )}
         </div>
       </div>
       <div className="col-span-1 flex gap-1">
@@ -473,6 +542,7 @@ function AddItemRow({
             setName('')
             setPrice('')
             setDescription('')
+            setBilling('one_time')
           }}
           className="h-8 px-2"
         >
@@ -625,11 +695,15 @@ function EditItemDialog({
     name?: string
     description?: string
     defaultPrice?: number
+    billingInterval?: 'one_time' | 'month'
   }) => Promise<void>
 }) {
   const [name, setName] = useState(item.name)
   const [description, setDescription] = useState(item.description ?? '')
   const [price, setPrice] = useState(item.defaultPrice.toString())
+  const [billing, setBilling] = useState<'one_time' | 'month'>(
+    item.billingInterval ?? 'one_time',
+  )
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -655,7 +729,28 @@ function EditItemDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Default price</Label>
+            <Label>Billing</Label>
+            <Select
+              value={billing}
+              onValueChange={(v) => setBilling(v as 'one_time' | 'month')}
+            >
+              <SelectTrigger className="max-w-[14rem]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="one_time">One-time</SelectItem>
+                <SelectItem value="month">Monthly retainer</SelectItem>
+              </SelectContent>
+            </Select>
+            {billing === 'month' && (
+              <p className="text-xs text-muted-foreground">
+                Syncs to Stripe as a recurring monthly price and generates a
+                subscribe link you can send to the client.
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>{billing === 'month' ? 'Price per month' : 'Default price'}</Label>
             <div className="relative max-w-[10rem]">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                 $
@@ -663,11 +758,16 @@ function EditItemDialog({
               <Input
                 type="number"
                 min={0}
-                step={100}
+                step={billing === 'month' ? 1 : 100}
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="pl-7"
+                className={billing === 'month' ? 'pl-7 pr-12' : 'pl-7'}
               />
+              {billing === 'month' && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+                  /mo
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -677,11 +777,12 @@ function EditItemDialog({
           </Button>
           <Button
             onClick={() => {
-              const n = parseInt(price, 10)
+              const n = parseFloat(price)
               return onSave({
                 name: name.trim() || undefined,
                 description: description.trim() || undefined,
                 defaultPrice: Number.isFinite(n) ? n : undefined,
+                billingInterval: billing,
               })
             }}
           >

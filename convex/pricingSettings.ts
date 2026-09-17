@@ -46,7 +46,15 @@ export const DEFAULT_PRICING = {
   voiceAiCrossSellPrice: 0,
   automationsCrossSellPrice: 0,
   rushFeePct: 0,
-  integrations: [],
+  // Annotated because an empty literal infers never[], which poisons
+  // PricingConfig (= typeof DEFAULT_PRICING) and broke the Convex typecheck
+  // on every deploy since this row shipped.
+  integrations: [] as Array<{
+    key: string;
+    label: string;
+    price: number;
+    customBuild?: boolean;
+  }>,
 };
 
 export type PricingConfig = typeof DEFAULT_PRICING;

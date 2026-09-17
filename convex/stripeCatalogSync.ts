@@ -94,15 +94,26 @@ export const syncItem = internalAction({
       productId = product.id as string;
     }
 
-    // 2) Reconcile the Price (immutable — recreate if amount changed)
+    // 2) Reconcile the Price (immutable — recreate if the amount OR the
+    //    billing interval changed, e.g. a one-time service turned into a
+    //    monthly retainer)
     const amountCents = Math.round(item.defaultPrice * 100);
+    const isMonthly = item.billingInterval === "month";
     let priceId = item.stripePriceId;
     let needsNewPrice = !priceId;
 
     if (priceId) {
       try {
         const current = await stripeGet(`/prices/${priceId}`);
-        if (current.unit_amount !== amountCents || current.currency !== "usd") {
+        const currentIsMonthly = current.recurring?.interval === "month";
+        if (
+          current.unit_amount !== amountCents ||
+          current.currency !== "usd" ||
+          currentIsMonthly !== isMonthly ||
+          // Someone archived it in the Stripe dashboard — recreate rather
+          // than keep selling against a dead price.
+          current.active === false
+        ) {
           needsNewPrice = true;
           await stripePost(`/prices/${priceId}`, { active: false });
         }
@@ -116,14 +127,54 @@ export const syncItem = internalAction({
         product: productId!,
         unit_amount: amountCents,
         currency: "usd",
+        // A recurring price is what makes Stripe bill this automatically
+        // every month once someone subscribes.
+        "recurring[interval]": isMonthly ? "month" : undefined,
       });
       priceId = price.id as string;
+    }
+
+    // 3) Payment Link — monthly retainers get a shareable subscribe URL
+    //    (send it to the client; Stripe starts the monthly billing when they
+    //    pay). Links are pinned to a specific price, so whenever the price is
+    //    recreated the old link is deactivated and a fresh one minted. A
+    //    one-time item keeps no link — if it used to be monthly, its link is
+    //    shut off so nobody can subscribe to a retired retainer.
+    let paymentLinkId = item.stripePaymentLinkId;
+    let paymentLinkUrl = item.stripePaymentLinkUrl;
+
+    if (isMonthly && (needsNewPrice || !paymentLinkId)) {
+      if (paymentLinkId) {
+        try {
+          await stripePost(`/payment_links/${paymentLinkId}`, { active: false });
+        } catch (err) {
+          console.error("Deactivate payment link failed:", paymentLinkId, err);
+        }
+      }
+      const link = await stripePost("/payment_links", {
+        "line_items[0][price]": priceId!,
+        "line_items[0][quantity]": 1,
+        "metadata[convex_item_id]": itemId,
+      });
+      paymentLinkId = link.id as string;
+      paymentLinkUrl = link.url as string;
+    } else if (!isMonthly && paymentLinkId) {
+      try {
+        await stripePost(`/payment_links/${paymentLinkId}`, { active: false });
+      } catch (err) {
+        console.error("Deactivate payment link failed:", paymentLinkId, err);
+      }
+      paymentLinkId = undefined;
+      paymentLinkUrl = undefined;
     }
 
     await ctx.runMutation(internal.stripeCatalogSync._setItemStripeIds, {
       itemId,
       stripeProductId: productId!,
       stripePriceId: priceId!,
+      stripePaymentLinkId: paymentLinkId,
+      stripePaymentLinkUrl: paymentLinkUrl,
+      clearPaymentLink: !isMonthly,
     });
   },
 });
@@ -132,8 +183,18 @@ export const archiveStripeEntities = internalAction({
   args: {
     stripeProductId: v.string(),
     stripePriceId: v.optional(v.string()),
+    stripePaymentLinkId: v.optional(v.string()),
   },
-  handler: async (_ctx, { stripeProductId, stripePriceId }) => {
+  handler: async (_ctx, { stripeProductId, stripePriceId, stripePaymentLinkId }) => {
+    // Shut the subscribe link off FIRST — it's the only publicly reachable
+    // surface, and a live link to an archived price is a broken checkout.
+    if (stripePaymentLinkId) {
+      try {
+        await stripePost(`/payment_links/${stripePaymentLinkId}`, { active: false });
+      } catch (err) {
+        console.error("Archive payment link failed:", stripePaymentLinkId, err);
+      }
+    }
     if (stripePriceId) {
       try {
         await stripePost(`/prices/${stripePriceId}`, { active: false });
@@ -187,8 +248,23 @@ export const _setItemStripeIds = internalMutation({
     itemId: v.id("serviceItems"),
     stripeProductId: v.string(),
     stripePriceId: v.string(),
+    stripePaymentLinkId: v.optional(v.string()),
+    stripePaymentLinkUrl: v.optional(v.string()),
+    // Optional args can't distinguish "absent" from "clear these fields", so
+    // one-time items say so explicitly to drop a stale link off the row.
+    clearPaymentLink: v.optional(v.boolean()),
   },
-  handler: async (ctx, { itemId, stripeProductId, stripePriceId }) => {
-    await ctx.db.patch(itemId, { stripeProductId, stripePriceId });
+  handler: async (
+    ctx,
+    { itemId, stripeProductId, stripePriceId, stripePaymentLinkId, stripePaymentLinkUrl, clearPaymentLink },
+  ) => {
+    const patch: Record<string, unknown> = { stripeProductId, stripePriceId };
+    if (stripePaymentLinkId !== undefined) patch.stripePaymentLinkId = stripePaymentLinkId;
+    if (stripePaymentLinkUrl !== undefined) patch.stripePaymentLinkUrl = stripePaymentLinkUrl;
+    if (clearPaymentLink) {
+      patch.stripePaymentLinkId = undefined;
+      patch.stripePaymentLinkUrl = undefined;
+    }
+    await ctx.db.patch(itemId, patch);
   },
 });

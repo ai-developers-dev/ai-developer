@@ -390,13 +390,23 @@ export default defineSchema({
     name: v.string(),
     description: v.optional(v.string()),
     defaultPrice: v.number(),
+    // Absent = one-time (every row predating retainers). "month" makes this a
+    // monthly retainer: the Stripe Price is created as recurring and a
+    // subscription Payment Link is minted so the client has a way to sign up.
+    billingInterval: v.optional(
+      v.union(v.literal("one_time"), v.literal("month"))
+    ),
     isActive: v.boolean(),
     displayOrder: v.number(),
     // Stripe sync — populated by stripeCatalogSync after each add/update.
-    // stripePriceId is regenerated whenever defaultPrice changes
-    // (Stripe Prices are immutable; old ones are archived).
+    // stripePriceId is regenerated whenever defaultPrice OR billingInterval
+    // changes (Stripe Prices are immutable; old ones are archived).
     stripeProductId: v.optional(v.string()),
     stripePriceId: v.optional(v.string()),
+    // Subscription Payment Link (monthly items only) — regenerated alongside
+    // the price, since a link is pinned to the price it was created with.
+    stripePaymentLinkId: v.optional(v.string()),
+    stripePaymentLinkUrl: v.optional(v.string()),
   }).index("by_categoryId", ["categoryId"]),
 
   services: defineTable({
