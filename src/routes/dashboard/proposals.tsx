@@ -163,8 +163,10 @@ function ProposalsPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [clientId, setClientId] = useState('')
   const [projectId, setProjectId] = useState('')
+  // Last single service added — feeds the auto-title and the proposal's
+  // service label. NOT the picker's value: the pickers stay blank so every
+  // pick fires, including the same service or category twice.
   const [serviceId, setServiceId] = useState('')
-  const [categoryId, setCategoryId] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...emptyLineItem }])
@@ -196,7 +198,6 @@ function ProposalsPage() {
     setClientId('')
     setProjectId('')
     setServiceId('')
-    setCategoryId('')
     setTitle('')
     setDescription('')
     setLineItems([{ ...emptyLineItem }])
@@ -283,7 +284,6 @@ function ProposalsPage() {
   }
 
   function handleCategorySelect(catId: string) {
-    setCategoryId(catId)
     const category = catalogData?.find((c) => c._id === catId)
     if (!category) return
 
@@ -694,7 +694,7 @@ function ProposalsPage() {
               {/* Category select - adds ALL items from category */}
               <div className="space-y-2">
                 <Label>Add Category (all items)</Label>
-                <Select value={categoryId} onValueChange={handleCategorySelect}>
+                <Select value="" onValueChange={handleCategorySelect}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a category to add all its items" />
                   </SelectTrigger>
@@ -717,7 +717,7 @@ function ProposalsPage() {
               {/* Single service select - adds one item */}
               <div className="space-y-2">
                 <Label>Add Single Service</Label>
-                <Select value={serviceId} onValueChange={handleServiceChange}>
+                <Select value="" onValueChange={handleServiceChange}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Or add individual services" />
                   </SelectTrigger>
