@@ -25,6 +25,16 @@ import { internal } from "./_generated/api";
 
 const STRIPE_API = "https://api.stripe.com/v1";
 
+/** $1,500 / $7.99 — cents only when there are some. */
+function usd(n: number): string {
+  const cents = Math.round(n * 100);
+  const whole = Math.floor(cents / 100)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const frac = cents % 100;
+  return `$${whole}${frac ? "." + String(frac).padStart(2, "0") : ""}`;
+}
+
 async function stripePost(
   path: string,
   body: Record<string, string | number | boolean | undefined>,
@@ -143,6 +153,17 @@ export const syncItem = internalAction({
     let paymentLinkId = item.stripePaymentLinkId;
     let paymentLinkUrl = item.stripePaymentLinkUrl;
 
+    // Markdown shown on the subscribe checkout, just above the Subscribe
+    // button. Payment Links can't carry a pre-applied coupon (only a code the
+    // client would have to type), so the deal is stated in text while the
+    // Price stays at what's actually charged.
+    const markdownMessage =
+      item.compareAtPrice !== undefined && item.compareAtPrice > item.defaultPrice
+        ? `Regularly ${usd(item.compareAtPrice)}/mo — you're saving ${usd(
+            item.compareAtPrice - item.defaultPrice,
+          )} every month.`
+        : undefined;
+
     if (isMonthly && (needsNewPrice || !paymentLinkId)) {
       if (paymentLinkId) {
         try {
@@ -155,9 +176,19 @@ export const syncItem = internalAction({
         "line_items[0][price]": priceId!,
         "line_items[0][quantity]": 1,
         "metadata[convex_item_id]": itemId,
+        "custom_text[submit][message]": markdownMessage,
       });
       paymentLinkId = link.id as string;
       paymentLinkUrl = link.url as string;
+    } else if (isMonthly && paymentLinkId) {
+      // Same price, existing link: update the markdown IN PLACE so a URL
+      // that's already been sent to clients keeps working. An empty value
+      // is Stripe's way of unsetting the message when the markdown is removed.
+      await stripePost(`/payment_links/${paymentLinkId}`, {
+        ...(markdownMessage
+          ? { "custom_text[submit][message]": markdownMessage }
+          : { "custom_text[submit]": "" }),
+      });
     } else if (!isMonthly && paymentLinkId) {
       try {
         await stripePost(`/payment_links/${paymentLinkId}`, { active: false });

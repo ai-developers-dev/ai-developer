@@ -390,6 +390,12 @@ export default defineSchema({
     name: v.string(),
     description: v.optional(v.string()),
     defaultPrice: v.number(),
+    // Optional "regular" price shown crossed out next to defaultPrice so the
+    // client sees a markdown. Display-only: defaultPrice is ALWAYS what gets
+    // charged, and the Stripe Price is never created at this amount — so no
+    // client can be billed the anchor by accident. Only honoured when it's
+    // greater than defaultPrice.
+    compareAtPrice: v.optional(v.number()),
     // Absent = one-time (every row predating retainers). "month" makes this a
     // monthly retainer: the Stripe Price is created as recurring and a
     // subscription Payment Link is minted so the client has a way to sign up.

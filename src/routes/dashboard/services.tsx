@@ -47,6 +47,22 @@ export const Route = createFileRoute('/dashboard/services')({
   component: ServicesPage,
 })
 
+/** A markdown only exists when the regular price is above the actual price. */
+function getMarkdown(price: number, regular: number | undefined) {
+  if (regular === undefined || !(regular > price) || regular <= 0) return null
+  return {
+    regular,
+    percentOff: Math.round(((regular - price) / regular) * 100),
+  }
+}
+
+function formatMoney(n: number): string {
+  return n.toLocaleString('en-US', {
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })
+}
+
 type CategoryWithItems = {
   _id: Id<'serviceCategories'>
   name: string
@@ -62,6 +78,7 @@ type CategoryWithItems = {
     description?: string
     defaultPrice: number
     billingInterval?: 'one_time' | 'month'
+    compareAtPrice?: number
     isActive: boolean
     displayOrder: number
     stripePaymentLinkUrl?: string
@@ -303,6 +320,7 @@ function ServiceItemRow({
   const [localPrice, setLocalPrice] = useState(item.defaultPrice.toString())
   const [copied, setCopied] = useState(false)
   const isMonthly = item.billingInterval === 'month'
+  const markdown = getMarkdown(item.defaultPrice, item.compareAtPrice)
 
   useEffect(() => {
     setLocalPrice(item.defaultPrice.toString())
@@ -329,6 +347,17 @@ function ServiceItemRow({
         {item.description && (
           <p className="text-xs text-muted-foreground truncate">
             {item.description}
+          </p>
+        )}
+        {markdown && (
+          <p className="text-xs mt-0.5">
+            <span className="text-muted-foreground line-through">
+              ${formatMoney(markdown.regular)}
+              {isMonthly ? '/mo' : ''}
+            </span>{' '}
+            <span className="text-green-300 font-medium">
+              {markdown.percentOff}% off — clients see this markdown
+            </span>
           </p>
         )}
       </div>
@@ -695,15 +724,28 @@ function EditItemDialog({
     name?: string
     description?: string
     defaultPrice?: number
+    compareAtPrice?: number | null
     billingInterval?: 'one_time' | 'month'
   }) => Promise<void>
 }) {
   const [name, setName] = useState(item.name)
   const [description, setDescription] = useState(item.description ?? '')
   const [price, setPrice] = useState(item.defaultPrice.toString())
+  const [regular, setRegular] = useState(item.compareAtPrice?.toString() ?? '')
   const [billing, setBilling] = useState<'one_time' | 'month'>(
     item.billingInterval ?? 'one_time',
   )
+  const priceNum = parseFloat(price)
+  const regularNum = parseFloat(regular)
+  const preview = Number.isFinite(priceNum)
+    ? getMarkdown(priceNum, Number.isFinite(regularNum) ? regularNum : undefined)
+    : null
+  const regularTooLow =
+    regular.trim() !== '' &&
+    Number.isFinite(regularNum) &&
+    Number.isFinite(priceNum) &&
+    regularNum <= priceNum
+  const per = billing === 'month' ? '/mo' : ''
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -770,6 +812,64 @@ function EditItemDialog({
               )}
             </div>
           </div>
+          <div className="space-y-2">
+            <Label>
+              Regular price{' '}
+              <span className="text-xs text-muted-foreground font-normal">
+                (optional — mark it down)
+              </span>
+            </Label>
+            <div className="relative max-w-[10rem]">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                $
+              </span>
+              <Input
+                type="number"
+                min={0}
+                step={billing === 'month' ? 1 : 100}
+                value={regular}
+                onChange={(e) => setRegular(e.target.value)}
+                placeholder="—"
+                className={billing === 'month' ? 'pl-7 pr-12' : 'pl-7'}
+              />
+              {billing === 'month' && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+                  /mo
+                </span>
+              )}
+            </div>
+            {regularTooLow ? (
+              <p className="text-xs text-amber-300">
+                The regular price has to be higher than your price to show a
+                markdown — this would be ignored.
+              </p>
+            ) : preview ? (
+              <p className="text-xs">
+                Clients see:{' '}
+                <span className="text-muted-foreground line-through">
+                  ${formatMoney(preview.regular)}
+                  {per}
+                </span>{' '}
+                <span className="font-semibold">
+                  ${formatMoney(priceNum)}
+                  {per}
+                </span>{' '}
+                <span className="text-green-300">
+                  — {preview.percentOff}% off
+                </span>
+                <span className="block text-muted-foreground mt-1">
+                  They're still only charged ${formatMoney(priceNum)}
+                  {per}. The regular price is shown, never billed.
+                </span>
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Set a higher regular price and clients see it crossed out next
+                to yours — on proposals
+                {billing === 'month' ? ' and the Stripe subscribe page' : ''}.
+              </p>
+            )}
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
@@ -782,6 +882,12 @@ function EditItemDialog({
                 name: name.trim() || undefined,
                 description: description.trim() || undefined,
                 defaultPrice: Number.isFinite(n) ? n : undefined,
+                // Blank clears the markdown; the server also drops a regular
+                // price that isn't above the actual price.
+                compareAtPrice:
+                  regular.trim() === '' || !Number.isFinite(regularNum)
+                    ? null
+                    : regularNum,
                 billingInterval: billing,
               })
             }}

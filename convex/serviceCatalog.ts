@@ -33,6 +33,15 @@ async function requireAdmin(ctx: any) {
   if (!user || user.role !== "admin") throw new Error("Not authorized");
 }
 
+/** A regular price only means something if it's above what's charged. */
+function normalizeCompareAt(
+  compareAt: number | undefined,
+  price: number,
+): number | undefined {
+  if (compareAt === undefined || !Number.isFinite(compareAt)) return undefined;
+  return compareAt > price ? compareAt : undefined;
+}
+
 function slugify(s: string): string {
   return s
     .toLowerCase()
@@ -97,6 +106,7 @@ export const listItemsForProposals = query({
           name: i.name,
           description: i.description,
           defaultPrice: i.defaultPrice,
+          compareAtPrice: i.compareAtPrice,
           billingInterval: i.billingInterval ?? "one_time",
           categoryId: i.categoryId,
           categoryName: cat?.name ?? "Other",
@@ -244,6 +254,7 @@ export const addItem = mutation({
     name: v.string(),
     description: v.optional(v.string()),
     defaultPrice: v.number(),
+    compareAtPrice: v.optional(v.number()),
     billingInterval: v.optional(
       v.union(v.literal("one_time"), v.literal("month"))
     ),
@@ -263,6 +274,7 @@ export const addItem = mutation({
       name: args.name,
       description: args.description,
       defaultPrice: args.defaultPrice,
+      compareAtPrice: normalizeCompareAt(args.compareAtPrice, args.defaultPrice),
       billingInterval: args.billingInterval,
       isActive: true,
       displayOrder: maxOrder + 1,
@@ -280,16 +292,33 @@ export const updateItem = mutation({
     name: v.optional(v.string()),
     description: v.optional(v.string()),
     defaultPrice: v.optional(v.number()),
+    // number = set the regular price, null = remove the markdown
+    compareAtPrice: v.optional(v.union(v.number(), v.null())),
     billingInterval: v.optional(
       v.union(v.literal("one_time"), v.literal("month"))
     ),
     isActive: v.optional(v.boolean()),
   },
-  handler: async (ctx, { id, ...rest }) => {
+  handler: async (ctx, { id, compareAtPrice, ...rest }) => {
     await requireAdmin(ctx);
+    const existing = await ctx.db.get(id);
+    if (!existing) throw new Error("Service not found");
     const patch: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(rest)) {
       if (v !== undefined) patch[k] = v;
+    }
+    const price = (patch.defaultPrice as number | undefined) ?? existing.defaultPrice;
+    if (compareAtPrice === null) {
+      patch.compareAtPrice = undefined;
+    } else if (compareAtPrice !== undefined) {
+      patch.compareAtPrice = normalizeCompareAt(compareAtPrice, price);
+    } else if (
+      existing.compareAtPrice !== undefined &&
+      existing.compareAtPrice <= price
+    ) {
+      // A price raise that meets or passes the old anchor would otherwise
+      // leave a nonsense "was $X, now $Y" with Y >= X — drop it.
+      patch.compareAtPrice = undefined;
     }
     await ctx.db.patch(id, patch);
     await ctx.scheduler.runAfter(0, internal.stripeCatalogSync.syncItem, {

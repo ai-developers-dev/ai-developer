@@ -104,6 +104,35 @@ interface LineItem {
 
 const emptyLineItem: LineItem = { description: '', quantity: 1, unitPrice: 0 }
 
+/**
+ * Line items for one catalog service. A marked-down service (regular price
+ * above its actual price) becomes TWO lines — the regular price, then a
+ * negative discount line — so the client sees the deal on the proposal, pay
+ * page and email, which all render negative lines as discounts. The lines
+ * still net to the actual price, so nothing extra is ever charged.
+ */
+function catalogLineItems(item: {
+  name: string
+  description?: string
+  defaultPrice?: number
+  compareAtPrice?: number
+}): LineItem[] {
+  const description = item.name + (item.description ? ` - ${item.description}` : '')
+  const price = item.defaultPrice ?? 0
+  const regular = item.compareAtPrice
+  if (regular === undefined || regular <= price) {
+    return [{ description, quantity: 1, unitPrice: price }]
+  }
+  return [
+    { description, quantity: 1, unitPrice: regular },
+    {
+      description: `${item.name} — discount`,
+      quantity: 1,
+      unitPrice: -(Math.round((regular - price) * 100) / 100),
+    },
+  ]
+}
+
 function ProposalsPage() {
   const proposals = useQuery(api.proposals.list, {})
   const clients = useQuery(api.clients.list)
@@ -231,18 +260,14 @@ function ProposalsPage() {
     const service = services?.find((s) => s._id === serviceIdValue)
     if (!service) return
 
-    const newItem: LineItem = {
-      description: service.name + (service.description ? ` - ${service.description}` : ''),
-      quantity: 1,
-      unitPrice: service.defaultPrice ?? 0,
-    }
+    const newItems = catalogLineItems(service)
 
     setLineItems((prev) => {
       const hasContent = prev.some((li) => li.description.trim() !== '')
       if (!hasContent) {
-        return [newItem]
+        return newItems
       }
-      return [...prev, newItem]
+      return [...prev, ...newItems]
     })
 
     if (!title || title === autoTitle(clientId, '')) {
@@ -258,11 +283,7 @@ function ProposalsPage() {
     const activeItems = category.items.filter((item) => item.isActive)
     if (activeItems.length === 0) return
 
-    const newItems: LineItem[] = activeItems.map((item) => ({
-      description: item.name + (item.description ? ` - ${item.description}` : ''),
-      quantity: 1,
-      unitPrice: item.defaultPrice ?? 0,
-    }))
+    const newItems: LineItem[] = activeItems.flatMap((item) => catalogLineItems(item))
 
     setLineItems((prev) => {
       const hasContent = prev.some((li) => li.description.trim() !== '')
@@ -700,7 +721,10 @@ function ProposalsPage() {
                             <SelectItem key={service._id} value={service._id}>
                               {service.name}
                               {service.defaultPrice
-                                ? ` ($${formatUsd(service.defaultPrice)})`
+                                ? service.compareAtPrice &&
+                                  service.compareAtPrice > service.defaultPrice
+                                  ? ` ($${formatUsd(service.defaultPrice)}, reg. $${formatUsd(service.compareAtPrice)})`
+                                  : ` ($${formatUsd(service.defaultPrice)})`
                                 : ''}
                             </SelectItem>
                           ))}

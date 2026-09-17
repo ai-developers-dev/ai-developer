@@ -198,14 +198,23 @@ function PortalProposalDetailPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {proposal.lineItems.map((item, i) => (
-                  <tr key={i}>
-                    <td className="py-3 pr-4 text-sm">{item.description}</td>
-                    <td className="py-3 pr-4 text-sm text-right text-muted-foreground">{item.quantity}</td>
-                    <td className="py-3 pr-4 text-sm text-right text-muted-foreground">${item.unitPrice.toLocaleString()}</td>
-                    <td className="py-3 text-sm text-right font-medium">${item.total.toLocaleString()}</td>
-                  </tr>
-                ))}
+                {proposal.lineItems.map((item, i) => {
+                  // Negative lines are discounts (markdowns and proposal-level
+                  // discounts) — render "-$701" in the discount colour, not "$-701".
+                  const isDiscount = item.total < 0
+                  return (
+                    <tr key={i}>
+                      <td className={`py-3 pr-4 text-sm ${isDiscount ? 'text-red-400' : ''}`}>{item.description}</td>
+                      <td className="py-3 pr-4 text-sm text-right text-muted-foreground">{item.quantity}</td>
+                      <td className="py-3 pr-4 text-sm text-right text-muted-foreground">
+                        {isDiscount ? '-' : ''}${Math.abs(item.unitPrice).toLocaleString()}
+                      </td>
+                      <td className={`py-3 text-sm text-right font-medium ${isDiscount ? 'text-red-400' : ''}`}>
+                        {isDiscount ? '-' : ''}${Math.abs(item.total).toLocaleString()}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
