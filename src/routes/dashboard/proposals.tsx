@@ -54,6 +54,11 @@ import {
   type Installment,
   type InstallmentInput,
 } from '@/lib/installments'
+import { ProposalDescription } from '@/components/proposals/proposal-description'
+import {
+  describeLineItems,
+  useAutoDescription,
+} from '@/components/proposals/use-auto-description'
 
 export const Route = createFileRoute('/dashboard/proposals')({
   component: ProposalsPage,
@@ -168,8 +173,10 @@ function ProposalsPage() {
   // pick fires, including the same service or category twice.
   const [serviceId, setServiceId] = useState('')
   const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...emptyLineItem }])
+  // Description lists the added services until the user edits it.
+  const desc = useAutoDescription(lineItems)
+  const description = desc.description
   const [validUntil, setValidUntil] = useState('')
 
   // Discount state
@@ -199,7 +206,7 @@ function ProposalsPage() {
     setProjectId('')
     setServiceId('')
     setTitle('')
-    setDescription('')
+    desc.reset()
     setLineItems([{ ...emptyLineItem }])
     setValidUntil('')
     setDiscountType('percent')
@@ -222,7 +229,7 @@ function ProposalsPage() {
     setProjectId(proposal.projectId ?? '')
     setServiceId('')
     setTitle(proposal.title)
-    setDescription(proposal.description ?? '')
+    desc.load(proposal.description ?? '')
     setLineItems(
       proposal.lineItems.map((li) => ({
         description: li.description,
@@ -269,6 +276,7 @@ function ProposalsPage() {
     if (!service) return
 
     const newItems = catalogLineItems(service)
+    desc.append(newItems)
 
     setLineItems((prev) => {
       const hasContent = prev.some((li) => li.description.trim() !== '')
@@ -291,6 +299,7 @@ function ProposalsPage() {
     if (activeItems.length === 0) return
 
     const newItems: LineItem[] = activeItems.flatMap((item) => catalogLineItems(item))
+    desc.append(newItems)
 
     setLineItems((prev) => {
       const hasContent = prev.some((li) => li.description.trim() !== '')
@@ -788,13 +797,30 @@ function ProposalsPage() {
 
               {/* Description */}
               <div className="space-y-2">
-                <Label>Description</Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Label>Description</Label>
+                  {!desc.isAuto && describeLineItems(lineItems) && (
+                    <button
+                      type="button"
+                      onClick={() => desc.rebuild()}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      title="Replace the description with the current line items and keep it in sync"
+                    >
+                      Rebuild from line items
+                    </button>
+                  )}
+                </div>
                 <Textarea
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Optional proposal description"
-                  rows={2}
+                  onChange={(e) => desc.edit(e.target.value)}
+                  placeholder="Services you add are listed here — edit freely"
+                  rows={Math.min(8, Math.max(3, description.split('\n').length + 1))}
                 />
+                {desc.isAuto && describeLineItems(lineItems) && (
+                  <p className="text-xs text-muted-foreground">
+                    Filled in from your line items. Type to edit — your changes won't be overwritten.
+                  </p>
+                )}
               </div>
 
               {/* Line Items */}
@@ -1181,7 +1207,7 @@ function ProposalsPage() {
               {/* Proposal Title & Description */}
               <h3 className="text-xl font-bold mb-2">{pdfProposal.title}</h3>
               {pdfProposal.description && (
-                <p className="text-white/60 text-sm leading-relaxed mb-6">{pdfProposal.description}</p>
+                <ProposalDescription text={pdfProposal.description} className="text-sm mb-6" />
               )}
 
               {/* Line Items Table */}

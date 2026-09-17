@@ -23,6 +23,7 @@ import {
   describeTrigger,
   type Installment,
 } from '@/lib/installments'
+import { ProposalDescription } from '@/components/proposals/proposal-description'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
@@ -181,7 +182,7 @@ function PortalProposalDetailPage() {
         </CardHeader>
         <CardContent>
           {proposal.description && (
-            <p className="text-muted-foreground mb-8">{proposal.description}</p>
+            <ProposalDescription text={proposal.description} className="mb-8" />
           )}
 
           <div className="mb-8">

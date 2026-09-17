@@ -32,6 +32,39 @@ function formatCurrency(amount: number): string {
   return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function inlineHtml(s: string): string {
+  return escapeHtml(s).replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#f4dddb;">$1</strong>')
+}
+
+/**
+ * Email twin of <ProposalDescription>: blank-line paragraphs, "•"/"-" line
+ * lists, **bold**. Escaped — the description is free text, and it used to be
+ * dropped into the HTML raw, which also collapsed every line break.
+ */
+function descriptionHtml(text: string): string {
+  return text
+    .split(/\n{2,}/)
+    .map((block) => {
+      const lines = block.split('\n')
+      const isList = lines.every((l) => /^\s*[•\-]/.test(l))
+      if (isList && lines.length > 1) {
+        return `<ul style="margin:16px 0 0;padding-left:20px;">${lines
+          .map((l) => `<li style="margin:4px 0;">${inlineHtml(l.trim().replace(/^[•\-]\s*/, ''))}</li>`)
+          .join('')}</ul>`
+      }
+      return `<p style="margin:16px 0 0;">${lines.map(inlineHtml).join('<br>')}</p>`
+    })
+    .join('')
+}
+
 function buildLineItemRows(lineItems: LineItemInput[]): string {
   return lineItems.map((item, i) => {
     const isDiscount = item.total < 0
@@ -157,7 +190,7 @@ export const sendProposalEmail = createServerFn({ method: 'POST' })
                         </td>
                       </tr>
                     </table>
-                    ${data.description ? `<p style="color:#d0c5af;font-size:14px;line-height:1.6;margin:20px 0 0;padding-top:16px;border-top:1px solid rgba(208,197,175,0.1);">${data.description}</p>` : ''}
+                    ${data.description ? `<div style="color:#d0c5af;font-size:14px;line-height:1.6;margin:20px 0 0;padding-top:4px;border-top:1px solid rgba(208,197,175,0.1);">${descriptionHtml(data.description)}</div>` : ''}
                   </div>
 
                   <!-- Line Items -->

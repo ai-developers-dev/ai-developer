@@ -15,6 +15,7 @@ import {
   type Installment,
 } from '@/lib/installments'
 import { CheckCircle2, Clock, Lock, ShieldCheck, X } from 'lucide-react'
+import { ProposalDescription } from '@/components/proposals/proposal-description'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
@@ -30,44 +31,6 @@ function formatCurrency(amount: number): string {
   return amount.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })
-}
-
-function ProposalDescription({ text }: { text: string }) {
-  const blocks = text.split(/\n{2,}/)
-  return (
-    <div className="space-y-4 text-[15px] text-[rgba(255,255,255,0.6)] leading-relaxed">
-      {blocks.map((block, i) => {
-        const lines = block.split('\n')
-        const isList = lines.every(
-          (l) => l.trim().startsWith('•') || l.trim().startsWith('-'),
-        )
-        if (isList && lines.length > 1) {
-          return (
-            <ul key={i} className="list-disc pl-5 space-y-1.5">
-              {lines.map((l, j) => (
-                <li key={j}>{renderInline(l.replace(/^[•\-]\s*/, ''))}</li>
-              ))}
-            </ul>
-          )
-        }
-        return <p key={i}>{renderInline(block)}</p>
-      })}
-    </div>
-  )
-}
-
-function renderInline(s: string): React.ReactNode {
-  const parts = s.split(/(\*\*[^*]+\*\*)/g)
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return (
-        <strong key={i} className="font-semibold text-[#FFFFFF]">
-          {part.slice(2, -2)}
-        </strong>
-      )
-    }
-    return <span key={i}>{part}</span>
   })
 }
 
@@ -271,7 +234,7 @@ function PublicPayPage() {
           {/* Description */}
           {proposal.description && (
             <div className="px-8 py-6 border-b border-[rgba(255,255,255,0.1)]">
-              <ProposalDescription text={proposal.description} />
+              <ProposalDescription text={proposal.description} className="text-[15px]" />
             </div>
           )}
 

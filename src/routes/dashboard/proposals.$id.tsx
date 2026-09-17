@@ -19,6 +19,7 @@ import {
   describeTrigger,
   type Installment,
 } from '@/lib/installments'
+import { ProposalDescription } from '@/components/proposals/proposal-description'
 
 export const Route = createFileRoute('/dashboard/proposals/$id')({
   component: ProposalDetailPage,
@@ -137,7 +138,7 @@ function ProposalDetailPage() {
         </CardHeader>
         <CardContent>
           {proposal.description && (
-            <p className="text-sm text-muted-foreground mb-6">{proposal.description}</p>
+            <ProposalDescription text={proposal.description} className="text-sm mb-6" />
           )}
 
           <table className="w-full mb-6">
